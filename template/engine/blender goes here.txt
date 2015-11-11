@@ -1,0 +1,1 @@
+Whenever your game is ready to be distributed, you probably want to ditribute a copy of the blenderplayer you use. Just copy the files from your blender directory here. You can delete some unesscesary files (blender.exe, datafiles, etc...)

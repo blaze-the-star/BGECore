@@ -1,0 +1,536 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Interface &mdash; BGECore 0.5 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.5',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="BGECore 0.5 documentation" href="index.html" />
+    <link rel="next" title="Utils" href="utils.html" />
+    <link rel="prev" title="Behaviors" href="behavior.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="behavior.html" title="Behaviors"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BGECore 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="interface">
+<h1>Interface<a class="headerlink" href="#interface" title="Permalink to this headline">¶</a></h1>
+<p>This module is the one that generates events for widgets and buttons that you use in
+your <code class="file docutils literal"><span class="pre">data/script/GUI</span></code> file or packge.</p>
+<blockquote>
+<div><strong>Shortcuts:</strong>
+<a class="reference internal" href="#core.interface.window.Window" title="core.interface.window.Window"><code class="xref py py-class docutils literal"><span class="pre">core.interface.window.Window</span></code></a>,
+<a class="reference internal" href="#core.interface.button.Button" title="core.interface.button.Button"><code class="xref py py-class docutils literal"><span class="pre">core.interface.button.Button</span></code></a>,
+<a class="reference internal" href="#core.interface.button.TextButton" title="core.interface.button.TextButton"><code class="xref py py-class docutils literal"><span class="pre">core.interface.button.TextButton</span></code></a>,
+<a class="reference internal" href="#core.interface.button.Menu" title="core.interface.button.Menu"><code class="xref py py-class docutils literal"><span class="pre">core.interface.button.Menu</span></code></a>,
+<a class="reference internal" href="#core.interface.button.TextMenu" title="core.interface.button.TextMenu"><code class="xref py py-class docutils literal"><span class="pre">core.interface.button.TextMenu</span></code></a></div></blockquote>
+<span class="target" id="module-core.interface"></span><dl class="data">
+<dt id="core.interface.window">
+<code class="descclassname">core.interface.</code><code class="descname">window</code><em class="property"> = None</em><a class="headerlink" href="#core.interface.window" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>window.Window</em> unique instance, initialized in the first tic of the interface loop.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="core.interface.loop">
+<code class="descclassname">core.interface.</code><code class="descname">loop</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface.html#loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Interface loop. Initializes and updates the game interface.</p>
+</dd></dl>
+
+<div class="section" id="window">
+<h2>Window<a class="headerlink" href="#window" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.interface.window.Window">
+<em class="property">class </em><code class="descclassname">core.interface.window.</code><code class="descname">Window</code><a class="reference internal" href="_modules/core/interface/window.html#Window"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.window.Window" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles the game window and cursor.</p>
+<p>Internally it throws a raycast from the cursor position in the <em>scene_gui</em> and the <em>scene_game</em> (if aviable) to generate mouse events.
+The current implementation only works with orthographic cameras with orientation (0,0,0). The recomended height
+from the world origin is 10.</p>
+<dl class="method">
+<dt id="core.interface.window.Window.resize">
+<code class="descname">resize</code><span class="sig-paren">(</span><em>winx</em>, <em>winy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/window.html#Window.resize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.window.Window.resize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resize the window, the new size will maintain the same aspect ratio.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>winx</strong> (<em>integer</em>) &#8211; Window width in pixels.</li>
+<li><strong>winy</strong> (<em>integer</em>) &#8211; Window height in pixels.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.window.Window.hideCursor">
+<code class="descname">hideCursor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/window.html#Window.hideCursor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.window.Window.hideCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns the cursor visibility Off</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.window.Window.showCursor">
+<code class="descname">showCursor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/window.html#Window.showCursor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.window.Window.showCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Turns the cursor visibility On</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.window.Window.setCursor">
+<code class="descname">setCursor</code><span class="sig-paren">(</span><em>objName</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/window.html#Window.setCursor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.window.Window.setCursor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Changes the cursor to a game object, usually the sprite of a new cursor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>objName</strong> (<em>string</em>) &#8211; Name of the game object to use as a cursor. It must be a object of the GUI scene in an inactive layer.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="widget">
+<h2>Widget<a class="headerlink" href="#widget" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.interface.widget.Widget">
+<em class="property">class </em><code class="descclassname">core.interface.widget.</code><code class="descname">Widget</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/widget.html#Widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.widget.Widget" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="buttons">
+<h2>Buttons<a class="headerlink" href="#buttons" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.interface.button.Button">
+<em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">Button</code><span class="sig-paren">(</span><em>sprite</em>, <em>over=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button" title="Permalink to this definition">¶</a></dt>
+<dd><p>A button Widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sprite</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used as the base of the widget.</li>
+<li><strong>over</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="core.interface.button.Button.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the button</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.mouse_in">
+<code class="descname">mouse_in</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse just enters the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_in()</span></code> when overriding it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.mouse_out">
+<code class="descname">mouse_out</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse just exits the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_out()</span></code> when overriding it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.mouse_over">
+<code class="descname">mouse_over</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_over"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_over" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse is over the button space.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.mouse_click">
+<code class="descname">mouse_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when clicking the button</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.disable">
+<code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>It dishables the button events.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.Button.enable">
+<code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>It enables the button events. (Enabled by default)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="core.interface.button.TextButton">
+<em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">TextButton</code><span class="sig-paren">(</span><em>sprite</em>, <em>over</em>, <em>font</em>, <em>text</em>, <em>size=16</em>, <em>align=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#TextButton"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.TextButton" title="Permalink to this definition">¶</a></dt>
+<dd><p>A button Widget with a Label.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>sprite</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used as the base of the widget.</li>
+<li><strong>over</strong> (<em>string, KX_GameObject or None</em>) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
+<li><strong>font</strong> (<em>string</em>) &#8211; The font of the label.</li>
+<li><strong>text</strong> (<em>string</em>) &#8211; The text of the label.</li>
+<li><strong>size</strong> (<em>integer</em>) &#8211; The size of the label.</li>
+<li><strong>align</strong> (<a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a>) &#8211; The alignation of the text in the label.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="core.interface.button.TextButton.enable">
+<code class="descname">enable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#TextButton.enable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.TextButton.enable" title="Permalink to this definition">¶</a></dt>
+<dd><p>It enables the button events. (Enabled by default)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.disable">
+<code class="descname">disable</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#TextButton.disable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.TextButton.disable" title="Permalink to this definition">¶</a></dt>
+<dd><p>It dishables the button events.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#TextButton.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.TextButton.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes the button</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.mouse_click">
+<code class="descname">mouse_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_click" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when clicking the button</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.mouse_in">
+<code class="descname">mouse_in</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse just enters the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_in()</span></code> when overriding it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.mouse_out">
+<code class="descname">mouse_out</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse just exits the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_out()</span></code> when overriding it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.button.TextButton.mouse_over">
+<code class="descname">mouse_over</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_over" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called when the mouse is over the button space.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="menus">
+<h2>Menus<a class="headerlink" href="#menus" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="core.interface.button.Menu">
+<em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">Menu</code><span class="sig-paren">(</span><em>index</em>, <em>sprite</em>, <em>over=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Menu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Menu" title="Permalink to this definition">¶</a></dt>
+<dd><p>A Button with an index, so you con do <code class="docutils literal"><span class="pre">if</span> <span class="pre">self.index</span> <span class="pre">==</span> <span class="pre">...:</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>index</strong> (<em>integer</em>) &#8211; The index.</li>
+<li><strong>button</strong> (<em>dictionary</em>) &#8211; Acces to other instances of the menu by their index.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="core.interface.button.TextMenu">
+<em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">TextMenu</code><span class="sig-paren">(</span><em>index</em>, <em>sprite</em>, <em>over</em>, <em>font</em>, <em>text</em>, <em>size=16</em>, <em>align=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#TextMenu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.TextMenu" title="Permalink to this definition">¶</a></dt>
+<dd><p>A TextButton with an index, so you con do <code class="docutils literal"><span class="pre">if</span> <span class="pre">self.index</span> <span class="pre">==</span> <span class="pre">...:</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>index</strong> (<em>integer</em>) &#8211; The index.</li>
+<li><strong>button</strong> (<em>dictionary</em>) &#8211; Acces to other instances of the menu by their index.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-core.interface.label">
+<span id="labels"></span><h2>Labels<a class="headerlink" href="#module-core.interface.label" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="core.interface.label.reverse_text">
+<code class="descclassname">core.interface.label.</code><code class="descname">reverse_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#reverse_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.reverse_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the reversed version of <em>text</em></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>string</em>) &#8211; Original text.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Reversed text.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="core.interface.label.Label">
+<em class="property">class </em><code class="descclassname">core.interface.label.</code><code class="descname">Label</code><span class="sig-paren">(</span><em>font, text, size=16, align=0, position=[0, 0, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label" title="Permalink to this definition">¶</a></dt>
+<dd><p>The basic Text object of BGECore.</p>
+<p>Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace
+a text object its name must prefixed with the <em>Font</em> keyword, e.j. &#8220;Font.TextName.000&#8221;. Labels need a font object to work. Font objects are created as
+old BGE dynamic text (2.49) and have some advantages over new text objects. Font object must be placed on an inactive layer of the GUI scene and must be
+prefixed with the <em>Font</em> keyword.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>font</strong> (<em>string</em>) &#8211; The font of the label.</li>
+<li><strong>text</strong> (<em>string</em>) &#8211; The text of the label.</li>
+<li><strong>size</strong> (<em>integer</em>) &#8211; The size of the label.</li>
+<li><strong>align</strong> (<a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a>) &#8211; The alignation of the text in the label.</li>
+<li><strong>position</strong> (<em>mathutils.Vector or size-3 list</em>) &#8211; The label position.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="core.interface.label.Label.delete">
+<code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.delete" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.getText">
+<code class="descname">getText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getText" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.setText">
+<code class="descname">setText</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setText" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>string</em>) &#8211; New text.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.getFont">
+<code class="descname">getFont</code><span class="sig-paren">(</span><em>name=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getFont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getFont" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>bool</em>) &#8211; If true returns the font name, if false the font object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Font object (KX_GameObject) or name (string)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.setFont">
+<code class="descname">setFont</code><span class="sig-paren">(</span><em>font</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setFont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setFont" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>font</strong> (<em>string</em>) &#8211; The font name, the same as the KX_GameObject.name but without the <em>Font</em> prefix.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.getSize">
+<code class="descname">getSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.setSize">
+<code class="descname">setSize</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setSize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.getAlign">
+<code class="descname">getAlign</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getAlign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getAlign" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Alignation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.setAlign">
+<code class="descname">setAlign</code><span class="sig-paren">(</span><em>align</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setAlign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setAlign" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>align</strong> (<a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a>) &#8211; New alignation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="core.interface.label.Label.visible">
+<code class="descname">visible</code><span class="sig-paren">(</span><em>bool=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.visible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.visible" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bool</strong> (<em>bool</em>) &#8211; If used, sets the visibility.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The visibility of the Label.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="alignation-constants">
+<span id="align-constant"></span><h3>Alignation Constants<a class="headerlink" href="#alignation-constants" title="Permalink to this headline">¶</a></h3>
+<p><code class="docutils literal"><span class="pre">core.interface.label.ALIGN_LEFT</span></code>
+<code class="docutils literal"><span class="pre">core.interface.label.ALIGN_CENTER</span></code>
+<code class="docutils literal"><span class="pre">core.interface.label.ALIGN_RIGHT</span></code></p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Interface</a><ul>
+<li><a class="reference internal" href="#window">Window</a></li>
+<li><a class="reference internal" href="#widget">Widget</a></li>
+<li><a class="reference internal" href="#buttons">Buttons</a></li>
+<li><a class="reference internal" href="#menus">Menus</a></li>
+<li><a class="reference internal" href="#module-core.interface.label">Labels</a><ul>
+<li><a class="reference internal" href="#alignation-constants">Alignation Constants</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="behavior.html"
+                        title="previous chapter">Behaviors</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">Utils</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/interface.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="Utils"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="behavior.html" title="Behaviors"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">BGECore 0.5 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2015, Robert Planas Jimenez.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

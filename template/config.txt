@@ -1,0 +1,24 @@
+player: engine/blenderplayer.exe
+blend: data/game.blend
+
+#game settings
+volume: 0.0
+
+#video settings
+resolution: 1280 768
+fullscreen: true
+stereomode: nostereo
+anti-aliasing: 0
+
+#game engine options
+debug: false
+fixedtime: false
+nomipmap: false
+show_framerate: false
+show_properties: false
+show_profile: false
+blender_material: false
+ignore_deprecation_warnings: true
+
+#Custom command line
+#exec: ./blenderplayer mygame.blend
