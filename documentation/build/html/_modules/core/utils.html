@@ -52,7 +52,7 @@
 <span class="kn">from</span> <span class="nn">random</span> <span class="kn">import</span> <span class="n">randint</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">script</span> <span class="kn">import</span> <span class="n">constant</span>
-<span class="kn">from</span> <span class="nn">core</span> <span class="kn">import</span> <span class="n">module</span><span class="p">,</span> <span class="n">filter2d</span>
+<span class="kn">from</span> <span class="nn">core</span> <span class="kn">import</span> <span class="n">module</span>
 
 <div class="viewcode-block" id="loadGameProperty"><a class="viewcode-back" href="../../utils.html#core.utils.loadGameProperty">[docs]</a><span class="k">def</span> <span class="nf">loadGameProperty</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot; Loads a property from your :file:`config.txt` file.</span>
@@ -115,10 +115,12 @@
 
 <span class="c">#3D Math</span></div>
 <div class="viewcode-block" id="vectorFrom2Points"><a class="viewcode-back" href="../../utils.html#core.utils.vectorFrom2Points">[docs]</a><span class="k">def</span> <span class="nf">vectorFrom2Points</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">module</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
-	<span class="sd">&quot;&quot;&quot; Returns a mathutils.Vector  form 2 points in the space.</span>
+	<span class="sd">&quot;&quot;&quot; Returns a |Vector|  form 2 points in the space.</span>
 <span class="sd">	</span>
-<span class="sd">	:param mathutils.Vector origin: Point A</span>
-<span class="sd">	:param mathutils.Vector dest: Point B</span>
+<span class="sd">	:param origin: Point A</span>
+<span class="sd">	:type origin: |Vector|</span>
+<span class="sd">	:param dest: Point B</span>
+<span class="sd">	:type dest: |Vector|</span>
 <span class="sd">	:param float module: If setted, the returned vector will have this maxium lenght. The new lenght will never be greater than the original.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">vec</span> <span class="o">=</span> <span class="n">Vector</span><span class="p">((</span><span class="n">dest</span><span class="o">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">origin</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">dest</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">origin</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">dest</span><span class="o">.</span><span class="n">z</span> <span class="o">-</span> <span class="n">origin</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
@@ -136,8 +138,10 @@
 <div class="viewcode-block" id="moveObjectToObject"><a class="viewcode-back" href="../../utils.html#core.utils.moveObjectToObject">[docs]</a><span class="k">def</span> <span class="nf">moveObjectToObject</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">speed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot; Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. </span>
 <span class="sd">	</span>
-<span class="sd">	:param KX_GameObject origin: Object to move.</span>
-<span class="sd">	:param KX_GameObject dest: Destination object.</span>
+<span class="sd">	:param origin: Object to move.</span>
+<span class="sd">	:type origin: |KX_GameObject|</span>
+<span class="sd">	:param dest: Destination object.</span>
+<span class="sd">	:type dest: |KX_GameObject|</span>
 <span class="sd">	:param float speed: The amount of movment to do in one frame.</span>
 <span class="sd">	:return: True if the object has been moved, false otherwise.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -146,8 +150,10 @@
 <div class="viewcode-block" id="moveObjectToPosition"><a class="viewcode-back" href="../../utils.html#core.utils.moveObjectToPosition">[docs]</a><span class="k">def</span> <span class="nf">moveObjectToPosition</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">dest</span><span class="p">,</span> <span class="n">speed</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot; Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. </span>
 <span class="sd">	</span>
-<span class="sd">	:param KX_GameObject origin: Object to move.</span>
-<span class="sd">	:param mathutils.Vector dest: Destination object.</span>
+<span class="sd">	:param origin: Object to move.</span>
+<span class="sd">	:type origin: |KX_GameObject|</span>
+<span class="sd">	:param dest: Destination object.</span>
+<span class="sd">	:type dest: |Vector|</span>
 <span class="sd">	:param float speed: The amount of movment to do in one frame.</span>
 <span class="sd">	:return: True if the object has been moved, false otherwise.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -237,7 +243,8 @@
 <span class="sd">	.. note::</span>
 <span class="sd">		Use instead of ``KX_Scene.active_camera = KX_GameObject``.</span>
 <span class="sd">	</span>
-<span class="sd">	:param KX_Scene scene: Scene where to change the active camera.</span>
+<span class="sd">	:param scene: Scene where to change the active camera.</span>
+<span class="sd">	:type scene: |KX_Scene|</span>
 <span class="sd">	:param string camera_name: Name of the new active camera.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">camera</span> <span class="o">=</span> <span class="n">scene</span><span class="o">.</span><span class="n">objects</span><span class="p">[</span><span class="n">camera_name</span><span class="p">]</span>
@@ -262,7 +269,8 @@
 <span class="sd">	Some filters may need special game properties, see: *TODO*</span>
 <span class="sd">	</span>
 <span class="sd">	:param string name: Name of the filter.</span>
-<span class="sd">	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:param camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:type camera: |KX_GameObject|</span>
 <span class="sd">	:param integer slot: The slot (Logic Brick Actuator ID) where to apply the filter. Slots are 2DFiletre actuators connected with the Python </span>
 <span class="sd">		controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
@@ -273,11 +281,15 @@
 			<span class="n">module</span><span class="o">.</span><span class="n">filter_queue</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">camera</span><span class="p">,</span> <span class="n">slot</span><span class="p">))</span>
 			<span class="n">camera</span><span class="o">.</span><span class="n">sensors</span><span class="p">[</span><span class="s">&quot;Always&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">usePosPulseMode</span><span class="o">=</span><span class="mi">1</span> 
 			<span class="k">return</span>
-			
+		
+		<span class="n">path</span> <span class="o">=</span> <span class="n">logic</span><span class="o">.</span><span class="n">expandPath</span><span class="p">(</span><span class="s">&quot;//core/glsl/&quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot;.filter2D&quot;</span><span class="p">)</span>
+		<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">input</span><span class="p">:</span>
+			<span class="n">text</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+		
 		<span class="nb">filter</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">actuators</span><span class="p">[</span><span class="s">&quot;F&quot;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">slot</span><span class="p">)]</span>
 		<span class="nb">filter</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">logic</span><span class="o">.</span><span class="n">RAS_2DFILTER_CUSTOMFILTER</span>
 		<span class="nb">filter</span><span class="o">.</span><span class="n">passNumber</span> <span class="o">=</span> <span class="n">slot</span>
-		<span class="nb">filter</span><span class="o">.</span><span class="n">shaderText</span> <span class="o">=</span> <span class="n">filter2d</span><span class="o">.</span><span class="n">dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+		<span class="nb">filter</span><span class="o">.</span><span class="n">shaderText</span> <span class="o">=</span> <span class="n">text</span>
 		<span class="n">cont</span><span class="o">.</span><span class="n">activate</span><span class="p">(</span><span class="nb">filter</span><span class="p">)</span>
 		<span class="n">verbose</span><span class="p">(</span><span class="s">&quot;Setted 2D Filter &quot;</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s">&quot; to slot &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">slot</span><span class="p">))</span>
 	<span class="k">except</span><span class="p">:</span>
@@ -287,7 +299,8 @@
 <div class="viewcode-block" id="removeFilter2D"><a class="viewcode-back" href="../../utils.html#core.utils.removeFilter2D">[docs]</a><span class="k">def</span> <span class="nf">removeFilter2D</span><span class="p">(</span><span class="n">camera</span><span class="p">,</span> <span class="n">slot</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot; Removes a 2DFilter.</span>
 <span class="sd">	</span>
-<span class="sd">	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:param camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:type camera: |KX_GameObject|</span>
 <span class="sd">	:param integer slot: The slot.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="k">try</span><span class="p">:</span>
@@ -301,12 +314,13 @@
 <div class="viewcode-block" id="libLoad"><a class="viewcode-back" href="../../utils.html#core.utils.libLoad">[docs]</a><span class="k">def</span> <span class="nf">libLoad</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">camera</span><span class="p">):</span>
 	<span class="sd">&quot;&quot;&quot; Loads an blend dinamically.</span>
 <span class="sd">	</span>
-<span class="sd">	Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: ``main.libLoad``.</span>
+<span class="sd">	Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: ``main.libload``.</span>
 <span class="sd">	This logic bricks are recomended to be used in an object that clearly is the main object of the scene or a camera if any.</span>
 <span class="sd">	</span>
 <span class="sd">	:param string filepath: Relative path from the *data* folder where the blend file is placed.</span>
 <span class="sd">	:param mode: The same mode that will be used on ``bge.logic.LibLoad()``, it&#39;s recomended to use &quot;Scene&quot;.</span>
-<span class="sd">	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:param camera: The main camera of the scene (where logic bricks are used).</span>
+<span class="sd">	:type camera: |KX_GameObject|</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">path</span> <span class="o">=</span> <span class="n">logic</span><span class="o">.</span><span class="n">expandPath</span><span class="p">(</span><span class="s">&quot;//../data/&quot;</span> <span class="o">+</span> <span class="n">filepath</span><span class="p">)</span>
 	<span class="n">scene_to</span> <span class="o">=</span> <span class="n">camera</span><span class="o">.</span><span class="n">scene</span>

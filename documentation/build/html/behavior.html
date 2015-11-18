@@ -82,7 +82,7 @@
 <dl class="function">
 <dt id="core.behavior.addScene">
 <code class="descclassname">core.behavior.</code><code class="descname">addScene</code><span class="sig-paren">(</span><em>class_name</em>, <em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#addScene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.addScene" title="Permalink to this definition">¶</a></dt>
-<dd><p>Adds a scene behavior class to a scene dictionary. This way when the KX_Scene is loaded the scene behavior will be inistanciated.</p>
+<dd><p>Adds a scene behavior class to a scene dictionary. This way when the <a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_Scene.html" target="_blank"><code class="xref py py-class docutils literal">KX_Scene</code></a> is loaded the scene behavior will be inistanciated.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -99,23 +99,23 @@
 
 <dl class="class">
 <dt id="core.behavior.Scene">
-<em class="property">class </em><code class="descclassname">core.behavior.</code><code class="descname">Scene</code><a class="reference internal" href="_modules/core/behavior.html#Scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">core.behavior.</code><code class="descname">Scene</code><a class="reference internal" href="_modules/core/behavior/base.html#Scene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene" title="Permalink to this definition">¶</a></dt>
 <dd><p>Scene behavior. Each scene can have one, the GUI scene must. This behavior is automatically instancied when the scene is loaded.</p>
 <dl class="method">
 <dt id="core.behavior.Scene.init">
-<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.init" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override this with your behavior initialization.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Scene.update">
-<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override this with your behavior update (each frame).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Scene.onKeyDown">
-<code class="descname">onKeyDown</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.onKeyDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyDown" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyDown</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.onKeyDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyDown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is pressed, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -133,7 +133,7 @@
 
 <dl class="method">
 <dt id="core.behavior.Scene.onKeyPressed">
-<code class="descname">onKeyPressed</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.onKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyPressed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyPressed</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.onKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyPressed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is being pressed, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -151,7 +151,7 @@
 
 <dl class="method">
 <dt id="core.behavior.Scene.onKeyUp">
-<code class="descname">onKeyUp</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.onKeyUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyUp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyUp</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.onKeyUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onKeyUp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is released, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -169,13 +169,13 @@
 
 <dl class="method">
 <dt id="core.behavior.Scene.onExit">
-<code class="descname">onExit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.onExit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onExit" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onExit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.onExit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.onExit" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when exiting the behavior. Usually when the scene is being replaced or deleted.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Scene.addBehavior">
-<code class="descname">addBehavior</code><span class="sig-paren">(</span><em>Behavior</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Scene.addBehavior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.addBehavior" title="Permalink to this definition">¶</a></dt>
+<code class="descname">addBehavior</code><span class="sig-paren">(</span><em>Behavior</em>, <em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.addBehavior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.addBehavior" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds an object behavior to a given object.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -183,13 +183,18 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>Behavior</strong> (<a class="reference internal" href="#core.behavior.Object" title="core.behavior.Object"><em>behavior.Object</em></a>) &#8211; The behavior to use.</li>
-<li><strong>obj</strong> (<em>KX_GameObject or string</em>) &#8211; The obj that will have this behavior.</li>
+<li><strong>obj</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a> or string) &#8211; The obj that will have this behavior.</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="method">
+<dt id="core.behavior.Scene.removeBehavior">
+<code class="descname">removeBehavior</code><span class="sig-paren">(</span><em>behavior</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Scene.removeBehavior"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Scene.removeBehavior" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -198,37 +203,65 @@
 <h2>Object Behavior<a class="headerlink" href="#object-behavior" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="core.behavior.Object">
-<em class="property">class </em><code class="descclassname">core.behavior.</code><code class="descname">Object</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">core.behavior.</code><code class="descname">Object</code><span class="sig-paren">(</span><em>object</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object" title="Permalink to this definition">¶</a></dt>
 <dd><p>Use <code class="xref py py-meth docutils literal"><span class="pre">Scene.addBehavior()</span></code> to construct this behavior.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object</strong> (<em>KX_GameObject or String</em>) &#8211; Object to apply this behavior on.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>object</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a> or String) &#8211; Object to apply this behavior on.</td>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="Object.obj">
+<code class="descname">obj</code><a class="headerlink" href="#Object.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>The object that this behavior is being applied to.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="Object.scene">
+<code class="descname">scene</code><a class="headerlink" href="#Object.scene" title="Permalink to this definition">¶</a></dt>
+<dd><p>The scene that&#8217;s using this behavior. Typically <a class="reference internal" href="index.html#core.module.scene_game" title="core.module.scene_game"><code class="xref py py-obj docutils literal"><span class="pre">core.module.scene_game</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_Scene.html" target="_blank"><code class="xref py py-class docutils literal">KX_Scene</code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="core.behavior.Object.init">
-<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.init" title="Permalink to this definition">¶</a></dt>
+<code class="descname">init</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.init" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override this with your behavior initialization.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Object.update">
-<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.update" title="Permalink to this definition">¶</a></dt>
+<code class="descname">update</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Override this with your behavior update (each frame).</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Object.argument">
-<code class="descname">argument</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.argument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.argument" title="Permalink to this definition">¶</a></dt>
+<code class="descname">argument</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.argument"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.argument" title="Permalink to this definition">¶</a></dt>
 <dd><p>Prints a fancy text if <em>arg</em> is <code class="docutils literal"><span class="pre">None</span></code>.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="core.behavior.Object.onKeyDown">
-<code class="descname">onKeyDown</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.onKeyDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyDown" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyDown</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.onKeyDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyDown" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is pressed, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -246,7 +279,7 @@
 
 <dl class="method">
 <dt id="core.behavior.Object.onKeyPressed">
-<code class="descname">onKeyPressed</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.onKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyPressed" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyPressed</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.onKeyPressed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyPressed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is being pressed, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -264,7 +297,7 @@
 
 <dl class="method">
 <dt id="core.behavior.Object.onKeyUp">
-<code class="descname">onKeyUp</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior.html#Object.onKeyUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyUp" title="Permalink to this definition">¶</a></dt>
+<code class="descname">onKeyUp</code><span class="sig-paren">(</span><em>keys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/behavior/base.html#Object.onKeyUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.behavior.Object.onKeyUp" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when a key is released, includes mouse and joystick keys.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

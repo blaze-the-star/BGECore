@@ -1,11 +1,40 @@
 from bge import logic
-from mathutils import Vector
+from mathutils import Vector, Euler
 from core import module
 
 dict = module.widget_dict
 
 #TODO: Style Mistake, all methods should be mouseOver() not mouse_over()
 class Widget():
+	""" This is a widget 
+	
+	.. attribute:: obj
+		
+		The KX_GameObject used as the base of the widget.
+	
+	.. attribute:: transformable
+		
+		List of objects that will be also tranformed with the widget (Recursive).
+	
+	.. attribute:: position
+		
+		The position of the widget in world coordinates.
+		
+		:type: |Vector|
+	
+	.. attribute:: scale
+		
+		The scale of the widget.
+		
+		:type: |Vector|
+	
+	.. attribute:: rotation
+		
+		The rotation of the widget in world coordinates.
+		
+		:type: mathutils.Euler
+	
+	"""
 	_active = True
 
 	def __init__(self, obj):
@@ -19,68 +48,69 @@ class Widget():
 		self._location = self.obj.worldPosition
 		self._scale = self.obj.localScale
 		self._rotation = self.obj.worldOrientation.to_euler()
+		
 		self.transformable = [self.obj]
+		
+		global dict
 		dict[self.obj] = self
 		
 	def delete(self):
+		global dict
 		del dict[self.obj]
 		del self
 		
-	def mouse_in(self):
+	def mouseIn(self):
 		pass
 		
-	def mouse_out(self):
+	def mouseOut(self):
 		pass
 		
-	def mouse_over(self):
+	def mouseOver(self):
 		pass
 	
-	def mouse_click(self):
+	def mouseClick(self):
 		pass
 		
-	def getPosition(self):
+	@property
+	def position(self):
 		return self._location
 	
-	def setPosition(self, x, y, z):
+	@position.setter
+	def position(self, xyz):
 		for obj in self.transformable:
 			if obj.__class__.__name__ == "KX_GameObject":
-				if x: obj.worldPosition.x = x
-				if y: obj.worldPosition.y = y
-				if z: obj.worldPosition.z = z
+				obj.worldPosition = xyz
 			else:
-				obj.setPosition(x, y, z)
-			
+				obj.position = xyz
 		self._location = self.obj.worldPosition
 		
-	def getScale(self):
+	@property
+	def scale(self):
 		return self._scale
 	
-	def setScale(self, x, y, z):
+	@scale.setter
+	def scale(self, xyz):
 		for obj in self.transformable:
 			if obj.__class__.__name__ == "KX_GameObject":
-				if x: obj.localScale.x = x
-				if y: obj.localScale.y = y
-				if z: obj.localScale.z = z
+				obj.localScale = xyz
 			else:
-				obj.setScale(x, y, z)
-			
+				obj.scale = xyz
 		self._scale = self.obj.localScale
 		
-	def getRotation(self):
+	@property
+	def rotation(self):
 		return self._rotation
 		
-	def setRotation(self, x, y, z):
+	@rotation.setter
+	def rotation(self, xyz):
 		for obj in self.transformable:
 			if obj.__class__.__name__ == "KX_GameObject":
 				v = self._rotation
-				if x: v.x = x
-				if y: v.y = y
-				if z: v.z = z
+				v = xyz
 				if obj == self.obj: obj.localOrientation = v.to_matrix()
 				else: obj.localOrientation = v.to_matrix() * obj.worldOrientation
 			else:
-				obj.setRotation(x, y, z)
-				
+				obj.rotation = xyz
 		self._rotation = self.obj.worldOrientation.to_euler()
 	
 	

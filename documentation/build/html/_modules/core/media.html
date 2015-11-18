@@ -62,22 +62,22 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="showScreen"><a class="viewcode-back" href="../../media.html#core.media.showScreen">[docs]</a><span class="k">def</span> <span class="nf">showScreen</span><span class="p">():</span>
-	<span class="sd">&quot;&quot;&quot; Makes the default screen visible &quot;&quot;&quot;</span>
+	<span class="sd">&quot;&quot;&quot; Makes the default screen visible. &quot;&quot;&quot;</span>
 	<span class="k">global</span> <span class="n">screen</span>
+	<span class="n">ac</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">scene_gui</span><span class="o">.</span><span class="n">active_camera</span>
 	<span class="k">if</span> <span class="n">screen</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
-		<span class="n">screen</span> <span class="o">=</span> <span class="n">Screen</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">scene_gui</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s">&quot;GUIScreen&quot;</span><span class="p">,</span> <span class="n">module</span><span class="o">.</span><span class="n">scene_gui</span><span class="o">.</span><span class="n">active_camera</span><span class="p">))</span>
-		<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+		<span class="n">screen</span> <span class="o">=</span> <span class="n">Screen</span><span class="p">(</span><span class="n">module</span><span class="o">.</span><span class="n">scene_gui</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="s">&quot;GUIScreen&quot;</span><span class="p">,</span> <span class="n">ac</span><span class="p">))</span>
+		<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mi">0</span>
 		<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="bp">True</span>
-	<span class="k">else</span><span class="p">:</span> <span class="n">utils</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="s">&quot;BGECore: media.showSreen() has been called with the screen alrady active&quot;</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="bp">True</span>
+		<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span> <span class="o">=</span> <span class="p">[</span><span class="n">ac</span><span class="o">.</span><span class="n">worldPosition</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">ac</span><span class="o">.</span><span class="n">worldPosition</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
 		</div>
 <div class="viewcode-block" id="hideScreen"><a class="viewcode-back" href="../../media.html#core.media.hideScreen">[docs]</a><span class="k">def</span> <span class="nf">hideScreen</span><span class="p">():</span>
-	<span class="sd">&quot;&quot;&quot; Makes the default screen invisible &quot;&quot;&quot;</span>
-
+	<span class="sd">&quot;&quot;&quot; Makes the default screen invisible. &quot;&quot;&quot;</span>
 	<span class="k">global</span> <span class="n">screen</span>
-	<span class="n">obj</span> <span class="o">=</span> <span class="n">screen</span><span class="o">.</span><span class="n">obj</span>
-	<span class="n">screen</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
-	<span class="n">obj</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
-	
+	<span class="k">if</span> <span class="ow">not</span> <span class="n">screen</span><span class="p">:</span> <span class="k">return</span>
+	<span class="n">screen</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="bp">False</span>
 
 <span class="c">#===================================</span>
 <span class="c">#			SREEN CLASS</span>
@@ -86,9 +86,18 @@
 	<span class="sd">&quot;&quot;&quot; The base object used in this widget will become a screen.</span>
 <span class="sd">	</span>
 <span class="sd">	:param object: Object to apply the changes.</span>
-<span class="sd">	:type object: KX_GameObject or string</span>
+<span class="sd">	:type object: |KX_GameObject| or string</span>
+<span class="sd">	</span>
+<span class="sd">	Attributes:</span>
+<span class="sd">		obj		The |KX_GameObject| used as screen.</span>
 <span class="sd">	&quot;&quot;&quot;</span>
-
+	
+	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">true_start_file</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
+	
 <div class="viewcode-block" id="Screen.replaceTexture"><a class="viewcode-back" href="../../media.html#core.media.Screen.replaceTexture">[docs]</a>	<span class="k">def</span> <span class="nf">replaceTexture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Change the texture of the object by another, external, texture.</span>
 <span class="sd">		</span>
@@ -115,14 +124,22 @@
 		<span class="n">module</span><span class="o">.</span><span class="n">video_playback_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 		
 		<span class="c">#Audio</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">speaker</span> <span class="o">=</span> <span class="n">AudioFile</span><span class="p">(</span><span class="n">video</span><span class="p">)</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
-		
+		<span class="bp">self</span><span class="o">.</span><span class="n">true_start_file</span> <span class="o">=</span> <span class="n">video</span>
+				
 		<span class="c">#Callback</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="n">callback</span>
 		</div>
 	<span class="k">def</span> <span class="nf">updateVideo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">refresh</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span> 
+		<span class="k">if</span> 	<span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">+=</span> <span class="mi">1</span>
+			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">true_start_file</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">preseek</span><span class="p">:</span>
+				<span class="k">try</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">speaker</span> <span class="o">=</span> <span class="n">AudioFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">true_start_file</span><span class="p">)</span><span class="o">.</span><span class="n">play</span><span class="p">()</span>
+				<span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+				<span class="bp">self</span><span class="o">.</span><span class="n">true_start_file</span> <span class="o">=</span> <span class="bp">None</span>
+			
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video</span><span class="o">.</span><span class="n">source</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">frame</span> <span class="o">=</span> <span class="mi">0</span>
 			<span class="n">module</span><span class="o">.</span><span class="n">video_playback_list</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback</span><span class="p">()</span>
 		
@@ -144,6 +161,7 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">handle</span> <span class="o">=</span> <span class="bp">None</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">target_volume</span> <span class="o">=</span> <span class="mi">0</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">volume_min</span> <span class="o">=</span> <span class="mi">0</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">callback</span> <span class="o">=</span> <span class="bp">None</span>
 	
 <div class="viewcode-block" id="AudioFile.play"><a class="viewcode-back" href="../../media.html#core.media.AudioFile.play">[docs]</a>	<span class="k">def</span> <span class="nf">play</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">loop</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">volume</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pitch</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">fadein</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">fadeout</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">callback</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Method to play the an audio file.</span>

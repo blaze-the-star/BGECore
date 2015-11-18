@@ -76,10 +76,10 @@
 	<span class="n">wp</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span>
 	<span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="n">wp</span><span class="o">.</span><span class="n">x</span><span class="o">+</span><span class="nb">float</span><span class="p">(</span><span class="mf">0.006</span><span class="o">*</span><span class="n">sx</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">y</span><span class="o">+</span><span class="p">(</span><span class="mf">0.002</span><span class="o">*</span><span class="n">sx</span><span class="p">),</span> <span class="n">wp</span><span class="o">.</span><span class="n">z</span><span class="p">]</span>
 	<span class="n">label</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">font</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">],</span> <span class="n">sx</span><span class="o">/</span><span class="mf">2.5</span><span class="p">,</span> <span class="n">align</span><span class="p">,</span> <span class="n">position</span><span class="p">)</span>
-	<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">worldOrientation</span><span class="o">.</span><span class="n">to_euler</span><span class="p">()</span>
-	<span class="n">label</span><span class="o">.</span><span class="n">setRotation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
+	<span class="n">xyz</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">worldOrientation</span><span class="o">.</span><span class="n">to_euler</span><span class="p">()</span>
+	<span class="n">label</span><span class="o">.</span><span class="n">rotation</span> <span class="o">=</span> <span class="n">xyz</span>
 	
-	<span class="n">label</span><span class="o">.</span><span class="n">visible</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span><span class="p">)</span>
+	<span class="n">label</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="n">obj</span><span class="o">.</span><span class="n">visible</span>
 	
 	<span class="n">module</span><span class="o">.</span><span class="n">labels</span><span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">label</span>
 	<span class="n">obj</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
@@ -122,9 +122,9 @@
 <span class="sd">	The basic Text object of BGECore.</span>
 <span class="sd">	</span>
 <span class="sd">	Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace</span>
-<span class="sd">	a text object its name must prefixed with the *Font* keyword, e.j. &quot;Font.TextName.000&quot;. Labels need a font object to work. Font objects are created as</span>
+<span class="sd">	a text object the TextObject must have two game properties &quot;*(String)* Font&quot; and &quot;*(String[Right,Center,Left])* Align&quot;. Labels need a font object to work. Font objects are created as</span>
 <span class="sd">	old BGE dynamic text (2.49) and have some advantages over new text objects. Font object must be placed on an inactive layer of the GUI scene and must be</span>
-<span class="sd">	prefixed with the *Font* keyword.</span>
+<span class="sd">	prefixed with the *Font* keyword, *e.j: Font.Hobo, Font.Title*</span>
 <span class="sd">	</span>
 <span class="sd">	:param string font: The font of the label.</span>
 <span class="sd">	:param string text: The text of the label.</span>
@@ -132,7 +132,7 @@
 <span class="sd">	:param align: The alignation of the text in the label.</span>
 <span class="sd">	:type align: :ref:`align-constant`</span>
 <span class="sd">	:param position: The label position.</span>
-<span class="sd">	:type position: mathutils.Vector or size-3 list</span>
+<span class="sd">	:type position: |Vector| or size-3 list</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">_font_id</span> <span class="o">=</span> <span class="mi">0</span>
 	<span class="n">_loaded_fonts_right</span> <span class="o">=</span> <span class="p">{}</span>
@@ -141,9 +141,9 @@
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">font</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">align</span> <span class="o">=</span> <span class="n">ALIGN_LEFT</span><span class="p">,</span> <span class="n">position</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">scene</span> <span class="o">=</span> <span class="n">module</span><span class="o">.</span><span class="n">scene_gui</span>
 		<span class="n">font_name</span> <span class="o">=</span> <span class="s">&quot;Font.&quot;</span> <span class="o">+</span> <span class="n">font</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objectsInactive</span><span class="p">[</span><span class="n">font_name</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objectsInactive</span><span class="p">[</span><span class="n">font_name</span><span class="p">]</span>
 		
-		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span> <span class="o">=</span> <span class="n">position</span>
 			
 		<span class="k">if</span> <span class="n">font_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">Label</span><span class="o">.</span><span class="n">_loaded_fonts_right</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -168,12 +168,12 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">localScale</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldOrientation</span><span class="o">.</span><span class="n">to_euler</span><span class="p">()</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">transformable</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">]</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="bp">None</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="bp">None</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="n">text</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span> <span class="o">=</span> <span class="bp">None</span> <span class="c">#Second object to use on ALIGN_CENTER</span>
 		
-		<span class="bp">self</span><span class="o">.</span><span class="n">setSize</span><span class="p">(</span><span class="n">size</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">setAlign</span><span class="p">(</span><span class="n">align</span><span class="p">)</span> <span class="c">#It also does setText() the first time.</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="n">size</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="n">align</span> <span class="c">#It also does set text the first time.</span>
 		
 <div class="viewcode-block" id="Label.delete"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.delete">[docs]</a>	<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
@@ -185,18 +185,22 @@
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="bp">None</span>
 		<span class="k">del</span> <span class="bp">self</span>
 	</div>
-<div class="viewcode-block" id="Label.getText"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.getText">[docs]</a>	<span class="k">def</span> <span class="nf">getText</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span>
-		</div>
-<div class="viewcode-block" id="Label.setText"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.setText">[docs]</a>	<span class="k">def</span> <span class="nf">setText</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; :param string text: New text. &quot;&quot;&quot;</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="n">ALIGN_LEFT</span><span class="p">:</span>
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Text that the Label displays.</span>
+<span class="sd">		</span>
+<span class="sd">		:type: String</span>
+<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_text</span>
+		
+	<span class="nd">@text.setter</span>
+	<span class="k">def</span> <span class="nf">text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_text</span> <span class="o">=</span> <span class="n">text</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="n">ALIGN_LEFT</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">text</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="n">ALIGN_RIGHT</span><span class="p">:</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="n">ALIGN_RIGHT</span><span class="p">:</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">reverse_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="n">ALIGN_CENTER</span><span class="p">:</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="n">ALIGN_CENTER</span><span class="p">:</span>
 			<span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span><span class="s">&quot;&quot;</span>
 			<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
 				<span class="n">rtext</span> <span class="o">=</span> <span class="n">reverse_text</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
@@ -207,59 +211,60 @@
 			
 			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">second</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">first</span>
-</div>
-<div class="viewcode-block" id="Label.getFont"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.getFont">[docs]</a>	<span class="k">def</span> <span class="nf">getFont</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		:param bool name: If true returns the font name, if false the font object. </span>
-<span class="sd">		:return: Font object (KX_GameObject) or name (string)</span>
+	
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">font</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Font name, the same as the object name but without the &quot;Font.&quot; prefix.</span>
+<span class="sd">		</span>
+<span class="sd">		:type: String</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">False</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span>
-		<span class="k">else</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
-		</div>
-<div class="viewcode-block" id="Label.setFont"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.setFont">[docs]</a>	<span class="k">def</span> <span class="nf">setFont</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">font</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">		:param string font: The font name, the same as the KX_GameObject.name but without the *Font* prefix. </span>
-<span class="sd">		&quot;&quot;&quot;</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font</span><span class="o">.</span><span class="n">name</span><span class="p">[</span><span class="mi">5</span><span class="p">:]</span>
+		
+	<span class="nd">@font.setter</span>
+	<span class="k">def</span> <span class="nf">font</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">font</span><span class="p">):</span>
 		<span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="p">[</span><span class="s">&quot;Text&quot;</span><span class="p">]</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objectsInactive</span><span class="p">[</span><span class="s">&quot;Font.&quot;</span><span class="o">+</span><span class="n">font</span><span class="p">]</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">objectsInactive</span><span class="p">[</span><span class="s">&quot;Font.&quot;</span><span class="o">+</span><span class="n">font</span><span class="p">]</span>
 		
-		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_location</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">localScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldOrientation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rotation</span><span class="o">.</span><span class="n">to_matrix</span><span class="p">()</span>		
-		</div>
-<div class="viewcode-block" id="Label.getSize"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.getSize">[docs]</a>	<span class="k">def</span> <span class="nf">getSize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+		
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; :type: Integer&quot;&quot;&quot;</span>
 		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="mi">100</span>
-		</div>
-<div class="viewcode-block" id="Label.setSize"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.setSize">[docs]</a>	<span class="k">def</span> <span class="nf">setSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; &quot;&quot;&quot;</span>
+
+	<span class="nd">@size.setter</span>
+	<span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
 		<span class="n">x</span> <span class="o">=</span> <span class="n">size</span><span class="o">/</span><span class="mi">100</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">setScale</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
-		</div>
-<div class="viewcode-block" id="Label.getAlign"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.getAlign">[docs]</a>	<span class="k">def</span> <span class="nf">getAlign</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; :return: Alignation &quot;&quot;&quot;</span>
-		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span>
-		</div>
-<div class="viewcode-block" id="Label.setAlign"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.setAlign">[docs]</a>	<span class="k">def</span> <span class="nf">setAlign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">align</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; :param align: New alignation </span>
-<span class="sd">			:type align: :ref:`align-constant`</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">x</span><span class="p">]</span>
+		
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">		:return: Alignation</span>
+<span class="sd">		:type: :ref:`align-constant`</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="n">align</span><span class="p">:</span> <span class="k">return</span>
-		<span class="n">font_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="o">.</span><span class="n">name</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span>
+		
+	<span class="nd">@align.setter</span>
+	<span class="k">def</span> <span class="nf">align</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">align</span><span class="p">):</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="n">align</span><span class="p">:</span> <span class="k">return</span>
+		<span class="n">font_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_font</span><span class="o">.</span><span class="n">name</span>
 		<span class="n">font_name</span> <span class="o">=</span> <span class="n">font_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;Font.&quot;</span><span class="p">,</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
 		
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">align</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">setRotation</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="n">align</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">replaceMesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loaded_fonts_left</span><span class="p">[</span><span class="n">font_name</span><span class="p">])</span>
 			
 		<span class="k">if</span> <span class="n">align</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">setRotation</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mf">3.1415</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span> 
+			<span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="mf">3.1415</span> 
 			<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">replaceMesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_loaded_fonts_right</span><span class="p">[</span><span class="n">font_name</span><span class="p">])</span>
 		
 		<span class="k">if</span> <span class="n">align</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-			<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
+			<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addObject</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_font</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">active_camera</span><span class="p">)</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="o">.</span><span class="n">worldPosition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_location</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="o">.</span><span class="n">localScale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">transformable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="p">)</span>
@@ -273,16 +278,21 @@
 				<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
 				<span class="bp">self</span><span class="o">.</span><span class="n">ob2</span> <span class="o">=</span> <span class="bp">None</span>
 			
-		<span class="bp">self</span><span class="o">.</span><span class="n">align</span> <span class="o">=</span> <span class="n">align</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getText</span><span class="p">())</span>
-		</div>
-<div class="viewcode-block" id="Label.visible"><a class="viewcode-back" href="../../../interface.html#core.interface.label.Label.visible">[docs]</a>	<span class="k">def</span> <span class="nf">visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bool</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; :param bool bool: If used, sets the visibility.</span>
-<span class="sd">			:return: The visibility of the Label.</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">_align</span> <span class="o">=</span> <span class="n">align</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="c">#The end of the world is near!</span>
+		
+	<span class="nd">@property</span>
+	<span class="k">def</span> <span class="nf">visible</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; The visibility of the Label.</span>
+<span class="sd">		</span>
+<span class="sd">		:type: bool</span>
 <span class="sd">		&quot;&quot;&quot;</span>
-		<span class="k">if</span> <span class="nb">bool</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span>
+		<span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span>
+	
+	<span class="nd">@visible.setter</span>
+	<span class="k">def</span> <span class="nf">visible</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="nb">bool</span>
-		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="nb">bool</span></div></div>
+		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ob2</span><span class="o">.</span><span class="n">visible</span> <span class="o">=</span> <span class="nb">bool</span></div>
 </pre></div>
 
           </div>

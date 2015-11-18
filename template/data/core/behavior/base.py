@@ -5,7 +5,21 @@ class Object():
 		Use :meth:`Scene.addBehavior` to construct this behavior.
 	
 		:param object: Object to apply this behavior on.
-		:type object: KX_GameObject or String
+		:type object: |KX_GameObject| or String
+		
+		.. attribute:: obj
+			
+			The object that this behavior is being applied to.
+			
+			:type: |KX_GameObject|
+			
+		.. attribute:: scene
+		
+			The scene that's using this behavior. Typically :obj:`core.module.scene_game`
+			
+			:type: |KX_Scene|
+			
+		
 	"""
 
 	def __init__(self, object):
@@ -131,7 +145,7 @@ class Scene():
 			
 			:param behavior.Object Behavior: The behavior to use.
 			:param obj: The obj that will have this behavior.
-			:type obj: KX_GameObject or string
+			:type obj: |KX_GameObject| or string
 		"""
 		
 		if type(obj) is str:

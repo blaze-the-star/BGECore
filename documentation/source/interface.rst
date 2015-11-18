@@ -9,7 +9,7 @@ your :file:`data/script/GUI` file or packge.
 	:class:`core.interface.button.TextButton`,
 	:class:`core.interface.button.Menu`,
 	:class:`core.interface.button.TextMenu`
-
+	
 .. automodule:: core.interface
 	:members:
     
@@ -21,9 +21,12 @@ Window
 Widget
 --------
 .. autoclass:: core.interface.widget.Widget
+	:members:
 	
 Buttons
 --------
+.. inheritance-diagram:: Button TextButton
+	:parts: 1
 .. autoclass:: core.interface.button.Button
 	:members:
 	:inherited-members:
@@ -34,6 +37,8 @@ Buttons
 	
 Menus
 --------
+.. inheritance-diagram:: Menu TextMenu
+	:parts: 1
 .. autoclass:: core.interface.button.Menu
 	:members:
 	
@@ -42,6 +47,8 @@ Menus
 	
 Labels
 --------
+.. inheritance-diagram:: label
+	:parts: 1
 .. automodule:: core.interface.label
 	:members:
 	

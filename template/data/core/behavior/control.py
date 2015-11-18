@@ -157,8 +157,9 @@ class ThirdPerson(MouseLook):
 		self.player_control.moving = False
 		
 		#Check if touching the ground
-		self._at_ground = False
-		if self.player_control: self.player_control._at_ground = False
+		self.scene.objects["PlayerBase"].position = self.obj.position
+		#self._at_ground = False
+		#if self.player_control: self.player_control._at_ground = False
 		
 		#Collision hack
 		self.obj.setCollisionMargin(self.player_control.speedz*4)

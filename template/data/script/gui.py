@@ -15,10 +15,10 @@ class GUI(behavior.Scene):
 		if not constant.GAME_DEBUG:
 			utils.setCamera(self.scene, "GUICamera.001")
 			media.showScreen()
-			media.screen.play("data/video/intro.avi", callback=control.newGame)
+			media.screen.play("data/video/intro.avi", callback=lambda: utils.setScene("Main"))
 		
 		#Start the game directly
-		else: control.newGame()
+		else: utils.setScene("Main")
 		
 	def update(self):
 		pass

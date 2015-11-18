@@ -114,14 +114,14 @@
 <dl class="function">
 <dt id="core.utils.vectorFrom2Points">
 <code class="descclassname">core.utils.</code><code class="descname">vectorFrom2Points</code><span class="sig-paren">(</span><em>origin</em>, <em>dest</em>, <em>module=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#vectorFrom2Points"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.utils.vectorFrom2Points" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a mathutils.Vector  form 2 points in the space.</p>
+<dd><p>Returns a <a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a>  form 2 points in the space.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>origin</strong> (<em>mathutils.Vector</em>) &#8211; Point A</li>
-<li><strong>dest</strong> (<em>mathutils.Vector</em>) &#8211; Point B</li>
+<li><strong>origin</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a>) &#8211; Point A</li>
+<li><strong>dest</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a>) &#8211; Point B</li>
 <li><strong>module</strong> (<em>float</em>) &#8211; If setted, the returned vector will have this maxium lenght. The new lenght will never be greater than the original.</li>
 </ul>
 </td>
@@ -139,8 +139,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>origin</strong> (<em>KX_GameObject</em>) &#8211; Object to move.</li>
-<li><strong>dest</strong> (<em>KX_GameObject</em>) &#8211; Destination object.</li>
+<li><strong>origin</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; Object to move.</li>
+<li><strong>dest</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; Destination object.</li>
 <li><strong>speed</strong> (<em>float</em>) &#8211; The amount of movment to do in one frame.</li>
 </ul>
 </td>
@@ -161,8 +161,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>origin</strong> (<em>KX_GameObject</em>) &#8211; Object to move.</li>
-<li><strong>dest</strong> (<em>mathutils.Vector</em>) &#8211; Destination object.</li>
+<li><strong>origin</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; Object to move.</li>
+<li><strong>dest</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a>) &#8211; Destination object.</li>
 <li><strong>speed</strong> (<em>float</em>) &#8211; The amount of movment to do in one frame.</li>
 </ul>
 </td>
@@ -223,7 +223,7 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>scene</strong> (<em>KX_Scene</em>) &#8211; Scene where to change the active camera.</li>
+<li><strong>scene</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_Scene.html" target="_blank"><code class="xref py py-class docutils literal">KX_Scene</code></a>) &#8211; Scene where to change the active camera.</li>
 <li><strong>camera_name</strong> (<em>string</em>) &#8211; Name of the new active camera.</li>
 </ul>
 </td>
@@ -244,7 +244,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>name</strong> (<em>string</em>) &#8211; Name of the filter.</li>
-<li><strong>camera</strong> (<em>KX_GameObject</em>) &#8211; The main camera of the scene (where logic bricks are used).</li>
+<li><strong>camera</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The main camera of the scene (where logic bricks are used).</li>
 <li><strong>slot</strong> (<em>integer</em>) &#8211; The slot (Logic Brick Actuator ID) where to apply the filter. Slots are 2DFiletre actuators connected with the Python 
 controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.</li>
 </ul>
@@ -263,7 +263,7 @@ controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.<
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>camera</strong> (<em>KX_GameObject</em>) &#8211; The main camera of the scene (where logic bricks are used).</li>
+<li><strong>camera</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The main camera of the scene (where logic bricks are used).</li>
 <li><strong>slot</strong> (<em>integer</em>) &#8211; The slot.</li>
 </ul>
 </td>
@@ -276,7 +276,7 @@ controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.<
 <dt id="core.utils.libLoad">
 <code class="descclassname">core.utils.</code><code class="descname">libLoad</code><span class="sig-paren">(</span><em>filepath</em>, <em>mode</em>, <em>camera</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/utils.html#libLoad"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.utils.libLoad" title="Permalink to this definition">¶</a></dt>
 <dd><p>Loads an blend dinamically.</p>
-<p>Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: <code class="docutils literal"><span class="pre">main.libLoad</span></code>.
+<p>Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: <code class="docutils literal"><span class="pre">main.libload</span></code>.
 This logic bricks are recomended to be used in an object that clearly is the main object of the scene or a camera if any.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -285,7 +285,7 @@ This logic bricks are recomended to be used in an object that clearly is the mai
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>filepath</strong> (<em>string</em>) &#8211; Relative path from the <em>data</em> folder where the blend file is placed.</li>
 <li><strong>mode</strong> &#8211; The same mode that will be used on <code class="docutils literal"><span class="pre">bge.logic.LibLoad()</span></code>, it&#8217;s recomended to use &#8220;Scene&#8221;.</li>
-<li><strong>camera</strong> (<em>KX_GameObject</em>) &#8211; The main camera of the scene (where logic bricks are used).</li>
+<li><strong>camera</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The main camera of the scene (where logic bricks are used).</li>
 </ul>
 </td>
 </tr>

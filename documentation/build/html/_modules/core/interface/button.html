@@ -57,8 +57,8 @@
 <span class="sd">	</span>
 <span class="sd">	:param sprite: The sprite that will be used as the base of the widget.</span>
 <span class="sd">	:param over: The sprite that will be used on top of the base when the button is selected.</span>
-<span class="sd">	:type sprite: string or KX_GameObject</span>
-<span class="sd">	:type over: string or KX_GameObject</span>
+<span class="sd">	:type sprite: string or |KX_GameObject|</span>
+<span class="sd">	:type over: string or |KX_GameObject|</span>
 <span class="sd">	&quot;&quot;&quot;</span>
 	<span class="n">obj</span> <span class="o">=</span> <span class="bp">None</span>
 	
@@ -81,7 +81,7 @@
 			<span class="bp">self</span><span class="o">.</span><span class="n">objt</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
 			<span class="bp">self</span><span class="o">.</span><span class="n">objt</span> <span class="o">=</span> <span class="bp">None</span>
 		</div>
-<div class="viewcode-block" id="Button.mouse_in"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouse_in">[docs]</a>	<span class="k">def</span> <span class="nf">mouse_in</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Button.mouseIn"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouseIn">[docs]</a>	<span class="k">def</span> <span class="nf">mouseIn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Called when the mouse just enters the button space. You must use ``super().mouse_in()`` when overriding it. &quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">over</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
 			<span class="k">try</span><span class="p">:</span>
@@ -92,7 +92,7 @@
 				<span class="k">print</span><span class="p">(</span><span class="s">&quot;Button type: &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span> <span class="o">+</span> <span class="s">&quot; Over: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">over</span><span class="p">))</span>
 				<span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
 		</div>
-<div class="viewcode-block" id="Button.mouse_out"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouse_out">[docs]</a>	<span class="k">def</span> <span class="nf">mouse_out</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Button.mouseOut"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouseOut">[docs]</a>	<span class="k">def</span> <span class="nf">mouseOut</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Called when the mouse just exits the button space. You must use ``super().mouse_out()`` when overriding it. &quot;&quot;&quot;</span>
 		<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">over</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
 			<span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">objt</span><span class="p">:</span>
@@ -100,11 +100,14 @@
 				<span class="bp">self</span><span class="o">.</span><span class="n">objt</span><span class="o">.</span><span class="n">endObject</span><span class="p">()</span>
 				<span class="bp">self</span><span class="o">.</span><span class="n">objt</span> <span class="o">=</span> <span class="bp">None</span>
 	</div>
-<div class="viewcode-block" id="Button.mouse_over"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouse_over">[docs]</a>	<span class="k">def</span> <span class="nf">mouse_over</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="sd">&quot;&quot;&quot; Called when the mouse is over the button space. &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Button.mouseOver"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouseOver">[docs]</a>	<span class="k">def</span> <span class="nf">mouseOver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+		<span class="sd">&quot;&quot;&quot; Called when the mouse is over the button space.</span>
+<span class="sd">		</span>
+<span class="sd">		TODO</span>
+<span class="sd">		&quot;&quot;&quot;</span>
 		<span class="k">pass</span>
 	</div>
-<div class="viewcode-block" id="Button.mouse_click"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouse_click">[docs]</a>	<span class="k">def</span> <span class="nf">mouse_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Button.mouseClick"><a class="viewcode-back" href="../../../interface.html#core.interface.button.Button.mouseClick">[docs]</a>	<span class="k">def</span> <span class="nf">mouseClick</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 		<span class="sd">&quot;&quot;&quot; Called when clicking the button &quot;&quot;&quot;</span>
 		<span class="k">pass</span>
 		</div>
@@ -125,8 +128,8 @@
 <span class="sd">	</span>
 <span class="sd">	:param sprite: The sprite that will be used as the base of the widget.</span>
 <span class="sd">	:param over: The sprite that will be used on top of the base when the button is selected.</span>
-<span class="sd">	:type sprite: string or KX_GameObject</span>
-<span class="sd">	:type over: string, KX_GameObject or None</span>
+<span class="sd">	:type sprite: string or |KX_GameObject|</span>
+<span class="sd">	:type over: string, |KX_GameObject| or None</span>
 <span class="sd">	</span>
 <span class="sd">	:param string font: The font of the label.</span>
 <span class="sd">	:param string text: The text of the label.</span>
@@ -138,7 +141,7 @@
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sprite</span><span class="p">,</span> <span class="n">over</span><span class="p">,</span> <span class="n">font</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">align</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">sprite</span><span class="p">,</span> <span class="n">over</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">Label</span><span class="p">(</span><span class="n">font</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">align</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obj</span><span class="o">.</span><span class="n">worldPosition</span><span class="p">)</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">setPosition</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">position</span><span class="o">.</span><span class="n">z</span> <span class="o">=</span> <span class="mf">0.2</span>
 		<span class="n">font</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">font</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">transformable</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 		
@@ -182,13 +185,7 @@
 	<span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">sprite</span><span class="p">,</span> <span class="n">over</span><span class="p">,</span> <span class="n">font</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span> <span class="n">align</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 		<span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">sprite</span><span class="p">,</span> <span class="n">over</span><span class="p">,</span> <span class="n">font</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">align</span><span class="p">)</span>
 		<span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span>
-		</div>
-<span class="k">class</span> <span class="nc">TestButton</span><span class="p">(</span><span class="n">Button</span><span class="p">):</span>
-	<span class="k">def</span> <span class="nf">mouse_click</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-		<span class="kn">from</span> <span class="nn">core.utils</span> <span class="kn">import</span> <span class="n">rand10</span>
-		<span class="k">print</span><span class="p">(</span><span class="s">&quot;(TestButton) Click from object: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
-		<span class="bp">self</span><span class="o">.</span><span class="n">set_rotation</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+		<span class="bp">self</span><span class="o">.</span><span class="n">button</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span></div>
 </pre></div>
 
           </div>

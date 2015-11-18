@@ -26,10 +26,10 @@ def replaceBlenderText(obj):
 	wp = obj.worldPosition
 	position = [wp.x+float(0.006*sx), wp.y+(0.002*sx), wp.z]
 	label = Label(font, obj["Text"], sx/2.5, align, position)
-	x, y, z = obj.worldOrientation.to_euler()
-	label.setRotation(x, y, z)
+	xyz = obj.worldOrientation.to_euler()
+	label.rotation = xyz
 	
-	label.visible(obj.visible)
+	label.visible = obj.visible
 	
 	module.labels[obj.name] = label
 	obj.endObject()
@@ -72,9 +72,9 @@ class Label(Widget):
 	The basic Text object of BGECore.
 	
 	Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace
-	a text object its name must prefixed with the *Font* keyword, e.j. "Font.TextName.000". Labels need a font object to work. Font objects are created as
+	a text object the TextObject must have two game properties "*(String)* Font" and "*(String[Right,Center,Left])* Align". Labels need a font object to work. Font objects are created as
 	old BGE dynamic text (2.49) and have some advantages over new text objects. Font object must be placed on an inactive layer of the GUI scene and must be
-	prefixed with the *Font* keyword.
+	prefixed with the *Font* keyword, *e.j: Font.Hobo, Font.Title*
 	
 	:param string font: The font of the label.
 	:param string text: The text of the label.
@@ -82,7 +82,7 @@ class Label(Widget):
 	:param align: The alignation of the text in the label.
 	:type align: :ref:`align-constant`
 	:param position: The label position.
-	:type position: mathutils.Vector or size-3 list
+	:type position: |Vector| or size-3 list
 	"""
 	_font_id = 0
 	_loaded_fonts_right = {}
@@ -91,9 +91,9 @@ class Label(Widget):
 	def __init__(self, font, text, size = 16, align = ALIGN_LEFT, position = [0,0,0]):
 		self.scene = module.scene_gui
 		font_name = "Font." + font
-		self.font = self.scene.objectsInactive[font_name]
+		self._font = self.scene.objectsInactive[font_name]
 		
-		self.obj = self.scene.addObject(self.font, self.scene.active_camera)
+		self.obj = self.scene.addObject(self._font, self.scene.active_camera)
 		self.obj.worldPosition = position
 			
 		if font_name not in Label._loaded_fonts_right.keys():
@@ -118,12 +118,12 @@ class Label(Widget):
 		self._scale = self.obj.localScale
 		self._rotation = self.obj.worldOrientation.to_euler()
 		self.transformable = [self.obj]
-		self.align = None
-		self.text = text
+		self._align = None
+		self._text = text
 		self.ob2 = None #Second object to use on ALIGN_CENTER
 		
-		self.setSize(size)
-		self.setAlign(align) #It also does setText() the first time.
+		self.size = size
+		self.align = align #It also does set text the first time.
 		
 	def delete(self):
 		""" """
@@ -135,18 +135,22 @@ class Label(Widget):
 		self.obj = None
 		del self
 	
-	def getText(self):
-		""" """
-		return self.text
+	@property
+	def text(self):
+		""" Text that the Label displays.
 		
-	def setText(self, text):
-		""" :param string text: New text. """
-		self.text = text
-		if self.align == ALIGN_LEFT:
+		:type: String
+		"""
+		return self._text
+		
+	@text.setter
+	def text(self, text):
+		self._text = text
+		if self._align == ALIGN_LEFT:
 			self.obj["Text"] = text
-		if self.align == ALIGN_RIGHT:
+		if self._align == ALIGN_RIGHT:
 			self.obj["Text"] = reverse_text(text)
-		if self.align == ALIGN_CENTER:
+		if self._align == ALIGN_CENTER:
 			first, second = "",""
 			for line in text.splitlines():
 				rtext = reverse_text(line)
@@ -157,59 +161,60 @@ class Label(Widget):
 			
 			self.obj["Text"] = second
 			self.ob2["Text"] = first
-
-	def getFont(self, name=False):
-		"""
-		:param bool name: If true returns the font name, if false the font object. 
-		:return: Font object (KX_GameObject) or name (string)
-		"""
-		if name == False: return self.font
-		else: return self.font.name[5:]
+	
+	@property
+	def font(self, name=False):
+		""" Font name, the same as the object name but without the "Font." prefix.
 		
-	def setFont(self, font):
+		:type: String
 		"""
-		:param string font: The font name, the same as the KX_GameObject.name but without the *Font* prefix. 
-		"""
+		return self._font.name[5:]
+		
+	@font.setter
+	def font(self, font):
 		text = self.obj["Text"]
 		self.obj.endObject()
-		self.font = self.scene.objectsInactive["Font."+font]
+		self._font = self.scene.objectsInactive["Font."+font]
 		
-		self.obj = self.scene.addObject(self.font, self.scene.active_camera)
+		self.obj = self.scene.addObject(self._font, self.scene.active_camera)
 		self.obj.worldPosition = self._location
 		self.obj.localScale = self._scale
 		self.obj.worldOrientation = self._rotation.to_matrix()		
 		
-	def getSize(self):
-		""" """
+	@property
+	def size(self):
+		""" :type: Integer"""
 		return self._scale.x * 100
-		
-	def setSize(self, size):
-		""" """
+
+	@size.setter
+	def size(self, size):
 		x = size/100
-		self.setScale(x,x,x)
+		self.scale = [x,x,x]
 		
-	def getAlign(self):
-		""" :return: Alignation """
-		return self.align
-		
-	def setAlign(self, align):
-		""" :param align: New alignation 
-			:type align: :ref:`align-constant`
+	@property
+	def align(self):
 		"""
-		if self.align and self.align == align: return
-		font_name = self.font.name
+		:return: Alignation
+		:type: :ref:`align-constant`
+		"""
+		return self._align
+		
+	@align.setter
+	def align(self, align):
+		if self._align and self._align == align: return
+		font_name = self._font.name
 		font_name = font_name.replace("Font.", "")
 		
-		if self.align and (self.align == 2 or self.align == 1) and align == 0:
-			self.obj.setRotation(None, 0, None)
+		if self._align and (self._align == 2 or self._align == 1) and align == 0:
+			self.obj.rotation.y = 0
 			self.obj.replaceMesh(self._loaded_fonts_left[font_name])
 			
 		if align == 2:
-			self.setRotation(None, 3.1415, None) 
+			self.rotation.y = 3.1415 
 			self.obj.replaceMesh(self._loaded_fonts_right[font_name])
 		
 		if align == 1:
-			self.ob2 = self.scene.addObject(self.font, self.scene.active_camera)
+			self.ob2 = self.scene.addObject(self._font, self.scene.active_camera)
 			self.ob2.worldPosition = self._location
 			self.ob2.localScale = self._scale
 			self.transformable.append(self.ob2)
@@ -223,13 +228,18 @@ class Label(Widget):
 				self.ob2.endObject()
 				self.ob2 = None
 			
-		self.align = align
-		self.setText(self.getText())
+		self._align = align
+		self.text = self.text #The end of the world is near!
 		
-	def visible(self, bool = None):
-		""" :param bool bool: If used, sets the visibility.
-			:return: The visibility of the Label.
+	@property
+	def visible(self):
+		""" The visibility of the Label.
+		
+		:type: bool
 		"""
-		if bool == None: return self.obj.visible
+		return self.obj.visible
+	
+	@visible.setter
+	def visible(self, bool):
 		self.obj.visible = bool
 		if self.ob2: self.ob2.visible = bool

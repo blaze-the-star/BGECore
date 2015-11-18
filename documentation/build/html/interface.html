@@ -136,11 +136,74 @@ from the world origin is 10.</p>
 <dl class="class">
 <dt id="core.interface.widget.Widget">
 <em class="property">class </em><code class="descclassname">core.interface.widget.</code><code class="descname">Widget</code><span class="sig-paren">(</span><em>obj</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/widget.html#Widget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.widget.Widget" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>This is a widget</p>
+<dl class="attribute">
+<dt id="core.interface.Widget.obj">
+<code class="descname">obj</code><a class="headerlink" href="#core.interface.Widget.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>The KX_GameObject used as the base of the widget.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.interface.Widget.transformable">
+<code class="descname">transformable</code><a class="headerlink" href="#core.interface.Widget.transformable" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of objects that will be also tranformed with the widget (Recursive).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.interface.Widget.position">
+<code class="descname">position</code><a class="headerlink" href="#core.interface.Widget.position" title="Permalink to this definition">¶</a></dt>
+<dd><p>The position of the widget in world coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.interface.Widget.scale">
+<code class="descname">scale</code><a class="headerlink" href="#core.interface.Widget.scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>The scale of the widget.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="core.interface.Widget.rotation">
+<code class="descname">rotation</code><a class="headerlink" href="#core.interface.Widget.rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The rotation of the widget in world coordinates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">mathutils.Euler</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
 
 </div>
 <div class="section" id="buttons">
 <h2>Buttons<a class="headerlink" href="#buttons" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-04342729a582b55d1720aa3067eac49ff43152b1.png" alt="Inheritance diagram of Button, TextButton" usemap="#inheritance19380a4aee" class="inheritance"/>
+<map id="inheritance19380a4aee" name="inheritance19380a4aee">
+<area shape="rect" id="node1" href="#core.interface.button.Button" title="A button Widget." alt="" coords="125,5,197,31"/>
+<area shape="rect" id="node3" href="#core.interface.button.TextButton" title="A button Widget with a Label." alt="" coords="245,5,337,31"/>
+<area shape="rect" id="node2" href="#core.interface.widget.Widget" title="This is a widget " alt="" coords="5,5,77,31"/>
+</map>
+</p>
 <dl class="class">
 <dt id="core.interface.button.Button">
 <em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">Button</code><span class="sig-paren">(</span><em>sprite</em>, <em>over=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button" title="Permalink to this definition">¶</a></dt>
@@ -150,8 +213,8 @@ from the world origin is 10.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sprite</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used as the base of the widget.</li>
-<li><strong>over</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
+<li><strong>sprite</strong> (string or <a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The sprite that will be used as the base of the widget.</li>
+<li><strong>over</strong> (string or <a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
 </ul>
 </td>
 </tr>
@@ -164,26 +227,27 @@ from the world origin is 10.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.Button.mouse_in">
-<code class="descname">mouse_in</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_in"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_in" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.Button.mouseIn">
+<code class="descname">mouseIn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouseIn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouseIn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse just enters the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_in()</span></code> when overriding it.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.Button.mouse_out">
-<code class="descname">mouse_out</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_out" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.Button.mouseOut">
+<code class="descname">mouseOut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouseOut"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouseOut" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse just exits the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_out()</span></code> when overriding it.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.Button.mouse_over">
-<code class="descname">mouse_over</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_over"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_over" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.Button.mouseOver">
+<code class="descname">mouseOver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouseOver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouseOver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse is over the button space.</p>
+<p>TODO</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.Button.mouse_click">
-<code class="descname">mouse_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouse_click"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouse_click" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.Button.mouseClick">
+<code class="descname">mouseClick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Button.mouseClick"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Button.mouseClick" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when clicking the button</p>
 </dd></dl>
 
@@ -210,8 +274,8 @@ from the world origin is 10.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>sprite</strong> (<em>string or KX_GameObject</em>) &#8211; The sprite that will be used as the base of the widget.</li>
-<li><strong>over</strong> (<em>string, KX_GameObject or None</em>) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
+<li><strong>sprite</strong> (string or <a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a>) &#8211; The sprite that will be used as the base of the widget.</li>
+<li><strong>over</strong> (string, <a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_GameObject.html" target="_blank"><code class="xref py py-class docutils literal">KX_GameObject</code></a> or None) &#8211; The sprite that will be used on top of the base when the button is selected.</li>
 <li><strong>font</strong> (<em>string</em>) &#8211; The font of the label.</li>
 <li><strong>text</strong> (<em>string</em>) &#8211; The text of the label.</li>
 <li><strong>size</strong> (<em>integer</em>) &#8211; The size of the label.</li>
@@ -240,27 +304,28 @@ from the world origin is 10.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.TextButton.mouse_click">
-<code class="descname">mouse_click</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_click" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.TextButton.mouseClick">
+<code class="descname">mouseClick</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouseClick" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when clicking the button</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.TextButton.mouse_in">
-<code class="descname">mouse_in</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_in" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.TextButton.mouseIn">
+<code class="descname">mouseIn</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouseIn" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse just enters the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_in()</span></code> when overriding it.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.TextButton.mouse_out">
-<code class="descname">mouse_out</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_out" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.TextButton.mouseOut">
+<code class="descname">mouseOut</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouseOut" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse just exits the button space. You must use <code class="docutils literal"><span class="pre">super().mouse_out()</span></code> when overriding it.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="core.interface.button.TextButton.mouse_over">
-<code class="descname">mouse_over</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouse_over" title="Permalink to this definition">¶</a></dt>
+<dt id="core.interface.button.TextButton.mouseOver">
+<code class="descname">mouseOver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#core.interface.button.TextButton.mouseOver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Called when the mouse is over the button space.</p>
+<p>TODO</p>
 </dd></dl>
 
 </dd></dl>
@@ -268,6 +333,16 @@ from the world origin is 10.</p>
 </div>
 <div class="section" id="menus">
 <h2>Menus<a class="headerlink" href="#menus" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-af57c4600e7ed6e13024fe54765d8c171983fafb.png" alt="Inheritance diagram of Menu, TextMenu" usemap="#inheritance201b943218" class="inheritance"/>
+<map id="inheritance201b943218" name="inheritance201b943218">
+<area shape="rect" id="node1" href="#core.interface.button.Button" title="A button Widget." alt="" coords="125,31,197,56"/>
+<area shape="rect" id="node3" href="#core.interface.button.Menu" title="A Button with an index, so you con do ``if self.index == ...:``" alt="" coords="255,5,327,31"/>
+<area shape="rect" id="node4" href="#core.interface.button.TextButton" title="A button Widget with a Label." alt="" coords="245,55,337,80"/>
+<area shape="rect" id="node2" href="#core.interface.widget.Widget" title="This is a widget " alt="" coords="5,31,77,56"/>
+<area shape="rect" id="node5" href="#core.interface.button.TextMenu" title="A TextButton with an index, so you con do ``if self.index == ...:``" alt="" coords="385,55,469,80"/>
+</map>
+</p>
 <dl class="class">
 <dt id="core.interface.button.Menu">
 <em class="property">class </em><code class="descclassname">core.interface.button.</code><code class="descname">Menu</code><span class="sig-paren">(</span><em>index</em>, <em>sprite</em>, <em>over=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/button.html#Menu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.button.Menu" title="Permalink to this definition">¶</a></dt>
@@ -305,9 +380,16 @@ from the world origin is 10.</p>
 </dd></dl>
 
 </div>
-<div class="section" id="module-core.interface.label">
-<span id="labels"></span><h2>Labels<a class="headerlink" href="#module-core.interface.label" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<div class="section" id="labels">
+<h2>Labels<a class="headerlink" href="#labels" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="_images/inheritance-8e0e4f9d1015553d3712be85a0015783f766369d.png" alt="Inheritance diagram of label" usemap="#inheritance16688dcbbf" class="inheritance"/>
+<map id="inheritance16688dcbbf" name="inheritance16688dcbbf">
+<area shape="rect" id="node1" href="#core.interface.label.Label" title="The basic Text object of BGECore." alt="" coords="125,5,197,31"/>
+<area shape="rect" id="node2" href="#core.interface.widget.Widget" title="This is a widget " alt="" coords="5,5,77,31"/>
+</map>
+</p>
+<span class="target" id="module-core.interface.label"></span><dl class="function">
 <dt id="core.interface.label.reverse_text">
 <code class="descclassname">core.interface.label.</code><code class="descname">reverse_text</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#reverse_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.reverse_text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the reversed version of <em>text</em></p>
@@ -328,9 +410,9 @@ from the world origin is 10.</p>
 <em class="property">class </em><code class="descclassname">core.interface.label.</code><code class="descname">Label</code><span class="sig-paren">(</span><em>font, text, size=16, align=0, position=[0, 0, 0]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label" title="Permalink to this definition">¶</a></dt>
 <dd><p>The basic Text object of BGECore.</p>
 <p>Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace
-a text object its name must prefixed with the <em>Font</em> keyword, e.j. &#8220;Font.TextName.000&#8221;. Labels need a font object to work. Font objects are created as
+a text object the TextObject must have two game properties &#8220;<em>(String)</em> Font&#8221; and &#8220;<em>(String[Right,Center,Left])</em> Align&#8221;. Labels need a font object to work. Font objects are created as
 old BGE dynamic text (2.49) and have some advantages over new text objects. Font object must be placed on an inactive layer of the GUI scene and must be
-prefixed with the <em>Font</em> keyword.</p>
+prefixed with the <em>Font</em> keyword, <em>e.j: Font.Hobo, Font.Title</em></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -340,7 +422,7 @@ prefixed with the <em>Font</em> keyword.</p>
 <li><strong>text</strong> (<em>string</em>) &#8211; The text of the label.</li>
 <li><strong>size</strong> (<em>integer</em>) &#8211; The size of the label.</li>
 <li><strong>align</strong> (<a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a>) &#8211; The alignation of the text in the label.</li>
-<li><strong>position</strong> (<em>mathutils.Vector or size-3 list</em>) &#8211; The label position.</li>
+<li><strong>position</strong> (<a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a> or size-3 list) &#8211; The label position.</li>
 </ul>
 </td>
 </tr>
@@ -351,98 +433,71 @@ prefixed with the <em>Font</em> keyword.</p>
 <code class="descname">delete</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.delete" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="method">
-<dt id="core.interface.label.Label.getText">
-<code class="descname">getText</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getText" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="core.interface.label.Label.setText">
-<code class="descname">setText</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setText"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setText" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dl class="attribute">
+<dt id="core.interface.label.Label.text">
+<code class="descname">text</code><a class="headerlink" href="#core.interface.label.Label.text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Text that the Label displays.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>text</strong> (<em>string</em>) &#8211; New text.</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">String</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="core.interface.label.Label.getFont">
-<code class="descname">getFont</code><span class="sig-paren">(</span><em>name=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getFont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getFont" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dl class="attribute">
+<dt id="core.interface.label.Label.font">
+<code class="descname">font</code><a class="headerlink" href="#core.interface.label.Label.font" title="Permalink to this definition">¶</a></dt>
+<dd><p>Font name, the same as the object name but without the &#8220;Font.&#8221; prefix.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>bool</em>) &#8211; If true returns the font name, if false the font object.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Font object (KX_GameObject) or name (string)</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">String</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="core.interface.label.Label.setFont">
-<code class="descname">setFont</code><span class="sig-paren">(</span><em>font</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setFont"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setFont" title="Permalink to this definition">¶</a></dt>
+<dl class="attribute">
+<dt id="core.interface.label.Label.size">
+<code class="descname">size</code><a class="headerlink" href="#core.interface.label.Label.size" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>font</strong> (<em>string</em>) &#8211; The font name, the same as the KX_GameObject.name but without the <em>Font</em> prefix.</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">Integer</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="method">
-<dt id="core.interface.label.Label.getSize">
-<code class="descname">getSize</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getSize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="core.interface.label.Label.setSize">
-<code class="descname">setSize</code><span class="sig-paren">(</span><em>size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setSize" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="core.interface.label.Label.getAlign">
-<code class="descname">getAlign</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.getAlign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.getAlign" title="Permalink to this definition">¶</a></dt>
+<dl class="attribute">
+<dt id="core.interface.label.Label.align">
+<code class="descname">align</code><a class="headerlink" href="#core.interface.label.Label.align" title="Permalink to this definition">¶</a></dt>
 <dd><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Alignation</td>
 </tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="core.interface.label.Label.setAlign">
-<code class="descname">setAlign</code><span class="sig-paren">(</span><em>align</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.setAlign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.setAlign" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>align</strong> (<a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a>) &#8211; New alignation</td>
+<tr class="field-even field"><th class="field-name">Type:</th><td class="field-body"><a class="reference internal" href="#align-constant"><span>Alignation Constants</span></a></td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="attribute">
 <dt id="core.interface.label.Label.visible">
-<code class="descname">visible</code><span class="sig-paren">(</span><em>bool=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/core/interface/label.html#Label.visible"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#core.interface.label.Label.visible" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<code class="descname">visible</code><a class="headerlink" href="#core.interface.label.Label.visible" title="Permalink to this definition">¶</a></dt>
+<dd><p>The visibility of the Label.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>bool</strong> (<em>bool</em>) &#8211; If used, sets the visibility.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The visibility of the Label.</td>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">bool</td>
 </tr>
 </tbody>
 </table>
@@ -472,7 +527,7 @@ prefixed with the <em>Font</em> keyword.</p>
 <li><a class="reference internal" href="#widget">Widget</a></li>
 <li><a class="reference internal" href="#buttons">Buttons</a></li>
 <li><a class="reference internal" href="#menus">Menus</a></li>
-<li><a class="reference internal" href="#module-core.interface.label">Labels</a><ul>
+<li><a class="reference internal" href="#labels">Labels</a><ul>
 <li><a class="reference internal" href="#alignation-constants">Alignation Constants</a></li>
 </ul>
 </li>

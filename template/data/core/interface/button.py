@@ -7,8 +7,8 @@ class Button(Widget):
 	
 	:param sprite: The sprite that will be used as the base of the widget.
 	:param over: The sprite that will be used on top of the base when the button is selected.
-	:type sprite: string or KX_GameObject
-	:type over: string or KX_GameObject
+	:type sprite: string or |KX_GameObject|
+	:type over: string or |KX_GameObject|
 	"""
 	obj = None
 	
@@ -31,7 +31,7 @@ class Button(Widget):
 			self.objt.endObject()
 			self.objt = None
 		
-	def mouse_in(self):
+	def mouseIn(self):
 		""" Called when the mouse just enters the button space. You must use ``super().mouse_in()`` when overriding it. """
 		if self.over and self._active == True:
 			try:
@@ -42,7 +42,7 @@ class Button(Widget):
 				print("Button type: " + self.__class__.__name__ + " Over: " + str(self.over))
 				traceback.print_exc()
 		
-	def mouse_out(self):
+	def mouseOut(self):
 		""" Called when the mouse just exits the button space. You must use ``super().mouse_out()`` when overriding it. """
 		if self.over and self._active == True:
 			if self.objt:
@@ -50,11 +50,14 @@ class Button(Widget):
 				self.objt.endObject()
 				self.objt = None
 	
-	def mouse_over(self):
-		""" Called when the mouse is over the button space. """
+	def mouseOver(self):
+		""" Called when the mouse is over the button space.
+		
+		TODO
+		"""
 		pass
 	
-	def mouse_click(self):
+	def mouseClick(self):
 		""" Called when clicking the button """
 		pass
 		
@@ -75,8 +78,8 @@ class TextButton(Button):
 	
 	:param sprite: The sprite that will be used as the base of the widget.
 	:param over: The sprite that will be used on top of the base when the button is selected.
-	:type sprite: string or KX_GameObject
-	:type over: string, KX_GameObject or None
+	:type sprite: string or |KX_GameObject|
+	:type over: string, |KX_GameObject| or None
 	
 	:param string font: The font of the label.
 	:param string text: The text of the label.
@@ -88,7 +91,7 @@ class TextButton(Button):
 	def __init__(self, sprite, over, font, text, size = 16, align = 0):
 		super().__init__(sprite, over)
 		self.text = Label(font, text, size, align, self.obj.worldPosition)
-		self.text.setPosition(None, None, 0.2)
+		self.text.position.z = 0.2
 		font = self.text.font
 		self.transformable.append(self.text)
 		
@@ -133,9 +136,3 @@ class TextMenu(TextButton):
 		super().__init__(sprite, over, font, text, size, align)
 		self.index = index
 		self.button[index] = self
-		
-class TestButton(Button):
-	def mouse_click(self):
-		from core.utils import rand10
-		print("(TestButton) Click from object: " + str(self))
-		self.set_rotation(0, 0, 2)

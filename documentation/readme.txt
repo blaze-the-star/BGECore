@@ -1,0 +1,8 @@
+To generate/update the documentation you need the following dependences:
+
+Python3 (Not BGE-Python, but the original): https://www.python.org/downloads/
+Sphinx: "pip install sphinx" or http://sphinx-doc.org/install.html
+Graphviz: http://www.graphviz.org/Download_windows.php (Do not use pip)
+
+Make sure that Python(Python3) and Dot (Graphviz) are on the system path or can be executed form anywhere in the system command line.
+

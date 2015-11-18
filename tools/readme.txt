@@ -6,6 +6,4 @@ You can find useful resources about Blender font generation and manipulation her
 (Another Alternative): http://www.ashsid.sk/wp/?p=21&lang=en-us
 (Colored Font With Gimp): http://www.blendenzo.com/tutColoredText.html
 
-Current SimpleLauncher compilation it's not compatible with BGECore design, fully functional launchers will be provided in the near future.
-
 

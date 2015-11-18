@@ -13,23 +13,22 @@ screen = None
 """
 
 def showScreen():
-	""" Makes the default screen visible """
+	""" Makes the default screen visible. """
 	global screen
+	ac = module.scene_gui.active_camera
 	if screen == None:
-		screen = Screen(module.scene_gui.addObject("GUIScreen", module.scene_gui.active_camera))
+		screen = Screen(module.scene_gui.addObject("GUIScreen", ac))
 		screen.obj.worldPosition.z = 0
 		screen.obj.visible = True
-	else: utils.verbose("BGECore: media.showSreen() has been called with the screen alrady active")
+	else:
+		screen.obj.visible = True
+		screen.obj.worldPosition = [ac.worldPosition.x, ac.worldPosition.y, 0]
 		
 def hideScreen():
-	""" Makes the default screen invisible """
-
+	""" Makes the default screen invisible. """
 	global screen
 	if not screen: return
-	obj = screen.obj
-	screen.delete()
-	obj.endObject()
-	
+	screen.obj.visible = False
 
 #===================================
 #			SREEN CLASS
@@ -38,7 +37,10 @@ class Screen(interface.widget.Widget):
 	""" The base object used in this widget will become a screen.
 	
 	:param object: Object to apply the changes.
-	:type object: KX_GameObject or string
+	:type object: |KX_GameObject| or string
+	
+	Attributes:
+		obj		The |KX_GameObject| used as screen.
 	"""
 	
 	def __init__(self, obj):

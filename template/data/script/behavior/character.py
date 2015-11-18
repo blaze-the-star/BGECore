@@ -44,18 +44,19 @@ class CharacterBehavior(behavior.Object):
 		if b_cam.camera_real_distance <= 4: self.mc.color.w = b_cam.camera_real_distance/4
 		else: self.mc.color.w = 1
 		
-		#Stop jump animation at ground
-		#if b_cam.player_control and b_cam.player_control.at_ground and self.any_action == False:
-		#	self.arm.playAction("Stand", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
-		#	self.any_action = True
-
+		print(b_cam.at_ground)
+		print(self.last_at_ground)
 		
+		#Stop jump animation at ground
 		if b_cam.at_ground != self.last_at_ground:
-			if not b_cam.at_ground:
+			print("Here")
+			if self.last_at_ground:
 				self.playAction("Jump", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
 			else:
 				self.playAction("Stand", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
 			
+		print(b_cam.at_ground)
+		print(self.last_at_ground)
 		self.last_at_ground = b_cam.at_ground
 		
 	def onKeyDown(self, keys):
@@ -68,11 +69,11 @@ class CharacterBehavior(behavior.Object):
 			self.playAction("Walk", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
 			
 		#if key.SPACE in keys:
-		#	self.arm.playAction("Jump", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
-		#	self.any_action = False
+			#self.arm.playAction("Jump", 0, 32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP)
 		
 	def playAction(self, name, start=0, finish=32, layer=0, blendin=5, play_mode=logic.KX_ACTION_MODE_LOOP):
 		#utils.verbose("Object (" + self.arm.name + "): Playing '" + name + "' now.")
+		self.arm.stopAction(layer)
 		self.arm.playAction(name, start, finish, layer, blendin, play_mode)
 			
 	def onKeyUp(self, keys):

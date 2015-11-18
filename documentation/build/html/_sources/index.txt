@@ -41,9 +41,6 @@ The ``core.module`` module provides acces to some very important references. Thi
 .. data:: core.module.window
 
 	Reference to :data:`core.interface.window`. 
-
-
-
    
 Indices and tables
 ==================

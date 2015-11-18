@@ -14,7 +14,7 @@ OutPlayerControl = control.OutPlayerControl
 ThirdPerson = control.ThirdPerson
 
 def addScene(class_name, name):
-	""" Adds a scene behavior class to a scene dictionary. This way when the KX_Scene is loaded the scene behavior will be inistanciated.
+	""" Adds a scene behavior class to a scene dictionary. This way when the |KX_Scene| is loaded the scene behavior will be inistanciated.
 	
 	:param behavior.Scene class_name: The scene behavior to use.
 	:param string name: The name of the scene that will have this scene behavior.

@@ -66,10 +66,12 @@ def rand10():
 
 #3D Math
 def vectorFrom2Points(origin, dest, module = None):
-	""" Returns a mathutils.Vector  form 2 points in the space.
+	""" Returns a |Vector|  form 2 points in the space.
 	
-	:param mathutils.Vector origin: Point A
-	:param mathutils.Vector dest: Point B
+	:param origin: Point A
+	:type origin: |Vector|
+	:param dest: Point B
+	:type dest: |Vector|
 	:param float module: If setted, the returned vector will have this maxium lenght. The new lenght will never be greater than the original.
 	"""
 	vec = Vector((dest.x - origin.x, dest.y - origin.y, dest.z - origin.z))
@@ -87,8 +89,10 @@ def vectorFrom2Points(origin, dest, module = None):
 def moveObjectToObject(origin, dest, speed = 1):
 	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. 
 	
-	:param KX_GameObject origin: Object to move.
-	:param KX_GameObject dest: Destination object.
+	:param origin: Object to move.
+	:type origin: |KX_GameObject|
+	:param dest: Destination object.
+	:type dest: |KX_GameObject|
 	:param float speed: The amount of movment to do in one frame.
 	:return: True if the object has been moved, false otherwise.
 	"""
@@ -97,8 +101,10 @@ def moveObjectToObject(origin, dest, speed = 1):
 def moveObjectToPosition(origin, dest, speed = 1):
 	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. 
 	
-	:param KX_GameObject origin: Object to move.
-	:param mathutils.Vector dest: Destination object.
+	:param origin: Object to move.
+	:type origin: |KX_GameObject|
+	:param dest: Destination object.
+	:type dest: |Vector|
 	:param float speed: The amount of movment to do in one frame.
 	:return: True if the object has been moved, false otherwise.
 	"""
@@ -188,7 +194,8 @@ def setCamera(scene, camera_name):
 	.. note::
 		Use instead of ``KX_Scene.active_camera = KX_GameObject``.
 	
-	:param KX_Scene scene: Scene where to change the active camera.
+	:param scene: Scene where to change the active camera.
+	:type scene: |KX_Scene|
 	:param string camera_name: Name of the new active camera.
 	"""
 	camera = scene.objects[camera_name]
@@ -213,7 +220,8 @@ def setFilter2D(name, camera, slot):
 	Some filters may need special game properties, see: *TODO*
 	
 	:param string name: Name of the filter.
-	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).
+	:param camera: The main camera of the scene (where logic bricks are used).
+	:type camera: |KX_GameObject|
 	:param integer slot: The slot (Logic Brick Actuator ID) where to apply the filter. Slots are 2DFiletre actuators connected with the Python 
 		controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.
 	"""
@@ -242,7 +250,8 @@ def setFilter2D(name, camera, slot):
 def removeFilter2D(camera, slot):
 	""" Removes a 2DFilter.
 	
-	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).
+	:param camera: The main camera of the scene (where logic bricks are used).
+	:type camera: |KX_GameObject|
 	:param integer slot: The slot.
 	"""
 	try:
@@ -256,12 +265,13 @@ def removeFilter2D(camera, slot):
 def libLoad(filepath, mode, camera):
 	""" Loads an blend dinamically.
 	
-	Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: ``main.libLoad``.
+	Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: ``main.libload``.
 	This logic bricks are recomended to be used in an object that clearly is the main object of the scene or a camera if any.
 	
 	:param string filepath: Relative path from the *data* folder where the blend file is placed.
 	:param mode: The same mode that will be used on ``bge.logic.LibLoad()``, it's recomended to use "Scene".
-	:param KX_GameObject camera: The main camera of the scene (where logic bricks are used).
+	:param camera: The main camera of the scene (where logic bricks are used).
+	:type camera: |KX_GameObject|
 	"""
 	path = logic.expandPath("//../data/" + filepath)
 	scene_to = camera.scene

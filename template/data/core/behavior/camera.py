@@ -16,7 +16,7 @@ class MouseLook(Object):
 		self._at_ground = False
 		module.enableInputFor(self)
 		self.player_control = None
-		object.collisionCallbacks.append(self.overGround)
+		self.scene.objects["PlayerBase"].collisionCallbacks.append(self.overGround)
 		self.colliding = False
 		
 	def update(self):
@@ -50,6 +50,5 @@ class MouseLook(Object):
 		angle = normal.angle(Vector((0,0,-1)))
 		self.colliding = True
 		if angle < 0.5:
-			self.at_ground = True
 			self._at_ground = True
 			if self.player_control: self.player_control.at_ground = True
