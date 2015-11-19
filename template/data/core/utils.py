@@ -27,8 +27,34 @@ def loadGameProperty(name):
 				return prop
 				
 def saveGameProperty(name, value):
-	""" TODO """
-	pass
+	""" Saves a property to your :file:`config.txt` file.
+		
+	:param string name: Name of the property to load.
+	:param value: Value to save, will be converted into a string.
+	"""
+	path = logic.expandPath("//../config.txt")
+	with open(path, "r+") as input:
+		match = False
+		new = ""
+		for l in input.read().splitlines():
+			if len(l) == 0 or l[0] == '#':
+				new += l + '\n'
+				continue
+				
+			x = l.find(name)
+			y = l.find(": ")
+			if x == 0 and y > 0 and not match:
+				l = l[:y+2]
+				l += str(value)
+				match = True
+			new += l + '\n'
+
+		if not match:
+			new += "\n" + name + ": " + str(value)
+		input.seek(0)
+		input.write(new)
+		
+				
 
 #Internal
 _sleeptime = 0.0000
@@ -65,6 +91,34 @@ def rand10():
 	return randint(0,9)
 
 #3D Math
+class LinearInterpolation:
+	def __init__(self, A, B, time, callback):
+		module.low_frequency_callbacks.append(self.update)
+		self.A = A
+		self.B = B
+		self.m = B-A
+		self.x = 0
+		self.y = time
+		self.callback = callback
+		
+	def update(self):
+		if self.x < 0 or self.x > self.y: self.delete()
+		self.x += module.LOW_FREQUENCY_TICK
+		x = self.x/self.y
+		y = self.m*x + self.A
+		
+		if self.m > 0:
+			if y < self.A: y = self.A
+			if y > self.B: y = self.B
+		if self.m < 0:
+			if y > self.A: y = self.A
+			if y < self.B: y = self.B 
+		self.callback(y)
+		
+	def delete(self):
+		module.low_frequency_callbacks.remove(self.update)
+		del self
+
 def vectorFrom2Points(origin, dest, module = None):
 	""" Returns a |Vector|  form 2 points in the space.
 	

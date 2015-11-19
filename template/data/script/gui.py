@@ -16,6 +16,8 @@ class GUI(behavior.Scene):
 			utils.setCamera(self.scene, "GUICamera.001")
 			media.showScreen()
 			media.screen.play("data/video/intro.avi", callback=lambda: utils.setScene("Main"))
+			media.screen.obj.color.w = 0
+			media.screen.fadeIn(10)
 		
 		#Start the game directly
 		else: utils.setScene("Main")

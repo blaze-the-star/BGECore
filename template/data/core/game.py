@@ -1,7 +1,7 @@
 from script import gui
 from script import behavior
 from bge import logic, events
-from core import module, utils
+from core import module, utils, media
 from core.interface import event
 import time
 import traceback
@@ -28,6 +28,7 @@ def loop():
 		module.scene_gui_behavior.scene = module.scene_gui
 		module.scene_gui_behavior.init()
 		for b in module.scene_gui_behavior.behaviors: b.init()
+		media.device.volume = float(utils.loadGameProperty("volume"))
 	
 	if module.window.camera.sensors["Always"].status != logic.KX_SENSOR_ACTIVE: return
 	
@@ -58,7 +59,7 @@ def loop():
 	for v in module.video_playback_list: v.updateVideo()
 			
 	done = time.time()
-	if (done - _last_time) >= 0.1:
+	if (done - _last_time) >= module.LOW_FREQUENCY_TICK:
 		_last_time = done
 		for call in module.low_frequency_callbacks:
 			call()

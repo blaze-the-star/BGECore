@@ -2,7 +2,7 @@ LAUNCHER
 - Compile Linux version & edit to work with installed blender in Debian and derivated systems.
 
 GUI
-- Fix widget setRotation()
+- Fix widget set rotation.
 - Add a LoadingBar widget.
 - Make default button layers. (GIMP)
 - Make default start game menu.
@@ -10,14 +10,11 @@ GUI
 - Make SplitWindow system for Window.
 
 MEDIA
-- Fix fadein/fadeout bug on AudioFile and Screen (should it be called VideoFile?)
 - Add SoundEffect class (3D short sound, remaining in RAM, deleted when setScene)
-- Add VideoFile fadein/fadeout (transparencey).
 - Add adjustable latterbox with transition effect.
 
 UTILS
 - Check overall.
-- Implement Config file save.
 
 BEHAVIOR
 - Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).

@@ -24,6 +24,8 @@ labels = {}
 video_playback_list = []
 low_frequency_callbacks = []
 
+LOW_FREQUENCY_TICK = 0.1
+
 def enableInputFor(behavior):
 	global listen_input_list
 	behavior.use_keyboard = True

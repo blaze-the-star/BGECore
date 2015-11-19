@@ -2,7 +2,7 @@ player: engine/blenderplayer.exe
 blend: data/game.blend
 
 #game settings
-volume: 0.0
+volume: 1.0
 
 #video settings
 resolution: 1280 768
