@@ -32,6 +32,10 @@ def _over_event_loop(own, status):
 		except: pass
 		_selok = False
 		if _hold == False: selected = None
+		
+	if status == 2:
+		try: list[own].mouseOver()
+		except: pass
 	
 	if status == 1:
 		if _hold == False or selected==own:
@@ -47,6 +51,9 @@ def _click_event_loop(status):
 	list = module.widget_dict
 	
 	if status == 1 and selected: _hold = True
+	if status == 2:
+		if selected in list: list[selected].mousePressed()
+	
 	if status != 3: return
 	
 	if selected and _selok == True and _hold == True:

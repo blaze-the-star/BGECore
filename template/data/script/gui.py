@@ -40,6 +40,9 @@ class GUI(behavior.Scene):
 behavior.addScene(GUI, constant.CORE_SCENE_GUI)
 
 class MenuButton(interface.TextMenu):
+	def mousePressed(self):
+		if self.index == 1: self.move()
+
 	def mouseClick(self):
 		gui = module.scene_gui_behavior
 		if self.index == 0:
@@ -50,7 +53,7 @@ class MenuButton(interface.TextMenu):
 			if module.scene_game.name == "Main": utils.setScene("Main2")
 			if module.scene_game.name == "Main2": utils.setScene("Main"); interface.window.hideCursor()
 			
-		if self.index == 1: self.move()
+		if self.index == 1: pass
 			
 		if self.index == 2:
 			lab = module.labels["LineOfText.003"]
@@ -62,6 +65,12 @@ class MenuButton(interface.TextMenu):
 	def move(self):
 		pos = self.position
 		for i, button in MenuButton.button.items():
+			#Store z position, we don't wanna change that.
 			z = button.position.z
+			
+			#Move widgets of the menu relative the the object being clicked.
+			#The vector from the object being clicked to itself is (0,0,0).
 			button.position = module.window.cursor.position + utils.vectorFrom2Points(pos, button.position)
+			
+			#Restores the z position
 			button.position.z = z

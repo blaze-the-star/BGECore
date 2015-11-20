@@ -121,6 +121,9 @@ class Widget():
 	def mouseClick(self):
 		pass
 		
+	def mousePressed(self):
+		pass
+		
 	@property
 	def position(self):
 		""" The position of the widget. On read it's the sprite position, on write it applies a relative position to all inner elements of the widget. """
