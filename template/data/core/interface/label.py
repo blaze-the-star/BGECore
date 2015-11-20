@@ -2,9 +2,6 @@ from core.interface.widget import Widget
 from core import module, utils
 from bge import logic
 
-#BUGS:
-# - Set rotation, when called at runtime doesn't work properly.
-
 ALIGN_LEFT = 0
 ALIGN_CENTER = 1
 ALIGN_RIGHT = 2
@@ -12,7 +9,7 @@ ALIGN_RIGHT = 2
 def replaceBlenderText(obj):
 	font = obj.get("Font")
 	if not font:
-		utils.debug("Impossible to replace text object " + obj.name + ". Doesn't have a Font property.")
+		#utils.debug("Impossible to replace text object " + obj.name + ". Doesn't have a Font property.")
 		return
 	
 	sx, sy, sz = [int(n*100) for n in obj.localScale]
@@ -24,10 +21,11 @@ def replaceBlenderText(obj):
 	align = ["Left", "Center", "Right"].index(align)
 	
 	wp = obj.worldPosition
-	position = [wp.x+float(0.006*sx), wp.y+(0.002*sx), wp.z]
-	label = Label(font, obj["Text"], sx/2.5, align, position)
+	#position = [wp.x+float(0.006*sx), wp.y+(0.002*sx), wp.z]
+	label = Label(font, obj["Text"], sx/2.5, align, wp)
 	xyz = obj.worldOrientation.to_euler()
 	label.rotation = xyz
+	if align == ALIGN_RIGHT: label.rotation.y = 3.14
 	
 	label.visible = obj.visible
 	
@@ -73,7 +71,7 @@ class Label(Widget):
 	
 	Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace
 	a text object the TextObject must have two game properties "*(String)* Font" and "*(String[Right,Center,Left])* Align". Labels need a font object to work. Font objects are created as
-	old BGE dynamic text (2.49) and have some advantages over new text objects. Font object must be placed on an inactive layer of the GUI scene and must be
+	old BGE dynamic text (2.49) and have some advantages over new text objects. Font objects must be placed on an inactive layer of the GUI scene and must be
 	prefixed with the *Font* keyword, *e.j: Font.Hobo, Font.Title*
 	
 	:param string font: The font of the label.
@@ -83,6 +81,8 @@ class Label(Widget):
 	:type align: :ref:`align-constant`
 	:param position: The label position.
 	:type position: |Vector| or size-3 list
+	
+	.. note:: Although font objects have a lot of avantages, they also have one clear inconvenient, they must be monspaced. A non-monospaced font won't be diplayed correctly.
 	"""
 	_font_id = 0
 	_loaded_fonts_right = {}
@@ -114,9 +114,10 @@ class Label(Widget):
 			Label._loaded_fonts_left[font] = self.obj.meshes[0]
 			Label._font_id += 1
 		
-		self._location = self.obj.worldPosition
-		self._scale = self.obj.localScale
-		self._rotation = self.obj.worldOrientation.to_euler()
+		self._location = super().ProxyPosition()
+		self._scale = super().ProxyScale()
+		self._rotation = super().ProxyRotation()
+		self._color = super().ProxyColor()
 		self.transformable = [self.obj]
 		self._align = None
 		self._text = text
@@ -205,15 +206,16 @@ class Label(Widget):
 		font_name = self._font.name
 		font_name = font_name.replace("Font.", "")
 		
-		if self._align and (self._align == 2 or self._align == 1) and align == 0:
+		if self._align and (self._align == ALIGN_RIGHT or self._align == ALIGN_CENTER) and align == ALIGN_LEFT:
 			self.obj.rotation.y = 0
 			self.obj.replaceMesh(self._loaded_fonts_left[font_name])
 			
-		if align == 2:
-			self.rotation.y = 3.1415 
+		if align == ALIGN_RIGHT:
+			print("Hey!")
 			self.obj.replaceMesh(self._loaded_fonts_right[font_name])
+			self.rotation.y = 3.1415 
 		
-		if align == 1:
+		if align == ALIGN_CENTER:
 			self.ob2 = self.scene.addObject(self._font, self.scene.active_camera)
 			self.ob2.worldPosition = self._location
 			self.ob2.localScale = self._scale

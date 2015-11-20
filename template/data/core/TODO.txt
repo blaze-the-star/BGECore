@@ -2,9 +2,9 @@ LAUNCHER
 - Compile Linux version & edit to work with installed blender in Debian and derivated systems.
 
 GUI
-- Fix widget set rotation.
 - Add a LoadingBar widget.
-- Make default button layers. (GIMP)
+- Make buttons with press layer (not only over)
+- Make button event (mousePressed), to do things while pressing.
 - Make default start game menu.
 - Make a pause system.
 - Make SplitWindow system for Window.
@@ -12,6 +12,9 @@ GUI
 MEDIA
 - Add SoundEffect class (3D short sound, remaining in RAM, deleted when setScene)
 - Add adjustable latterbox with transition effect.
+- Add backgroundColor and make fadeIn work with this color and fadeOut with it's inverse.
+- window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
+moved/scaled/rotated when you swich a GUI camera.
 
 UTILS
 - Check overall.

@@ -5,8 +5,12 @@ import traceback
 class Button(Widget):
 	""" A button Widget.
 	
+	The sprite and the sprite over the buttonn should be planes with scale 1:1:1, you can scale them in edit-mode. Make sure both have the same
+	origin. It's recomeded to use shadeless, object color and z-transparecy(alpha:0) on the materials, and Influence->Diffuse->Alpha:1 on the texture. 
+	
+	
 	:param sprite: The sprite that will be used as the base of the widget.
-	:param over: The sprite that will be used on top of the base when the button is selected.
+	:param over: The sprite that will be used on top of the base when the button is selected. (Must be on an inactive layer, must be No Collision)
 	:type sprite: string or |KX_GameObject|
 	:type over: string or |KX_GameObject|
 	"""
@@ -36,7 +40,7 @@ class Button(Widget):
 		if self.over and self._active == True:
 			try:
 				self.objt = self.scene.addObject(self.over, self.obj)
-				self.objt.worldPosition.z = self.obj.worldPosition.z + 0.1
+				self.objt.worldPosition.z = self.obj.worldPosition.z + 0.01
 				self.transformable.append(self.objt)
 			except:
 				print("Button type: " + self.__class__.__name__ + " Over: " + str(self.over))
@@ -73,6 +77,7 @@ class Button(Widget):
 		self._active = True
 		
 		
+from mathutils import Vector
 class TextButton(Button):
 	""" A button Widget with a Label.
 	
@@ -86,28 +91,42 @@ class TextButton(Button):
 	:param integer size: The size of the label.
 	:param align: The alignation of the text in the label.
 	:type align: :ref:`align-constant`
+	
+	.. attribute:: label
+	
+	Reference to the Label of this TextButton
+	
 	"""
 
 	def __init__(self, sprite, over, font, text, size = 16, align = 0):
 		super().__init__(sprite, over)
-		self.text = Label(font, text, size, align, self.obj.worldPosition)
-		self.text.position.z = 0.2
-		font = self.text.font
-		self.transformable.append(self.text)
+		
+		sc = self.scale
+		self.scale = [1,1,1]
+		rt = self.rotation
+		self.rotation = [0,0,0]
+		
+		self.label = Label(font, text, size, align, self.obj.worldPosition)
+		self.label.position.z += 0.05
+		font = self.label.font
+		self.transformable.append(self.label)
+		
+		self.scale = sc
+		self.rotation = rt
 		
 	def enable(self):
 		""" It enables the button events. (Enabled by default) """
 		super().enable()
-		self.text.visible = True
+		self.label.visible = True
 
 	def disable(self):
 		""" It dishables the button events. """
 		super().disable()
-		self.text.visible = False
+		self.label.visible = False
 	
 	def delete(self):
 		""" Deletes the button """
-		self.text.delete()
+		self.label.delete()
 		super().delete()
 
 class Menu(Button):
@@ -122,6 +141,7 @@ class Menu(Button):
 		super().__init__(sprite, over)
 		self.index = index
 		self.button[index] = self
+	
 	
 class TextMenu(TextButton):
 	""" A TextButton with an index, so you con do ``if self.index == ...:``

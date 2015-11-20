@@ -16,6 +16,11 @@ class Window():
 	Internally it throws a raycast from the cursor position in the *scene_gui* and the *scene_game* (if aviable) to generate mouse events.
 	The current implementation only works with orthographic cameras with orientation (0,0,0). The recomended height
 	from the world origin is 10.
+	
+	.. attribute:: cursor
+	
+	The |KX_GameObject| of a custom cursor is used, otherwise *None* 
+	
 	"""
 	
 	cursor = None

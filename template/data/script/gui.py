@@ -1,26 +1,38 @@
 from core import interface, utils, module, behavior, media
 from script import constant, control
 from bge import logic
+from mathutils import Vector
 
 class GUI(behavior.Scene):
 	def init(self):
+		#Set the cursor, hide for the intro video.
+		interface.window.setCursor("Cursor")
 		interface.window.hideCursor()
 	
-		MenuButton(0, "MItem1", None, "Hobo", "Change Scene")
-		MenuButton(1, "MItem2", None, "Hobo", "Exit")
-		MenuButton(2, "MItem3", None, "Hobo", "Print Version")
-		MenuButton(3, "MItem4", None, "Hobo", "Nothing")
+		#Setup the menu.
+		MenuButton(0, "MItem1", "MItemOver", "Hobo", "Change scene", align=interface.label.ALIGN_CENTER)
+		MenuButton(1, "MItem2", "MItemOver", "Hobo", "Move", align=interface.label.ALIGN_CENTER)
+		MenuButton(2, "MItem3", "MItemOver", "Hobo", "Change color", align=interface.label.ALIGN_CENTER)
+		MenuButton(3, "MItem4", "MItemOver", "Hobo", "Exit", align=interface.label.ALIGN_CENTER)
+		
+		#Change color of the quote
+		module.labels["LineOfText.003"].color = [2,0,0,1]
 		
 		#Start the game with intro video
 		if not constant.GAME_DEBUG:
-			utils.setCamera(self.scene, "GUICamera.001")
+			utils.setCamera(self.scene, "GUICamera.001") #Makes the menu desapear.
 			media.showScreen()
-			media.screen.play("data/video/intro.avi", callback=lambda: utils.setScene("Main"))
-			media.screen.obj.color.w = 0
-			media.screen.fadeIn(10)
+			media.screen.play("data/video/intro.avi", callback=self.afterVideo)
+			media.screen.obj.color.w = 0 #Sets the screen alpha to 0 (invisible).
+			media.screen.fadeIn(2) #Sets the screen alpha to 1 with a linear interpolation over 2 seconds.
 		
 		#Start the game directly
-		else: utils.setScene("Main")
+		else: self.afterVideo()
+		
+	def afterVideo(self):
+		utils.setCamera(self.scene, "GUICamera.000")
+		interface.window.showCursor()
+		media.hideScreen()	
 		
 	def update(self):
 		pass
@@ -28,23 +40,28 @@ class GUI(behavior.Scene):
 behavior.addScene(GUI, constant.CORE_SCENE_GUI)
 
 class MenuButton(interface.TextMenu):
-	def mouse_click(self):
+	def mouseClick(self):
+		gui = module.scene_gui_behavior
 		if self.index == 0:
 			if not module.scene_game:
 				utils.setScene("Main2")
 				return
+				
 			if module.scene_game.name == "Main": utils.setScene("Main2")
-			if module.scene_game.name == "Main2": utils.setScene("Main")
+			if module.scene_game.name == "Main2": utils.setScene("Main"); interface.window.hideCursor()
 			
-		if self.index == 1:
-			logic.endGame()
+		if self.index == 1: self.move()
 			
 		if self.index == 2:
-			print(constant.VERSION)
-			self.button[3].index = 2
-			self.button[2].index = 3
-			self.button[2].text["Text"] = "Nothing"
-			self.button[3].text["Text"] = "Print Version"
+			lab = module.labels["LineOfText.003"]
+			lab.color = utils.randRGB()
 			
 		if self.index == 3:
-			pass
+			logic.endGame()
+			
+	def move(self):
+		pos = self.position
+		for i, button in MenuButton.button.items():
+			z = button.position.z
+			button.position = module.window.cursor.position + utils.vectorFrom2Points(pos, button.position)
+			button.position.z = z

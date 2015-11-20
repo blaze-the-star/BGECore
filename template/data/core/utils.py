@@ -86,12 +86,35 @@ def verbose(text):
 	""" Prints *text* if ``CORE_DEBUG_VERBOSE`` is enabled. """
 	if constant.CORE_DEBUG_VERBOSE == True: print(text)
 	
+def randRGB(r = None, g = None, b = None, a = 1):
+	""" Generates a random vector representing a color, paramaters not *None* will use that value instead of generating a new one. """
+	if not r: r = randint(0,100)/100
+	if not g: g = randint(0,100)/100
+	if not b: b = randint(0,100)/100
+	if not a: a = randint(0,100)/100
+	return Vector((r,g,b,a))
+
 def rand10():
 	""" Generates a rondom integer from 0 to 9 """
 	return randint(0,9)
 
 #3D Math
 class LinearInterpolation:
+	""" Makes a linear interpolation over time, uses a callback to apply changes.
+	
+	This class can be used as a function, the garabage collector will not delete its instances until the interpolation ends. The callbacks are done at 10Hz.
+	
+	:param float A: The start value.
+	:param float B: The end value.
+	:param float time: The time it takes, in seconds.
+	:param callback: The function to call to apply changes, it's first argument will be the value of the interpolation (A <= value <= B).
+	
+	.. attribute:: x
+	
+		The time since the interpolation started, in seconds.
+	
+		:type: float
+	"""
 	def __init__(self, A, B, time, callback):
 		module.low_frequency_callbacks.append(self.update)
 		self.A = A
@@ -116,6 +139,7 @@ class LinearInterpolation:
 		self.callback(y)
 		
 	def delete(self):
+		""" Deletes/Stops the interpolation. Automatically called once x >= time. """
 		module.low_frequency_callbacks.remove(self.update)
 		del self
 

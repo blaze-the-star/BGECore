@@ -18,6 +18,10 @@ Debug and performance
 Math and movement
 -----------------
 .. autofunction:: rand10
+.. autofunction:: randRGB
+.. autoclass:: LinearInterpolation
+	:members:
+
 .. autofunction:: vectorFrom2Points
 .. autofunction:: moveObjectToObject
 .. autofunction:: moveObjectToPosition

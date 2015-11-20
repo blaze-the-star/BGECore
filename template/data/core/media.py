@@ -66,7 +66,6 @@ class Screen(interface.widget.Widget):
 		""" Plays a video on this screen, also makes the *speaker* aviable.
 		
 		:param string video: The relative path (to the game folder) of the video to use.
-		:param float volume: The volume of Audio.
 		:param function callback: Function to call once the video ends.
 		"""
 		#Video
@@ -99,7 +98,6 @@ class Screen(interface.widget.Widget):
 		utils.LinearInterpolation(self.obj.color.w, 0, time, self._interpol)
 	
 	def _interpol(self, x):
-		print(self.obj.color.w)
 		self.obj.color.w = x
 		
 	def updateVideo(self):
