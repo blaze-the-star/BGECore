@@ -108,6 +108,7 @@ class LinearInterpolation:
 	:param float B: The end value.
 	:param float time: The time it takes, in seconds.
 	:param callback: The function to call to apply changes, it's first argument will be the value of the interpolation (A <= value <= B).
+	:param final: The function to call when the interpolation ends.
 	
 	.. attribute:: x
 	
@@ -115,7 +116,7 @@ class LinearInterpolation:
 	
 		:type: float
 	"""
-	def __init__(self, A, B, time, callback):
+	def __init__(self, A, B, time, callback, final = None):
 		module.low_frequency_callbacks.append(self.update)
 		self.A = A
 		self.B = B
@@ -123,6 +124,7 @@ class LinearInterpolation:
 		self.x = 0
 		self.y = time
 		self.callback = callback
+		self.final = final
 		
 	def update(self):
 		if self.x < 0 or self.x > self.y: self.delete()
@@ -141,6 +143,7 @@ class LinearInterpolation:
 	def delete(self):
 		""" Deletes/Stops the interpolation. Automatically called once x >= time. """
 		module.low_frequency_callbacks.remove(self.update)
+		if self.final: self.final()
 		del self
 
 def vectorFrom2Points(origin, dest, module = None):

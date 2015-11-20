@@ -28,7 +28,9 @@ def _over_event_loop(own, status):
 	list = module.widget_dict
 	
 	if status == 3:
-		try: list[own].mouseOut()
+		try:
+			list[own]._mouseOut()
+			if cam.pointInsideFrustum(pos): list[own].mouseOut()
 		except: pass
 		_selok = False
 		if _hold == False: selected = None
@@ -40,7 +42,9 @@ def _over_event_loop(own, status):
 	if status == 1:
 		if _hold == False or selected==own:
 			try:
-				if own in list: list[own].mouseIn()
+				if own in list:
+					list[own]._mouseIn()
+					if module.window.cursorInsideFrustum(): list[own].mouseIn()
 			except: utils.debug("_over_event_loop: Forgot to disable collisions?")
 			selected = own
 			_selok = True
@@ -59,7 +63,8 @@ def _click_event_loop(status):
 	if selected and _selok == True and _hold == True:
 		try:
 			if selected in list and list[selected]._active == True:
-				list[selected].mouseClick()
+				list[selected]._mouseClick()
+				if module.window.cursorInsideFrustum(): list[selected].mouseClick()
 		except:
 			utils.debug("_click_event_loop: Forgot to disable collisions?")
 			utils.debug(traceback.format_exc())

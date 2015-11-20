@@ -39,6 +39,11 @@ Menus
 --------
 .. inheritance-diagram:: Menu TextMenu
 	:parts: 1
+
+.. autofunction:: core.interface.button.menuMove
+.. autofunction:: core.interface.button.menuMoveWithCursor
+.. autofunction:: core.interface.button.menuScale
+
 .. autoclass:: core.interface.button.Menu
 	:members:
 	

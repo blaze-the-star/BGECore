@@ -1,5 +1,7 @@
 from core.interface.widget import Widget
-from core.interface.label import Label
+from core.interface.label import Label, ALIGN_CENTER, ALIGN_RIGHT, ALIGN_LEFT
+from core import utils, module
+from mathutils import Vector
 import traceback
 
 class Button(Widget):
@@ -35,8 +37,7 @@ class Button(Widget):
 			self.objt.endObject()
 			self.objt = None
 		
-	def mouseIn(self):
-		""" Called when the mouse just enters the button space. You must use ``super().mouse_in()`` when overriding it. """
+	def _mouseIn(self):
 		if self.over and self._active == True:
 			try:
 				self.objt = self.scene.addObject(self.over, self.obj)
@@ -46,13 +47,20 @@ class Button(Widget):
 				print("Button type: " + self.__class__.__name__ + " Over: " + str(self.over))
 				traceback.print_exc()
 		
-	def mouseOut(self):
-		""" Called when the mouse just exits the button space. You must use ``super().mouse_out()`` when overriding it. """
+	def _mouseOut(self):
 		if self.over and self._active == True:
 			if self.objt:
 				self.transformable.remove(self.objt)
 				self.objt.endObject()
 				self.objt = None
+				
+	def mouseIn(self):
+		""" Called when the mouse just enters the button space. """
+		pass
+		
+	def mouseOut(self):
+		""" Called when the mouse just exits the button space."""
+		pass
 	
 	def mouseOver(self):
 		""" Called when the mouse is over the button space.
@@ -76,8 +84,6 @@ class Button(Widget):
 		self.obj.visible = False
 		self._active = True
 		
-		
-from mathutils import Vector
 class TextButton(Button):
 	""" A button Widget with a Label.
 	
@@ -129,6 +135,64 @@ class TextButton(Button):
 		self.label.delete()
 		super().delete()
 
+def menuMove(self, position):
+	""" Moves a menu to a given position. 
+	
+	Also accesible from *Menu* and *TextMenu* with: ``self.move(position)``
+	
+	:param position: The position in world coordinates.
+	:type position: |Vector|
+	"""
+	pos = self.position
+	for i, button in self.button.items():
+		z = button.position.z
+		button.position = position + utils.vectorFrom2Points(pos, button.position)
+		button.position.z = z
+		
+def menuScale(self, scale, point = None):
+	"""Scales a menu based on the scale of *self.obj.position* from any given position. 
+	
+	Also accesible from *Menu* and *TextMenu* with: ``self.resize(position, point = self.obj.position)``
+	
+	:param scale: The scale in world coordinates of the Button.
+	:type position: |Vector|
+	:param point: The center point from where to scale, if *None* no center point will be used and the scale will not modify the buttons position.
+	:type position: |Vector|
+	"""
+	xyz = Vector(scale)
+	if point != None: point = Vector((point))
+	pos = self.position
+	sca = self.scale
+	for i, button in self.button.items():
+		os = button.scale
+		ls = Vector((xyz.x / sca.x, xyz.y / sca.y, xyz.z / sca.z))
+		sc = [os.x * ls.x, os.y * ls.y, os.z * ls.z]
+		button.scale = sc
+		
+		if point != None:
+			os = (point - button.position)
+			sc = [os.x * ls.x, os.y * ls.y, os.z * ls.z]
+			z = button.position.z
+			button.position = Vector(sc) + pos
+			button.position.z = z
+			
+_cursor_relative = {}
+def menuMoveWithCursor(self):
+	"""Moves a menu to a given position. 
+	
+	Also accesible from *Menu* and *TextMenu* with: ``self.move(position)``
+	
+	:param position: The position in world coordinates.
+	:type position: |Vector|
+	"""
+	global _cursor_relative
+	ccp = module.window.cursor.position
+	
+	if self not in _cursor_relative.keys():
+		_cursor_relative[self] = utils.vectorFrom2Points(ccp, self.position)
+	
+	menuMove(self, ccp + _cursor_relative[self])
+		
 class Menu(Button):
 	""" A Button with an index, so you con do ``if self.index == ...:``
 	
@@ -137,11 +201,17 @@ class Menu(Button):
 	"""
 	
 	button = {}
+	over = None
 	def __init__(self, index, sprite, over = None):
+		if over == None: over = self.over
+		
 		super().__init__(sprite, over)
 		self.index = index
 		self.button[index] = self
 	
+	def move(self, position): menuMove(self, position)
+	def moveWithCursor(self): menuMoveWithCursor(self)
+	def resize(self, scale): menuScale(self, scale)
 	
 class TextMenu(TextButton):
 	""" A TextButton with an index, so you con do ``if self.index == ...:``
@@ -151,8 +221,31 @@ class TextMenu(TextButton):
 	"""
 	
 	button = {}
-
-	def __init__(self, index, sprite, over, font, text, size = 16, align = 0):
+	
+	over = None
+	font = None
+	size = 16
+	align = ALIGN_LEFT
+	
+	def __init__(self, index, sprite, text, over = None, font = None, size = None, align = None):
+		if over == None: over = self.over
+		if font == None: font = self.font
+		if size == None: size = self.size
+		if align == None: align = self.align
+		
 		super().__init__(sprite, over, font, text, size, align)
 		self.index = index
 		self.button[index] = self
+		
+		module.enableInputFor(self)
+		
+	def _mouseClick(self):
+		super()._mouseClick()
+		global _cursor_relative
+		if self in _cursor_relative.keys(): del _cursor_relative[self]
+	
+	def move(self, position): menuMove(self, position)
+	def moveWithCursor(self): menuMoveWithCursor(self)
+	def resize(self, scale, noparent = False):
+		if noparent: menuScale(self, scale)
+		else: menuScale(self, scale, self.position)

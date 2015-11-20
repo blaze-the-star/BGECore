@@ -21,6 +21,10 @@ class Window():
 	
 	The |KX_GameObject| of a custom cursor is used, otherwise *None* 
 	
+	.. attribute:: cursor_position
+
+	A |Vector| representing the position of the cursor. Same as *cursor.position* if using a custom cursor, otherwise the position it would have.
+	
 	"""
 	
 	cursor = None
@@ -34,14 +38,13 @@ class Window():
 		module.scene_gui = self.scene_gui
 		self.camera = self.scene_gui.active_camera
 		self.camera_height = self.camera.worldPosition.z - 0.5
+		self.cursor_position = None
 		
 		#Scale Camera X/Y
 		if self.camera:
 			self.scx = self.camera.ortho_scale
 			self.scy = self.camera.ortho_scale * (self.height / self.width)
-			#utils.setFilter2D("bloom", self.camera, 0)
-			#utils.setFilter2D("barrel", self.camera, 1)
-			
+			self.camera.frustum_culling = False
 			
 		logic.mouse.position = (0.5,0.5)
 		
@@ -52,13 +55,20 @@ class Window():
 		tto = [to[0]+cx, to[1]+cy, 0]
 		self.generateEvents(to, tto)
 		
-		if self.cursor:
-			self.cursor.worldPosition = [tto[0], tto[1], self.camera_height]
+		self.cursor_position = [tto[0], tto[1], self.camera_height]
+		if self.cursor: self.cursor.worldPosition = self.cursor_position
 			
 		winx = render.getWindowWidth()
 		winy = render.getWindowHeight()
 		if winx == self.width and winy == self.height: return
 		else: self.resize(winx, winy)
+		
+	def cursorInsideFrustum(self):
+		""" Checks if the custom is inside the frustum of the camera.
+		
+		:return bool: True if it is.
+		"""
+		return self.camera.pointInsideFrustum(self.cursor_position)
 	
 	def resize(self, winx, winy):
 		""" Resize the window, the new size will maintain the same aspect ratio.

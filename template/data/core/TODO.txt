@@ -4,7 +4,6 @@ LAUNCHER
 GUI
 - Add a LoadingBar widget.
 - Make buttons with press layer (not only over)
-- Make button event (mousePressed), to do things while pressing.
 - Make default start game menu.
 - Make a pause system.
 - Make SplitWindow system for Window.

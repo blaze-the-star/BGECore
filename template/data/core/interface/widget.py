@@ -70,6 +70,7 @@ class Widget():
 	
 	"""
 	_active = True
+	_immuse_keyboard = True
 
 	def __init__(self, obj):
 		self.scene = module.window.scene_gui
@@ -87,6 +88,10 @@ class Widget():
 		
 		global dict
 		dict[self.obj] = self
+		
+		self.init()
+		
+	def init(self): pass
 		
 	def ProxyPosition(self):
 		P = ProxyPosition(self.obj.worldPosition)
@@ -121,7 +126,25 @@ class Widget():
 	def mouseClick(self):
 		pass
 		
-	def mousePressed(self):
+	def _mouseClick(self):
+		pass
+		
+	def _mouseIn(self):
+		pass
+	
+	def _mouseOut(self):
+		pass
+		
+	def mousePressed(self, keys):
+		pass
+		
+	def onKeyUp(self, keys):
+		pass
+
+	def onKeyPressed(self, keys):
+		pass
+
+	def onKeyDown(self, keys):
 		pass
 		
 	@property
@@ -169,6 +192,7 @@ class Widget():
 		
 	@property
 	def rotation(self):
+		""" The rotation of the widget. On read it's the sprite orientation, on write it applies a proportional rotation to all inner elements of the widget. """
 		return self._rotation
 		
 	@rotation.setter
@@ -196,6 +220,10 @@ class Widget():
 		
 	@property
 	def color(self):
+		""" The widget color. The color is applied to all inner elemnts of the widget. 
+		
+		.. note:: Object color must be enabled in the material properties.
+		"""
 		return self._color
 		
 	@color.setter

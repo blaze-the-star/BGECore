@@ -211,7 +211,6 @@ class Label(Widget):
 			self.obj.replaceMesh(self._loaded_fonts_left[font_name])
 			
 		if align == ALIGN_RIGHT:
-			print("Hey!")
 			self.obj.replaceMesh(self._loaded_fonts_right[font_name])
 			self.rotation.y = 3.1415 
 		
