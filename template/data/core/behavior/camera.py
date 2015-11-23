@@ -10,14 +10,9 @@ class MouseLook(Object):
 		self.sensitivity = 0.75
 		self.invertx = -1
 		self.inverty = -1
-		self.speedx = 0.1
-		self.speedz = 0.3
-		self.at_ground = False
-		self._at_ground = False
+		self.speedx = 0.01
+		self.speedz = 0.03
 		module.enableInputFor(self)
-		self.player_control = None
-		self.scene.objects["PlayerBase"].collisionCallbacks.append(self.overGround)
-		self.colliding = False
 		
 	def update(self):
 		x, y = logic.mouse.position
@@ -29,14 +24,6 @@ class MouseLook(Object):
 		self.obj.localOrientation = rot.to_matrix()
 		logic.mouse.position = (0.5, 0.5)
 		
-		#Check if touching the ground
-		self.at_ground = False
-		if self.player_control: self.player_control.at_ground = False
-		
-		#Collision hack
-		self.obj.setCollisionMargin(self.speedz*2)
-		self.colliding = True
-		
 	def onKeyPressed(self, keys):
 		m = [0,0,0]
 		if key.W in keys: m[2] = -self.speedz
@@ -44,11 +31,3 @@ class MouseLook(Object):
 		if key.A in keys: m[0] = -self.speedx
 		if key.D in keys: m[0] = +self.speedx
 		self.obj.applyMovement(m, True)
-		
-	def overGround(self, object, point, normal):
-		#print('Hit by %r at %s with normal %s' % (object.name, point, normal))
-		angle = normal.angle(Vector((0,0,-1)))
-		self.colliding = True
-		if angle < 0.5:
-			self._at_ground = True
-			if self.player_control: self.player_control.at_ground = True

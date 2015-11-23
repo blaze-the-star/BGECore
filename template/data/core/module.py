@@ -8,6 +8,10 @@ scene_gui = None
 #Static of core.utils.setScene()
 change_scene_frame = False
 
+#Static of core.dynamic.loadScene()
+change_scene_dynamic = False
+change_scene_dynamic_state = 0
+
 #Static of core.utils.setFilter2D()
 filter_queue = []
 
@@ -23,8 +27,12 @@ labels = {}
 
 video_playback_list = []
 low_frequency_callbacks = []
+height_frequency_callbacks = []
 
 LOW_FREQUENCY_TICK = 0.1
+HEIGHT_FREQUENCY_TICK = 0.02
+
+cont = None
 
 def enableInputFor(behavior):
 	global listen_input_list

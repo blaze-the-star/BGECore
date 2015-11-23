@@ -1,33 +1,42 @@
-from core.interface.widget import Widget
+from core.interface import widget, flabel
 from core import module, utils
-from bge import logic
+from bge import logic, render
+from mathutils import Vector
+import blf, bgl, math
 
 ALIGN_LEFT = 0
 ALIGN_CENTER = 1
 ALIGN_RIGHT = 2
 
 def replaceBlenderText(obj):
+	""" Called at the start of the game, replaces all text objects with Labels. To be replaced the objects must have the following game properties:
+	
+	* Font (*String*): Name of the font to use.
+	* Align (*String*): Either Left, Center or Right
+	* FLable (*Bool*, Optional): If true the text object will be replaced by a FLabel instead.
+	
+	"""
+	if obj.get("FLabel") == True:
+		flabel.replaceBlenderText(obj)
+		return
+		
 	font = obj.get("Font")
 	if not font:
 		#utils.debug("Impossible to replace text object " + obj.name + ". Doesn't have a Font property.")
 		return
 	
 	sx, sy, sz = [int(n*100) for n in obj.localScale]
-	if sx != sy or sy != sz:
-		utils.debug("Impossible to replace text object " + obj.name + ". Size is not uniform.")
-		return
 	
 	align = obj.get("Align", 0)
 	align = ["Left", "Center", "Right"].index(align)
 	
 	wp = obj.worldPosition
-	#position = [wp.x+float(0.006*sx), wp.y+(0.002*sx), wp.z]
-	label = Label(font, obj["Text"], sx/2.5, align, wp)
+	label = Label(font, obj["Text"], sx, align, wp)
 	xyz = obj.worldOrientation.to_euler()
 	label.rotation = xyz
-	if align == ALIGN_RIGHT: label.rotation.y = 3.14
 	
 	label.visible = obj.visible
+	label.color = obj.color
 	
 	module.labels[obj.name] = label
 	obj.endObject()
@@ -64,183 +73,207 @@ def _swap_UV_2(v0, v1):
 	v0.setUV(uv0)
 	v1.setUV(uv1)
 	
-#The size of a Label is equal to the scale / 100. BGECore Design must guarentee that all fonts have 4 vertex and medians of size 1.
-class Label(Widget):
+class Label():
 	"""
 	The basic Text object of BGECore.
 	
-	Labels are dynamic texts that can be instantiated at runtime in any given position, used in Widgets or as a replacemnet for BGE text objects. To replace
-	a text object the TextObject must have two game properties "*(String)* Font" and "*(String[Right,Center,Left])* Align". Labels need a font object to work. Font objects are created as
-	old BGE dynamic text (2.49) and have some advantages over new text objects. Font objects must be placed on an inactive layer of the GUI scene and must be
-	prefixed with the *Font* keyword, *e.j: Font.Hobo, Font.Title*
-	
 	:param string font: The font of the label.
 	:param string text: The text of the label.
-	:param integer size: The size of the label.
+	:param integer size: The size of the label. (100 times the scale)
 	:param align: The alignation of the text in the label.
 	:type align: :ref:`align-constant`
 	:param position: The label position.
 	:type position: |Vector| or size-3 list
+		
+	.. warning:: This version uses the blender font module (blf). Currently text rendered with blf have the following bugs:
+		
+		* Pixelation when rotating them.
+		* Incompativility with object materials using Alpha Sort / Alpha Blend.
+		* In order to look really good a text object with Object Properties -> Colro -> Alpha > 0 and < 1 must be present (but not nescesarily inside the camera frustum).
+		
+		Alternatively you can use **core.interface.flabel.FLabel** (Same API), wich uses a bitmap texture, however it has it's own problems:
+		
+		* No Kerning
+		* Most special characters don't work (inapropiate for anything other than english).
+		* Unacurate center alignation (It can cause some wierd efects, can be fixed inside BGECore thought).
 	
-	.. note:: Although font objects have a lot of avantages, they also have one clear inconvenient, they must be monspaced. A non-monospaced font won't be diplayed correctly.
+	.. note:: Materials using Game settings -> Alpha Sort / Alpha Blend will be rendered always behind the Label.
+	
+	.. attribute:: visible
+	
+		Visibility, true or false. Use *color.w* for alpha channel. 
+	
+	.. attribute:: align
+	
+		Alignation of the text, on the following contants: ``ALIGN_LEFT``, ``ALIGN_CENTER`` or ``ALIGN_RIGHT``
+
+	.. attribute:: text
+	
+	.. attribute:: middle_height
+	
+		**Bool**, if True the text will be Y-Axis centered to the origin. Useful for widgets.
+	
 	"""
-	_font_id = 0
-	_loaded_fonts_right = {}
-	_loaded_fonts_left = {}
+	_fontname_id = {}
 
 	def __init__(self, font, text, size = 16, align = ALIGN_LEFT, position = [0,0,0]):
+		position = Vector(position)
+		
 		self.scene = module.scene_gui
-		font_name = "Font." + font
-		self._font = self.scene.objectsInactive[font_name]
+		self._font = font
+		self._position = self.ProxyPosition(position)
+		self._rotation = self.ProxyRotation([0,0,0])
 		
-		self.obj = self.scene.addObject(self._font, self.scene.active_camera)
-		self.obj.worldPosition = position
-			
-		if font_name not in Label._loaded_fonts_right.keys():
-			mesh = logic.LibNew('Font'+str(Label._font_id), 'Mesh', [font_name])[0]
-			v_array = mesh.getVertexArrayLength(0)
-			if v_array != 4:
-				utils.debug("Font object not valid, skipping!")
-				return
-			
-			v0 = mesh.getVertex(0,0)
-			v1 = mesh.getVertex(0,1)
-			v2 = mesh.getVertex(0,2)
-			v3 = mesh.getVertex(0,3)
-			_swap_UV_2(v0,v1)
-			_swap_UV_2(v2,v3)
-			
-			Label._loaded_fonts_right[font] = mesh
-			Label._loaded_fonts_left[font] = self.obj.meshes[0]
-			Label._font_id += 1
+		self._glposition = [0,0,0]
+		self._glscale = None
+		self._glunit = None
+		self._glzunit = None
+		self._scale = self.ProxyScale([size/100, size/100, size/100])
+		self._color = self.ProxyColor([1,1,1,1])
 		
-		self._location = super().ProxyPosition()
-		self._scale = super().ProxyScale()
-		self._rotation = super().ProxyRotation()
-		self._color = super().ProxyColor()
-		self.transformable = [self.obj]
-		self._align = None
-		self._text = text
-		self.ob2 = None #Second object to use on ALIGN_CENTER
+		self.text = text
+		self.font = self._font
+		self.visible = True
+		self.align = align
+		self.scene.post_draw.append(self.draw)
+		self.middle_height = False
 		
-		self.size = size
-		self.align = align #It also does set text the first time.
+		self._lastscale = None
+		self._lastorth = self.scene.active_camera.ortho_scale
+		
+	def ProxyPosition(self, position):
+		P = widget.ProxyPosition(position)
+		P.obj = self; return P
+		
+	def ProxyScale(self, scale):
+		P = widget.ProxyScale(scale)
+		P.obj = self; return P
+		
+	def ProxyRotation(self, orientation):
+		P = widget.ProxyRotation(orientation)
+		P.obj = self; return P
+		
+	def ProxyColor(self, color):
+		P = widget.ProxyColor(color)
+		P.obj = self; return P
 		
 	def delete(self):
 		""" """
-		if self.ob2:
-			self.ob2.endObject()
-			self.obj2 = None
-			
-		self.obj.endObject()
-		self.obj = None
+		scene.post_draw.remove(self.draw)
 		del self
-	
-	@property
-	def text(self):
-		""" Text that the Label displays.
 		
-		:type: String
-		"""
-		return self._text
+	def draw(self):
+		if self.visible == False: return
 		
-	@text.setter
-	def text(self, text):
-		self._text = text
-		if self._align == ALIGN_LEFT:
-			self.obj["Text"] = text
-		if self._align == ALIGN_RIGHT:
-			self.obj["Text"] = reverse_text(text)
-		if self._align == ALIGN_CENTER:
-			first, second = "",""
-			for line in text.splitlines():
-				rtext = reverse_text(line)
-				if len(rtext) % 2: n = 1
-				else: n = 0
-				first += "  " + rtext[len(rtext)//2+n:] + "\n"
-				second += " " + line[len(line)//2:] + "\n"
+		cam = self.scene.active_camera
+		orth = cam.ortho_scale
+		
+		#TO IMPROVE
+		height = render.getWindowHeight()
+		width = render.getWindowWidth()
+		near = cam.near
+		far = cam.far
+		h = cam.worldPosition.z
+		font_id = Label._fontname_id[self._font]
+		unit = width/orth
+		rpos = self._position - cam.worldPosition
+		
+		bgl.glMatrixMode(bgl.GL_PROJECTION)
+		bgl.glLoadIdentity()
+		bgl.gluOrtho2D(0, width, 0, height)
+		bgl.glMatrixMode(bgl.GL_MODELVIEW)
+		bgl.glLoadIdentity()
+		
+		#Z AXIS
+		oh = (far-near)/2
+		ortho_unit = 1/oh
+		dh = oh - h
+
+		pos = list([width/2+rpos[0]*unit, height/2+rpos[1]*unit, dh*ortho_unit + rpos[2]*ortho_unit])
+		if self._lastscale != self.scale or True:
+			blf.size(font_id, int(self.scale.x*unit), 72)
+		else:
+			if self._lastorth != orth:
+				sc = (float(self._lastorth) / float(orth)) * self.scale.x
+				bgl.glScalef(sc,sc,1)
+				print(str(self._lastorth) + " " + str(orth))
+				pos[0] /= sc
+				pos[1] /= sc
+				
+			else:
+				self._lastorth = orth
+		
+		x, y = blf.dimensions(font_id, self.text) #NOTE: Always after blf.size()
+		
+		if self.align == ALIGN_CENTER:
+			pos[0] -= (x)/2 * math.cos(self._rotation.z)
+			pos[1] -= x/2 * math.sin(self._rotation.z)
+		if self.align == ALIGN_RIGHT:
+			pos[0] -= x * math.cos(self._rotation.z)
+			pos[1] -= x * math.sin(self._rotation.z)
 			
-			self.obj["Text"] = second
-			self.ob2["Text"] = first
+		if self.middle_height == True:
+			pos[0] -= y/4 * math.sin(self._rotation.z)
+			pos[1] -= y/4 * math.cos(self._rotation.z)
+		
+		blf.position(font_id, pos[0], pos[1], pos[2])
+		blf.enable(font_id, blf.ROTATION)
+		if self.rotation.z > 0.01 or self.rotation.z < -0.01:
+			blf.rotation(font_id, self._rotation.z)
+		else:
+			blf.rotation(font_id, 0)
+		
+		bgl.glColor4f(self._color.x, self._color.y, self._color.z, self._color.w)
+		blf.draw(font_id, self.text)
+		blf.disable(font_id, blf.ROTATION)
+		
+		self._lastscale = self.scale
 	
 	@property
-	def font(self, name=False):
-		""" Font name, the same as the object name but without the "Font." prefix.
+	def position(self):
+		""" """
+		return self._position
+		
+	@position.setter
+	def position(self, xyz):
+		self._position = self.ProxyPosition(xyz)
+		
+	@property
+	def scale(self):
+		"""  """
+		return self._scale
+		
+	@scale.setter
+	def scale(self, xyz):
+		self._scale = self.ProxyScale(xyz)
+		
+	@property
+	def rotation(self):
+		"""  """
+		return self._rotation
+		
+	@rotation.setter
+	def rotation(self, xyz):
+		self._rotation = self.ProxyRotation(xyz)
+		
+	@property
+	def color(self):
+		"""  """
+		return self._color
+		
+	@color.setter
+	def color(self, color):
+		self._color = self.ProxyColor(color)
+	
+	@property
+	def font(self):
+		""" Font name to use from the `data/gui/font` directory. Ecpected ``.ttf`` file extension.
 		
 		:type: String
 		"""
-		return self._font.name[5:]
+		return self._font
 		
 	@font.setter
 	def font(self, font):
-		text = self.obj["Text"]
-		self.obj.endObject()
-		self._font = self.scene.objectsInactive["Font."+font]
-		
-		self.obj = self.scene.addObject(self._font, self.scene.active_camera)
-		self.obj.worldPosition = self._location
-		self.obj.localScale = self._scale
-		self.obj.worldOrientation = self._rotation.to_matrix()		
-		
-	@property
-	def size(self):
-		""" :type: Integer"""
-		return self._scale.x * 100
-
-	@size.setter
-	def size(self, size):
-		x = size/100
-		self.scale = [x,x,x]
-		
-	@property
-	def align(self):
-		"""
-		:return: Alignation
-		:type: :ref:`align-constant`
-		"""
-		return self._align
-		
-	@align.setter
-	def align(self, align):
-		if self._align and self._align == align: return
-		font_name = self._font.name
-		font_name = font_name.replace("Font.", "")
-		
-		if self._align and (self._align == ALIGN_RIGHT or self._align == ALIGN_CENTER) and align == ALIGN_LEFT:
-			self.obj.rotation.y = 0
-			self.obj.replaceMesh(self._loaded_fonts_left[font_name])
-			
-		if align == ALIGN_RIGHT:
-			self.obj.replaceMesh(self._loaded_fonts_right[font_name])
-			self.rotation.y = 3.1415 
-		
-		if align == ALIGN_CENTER:
-			self.ob2 = self.scene.addObject(self._font, self.scene.active_camera)
-			self.ob2.worldPosition = self._location
-			self.ob2.localScale = self._scale
-			self.transformable.append(self.ob2)
-			v = self.ob2.worldOrientation.to_euler()
-			v.y = 3.1415
-			self.ob2.localOrientation = v.to_matrix()
-			self.ob2.replaceMesh(self._loaded_fonts_right[font_name])
-		else:
-			if self.ob2:
-				self.transformable.remove(self.ob2)
-				self.ob2.endObject()
-				self.ob2 = None
-			
-		self._align = align
-		self.text = self.text #The end of the world is near!
-		
-	@property
-	def visible(self):
-		""" The visibility of the Label.
-		
-		:type: bool
-		"""
-		return self.obj.visible
-	
-	@visible.setter
-	def visible(self, bool):
-		self.obj.visible = bool
-		if self.ob2: self.ob2.visible = bool
+		font_path = logic.expandPath('//gui/font/' + font + '.ttf')
+		if font not in Label._fontname_id: Label._fontname_id[font] = blf.load(font_path)

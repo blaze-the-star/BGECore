@@ -1,7 +1,7 @@
 from script import gui
 from script import behavior
 from bge import logic, events
-from core import module, utils, media
+from core import module, utils, media, dynamic
 from core.interface import event
 import time
 import traceback
@@ -13,12 +13,14 @@ elapsed = done - start
 
 _state = 0
 _last_time = time.time()
+_last_time2 = _last_time
 def loop():
-	global _state, _last_time
+	global _state, _last_time, _last_time2
 	
 	#Set scene
 	if module.change_scene_frame == True:
-		utils.setScene(None)
+		if module.change_scene_dynamic == True: dynamic.loadScene(None, None)
+		else: utils.setScene(None)
 		return
 	
 	#Game initialization	
@@ -26,11 +28,13 @@ def loop():
 		_state = 1
 		logic.setMaxLogicFrame(1)
 		module.scene_gui_behavior.scene = module.scene_gui
+		for o in module.scene_gui.objects: module.scene_gui_behavior.objects[o.name] = o
 		module.scene_gui_behavior.init()
 		for b in module.scene_gui_behavior.behaviors: b.init()
 		media.device.volume = float(utils.loadGameProperty("volume"))
+		module.cont = logic.getCurrentController()
 	
-	if module.window.camera.sensors["Always"].status != logic.KX_SENSOR_ACTIVE: return
+	if module.cont.owner.sensors["Always"].status != logic.KX_SENSOR_ACTIVE: return
 	
 	#Key events
 	event._key_event_loop()
@@ -60,6 +64,14 @@ def loop():
 			
 	done = time.time()
 	if (done - _last_time) >= module.LOW_FREQUENCY_TICK:
+		dtime = done - _last_time
 		_last_time = done
 		for call in module.low_frequency_callbacks:
-			call()
+			call(dtime)
+	
+	if (done - _last_time2) >= module.HEIGHT_FREQUENCY_TICK:
+		dtime = done - _last_time2
+		_last_time2 = done
+		for call in module.height_frequency_callbacks:
+			call(dtime)
+	

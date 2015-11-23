@@ -42,6 +42,7 @@ class Button(Widget):
 			try:
 				self.objt = self.scene.addObject(self.over, self.obj)
 				self.objt.worldPosition.z = self.obj.worldPosition.z + 0.01
+				self.objt.color = self.obj.color
 				self.transformable.append(self.objt)
 			except:
 				print("Button type: " + self.__class__.__name__ + " Over: " + str(self.over))
@@ -80,6 +81,7 @@ class Button(Widget):
 		self._active = False
 	
 	def enable(self):
+		print("Enable!")
 		""" It enables the button events. (Enabled by default) """
 		self.obj.visible = False
 		self._active = True
@@ -114,6 +116,7 @@ class TextButton(Button):
 		
 		self.label = Label(font, text, size, align, self.obj.worldPosition)
 		self.label.position.z += 0.05
+		self.label.middle_height = True
 		font = self.label.font
 		self.transformable.append(self.label)
 		
@@ -209,6 +212,13 @@ class Menu(Button):
 		self.index = index
 		self.button[index] = self
 	
+	def _mouseClick(self):
+		super()._mouseClick()
+		global _cursor_relative
+		if self in _cursor_relative.keys(): del _cursor_relative[self]
+		self.select()
+	
+	def select(self): pass
 	def move(self, position): menuMove(self, position)
 	def moveWithCursor(self): menuMoveWithCursor(self)
 	def resize(self, scale): menuScale(self, scale)
@@ -236,6 +246,8 @@ class TextMenu(TextButton):
 		super().__init__(sprite, over, font, text, size, align)
 		self.index = index
 		self.button[index] = self
+		self.label.color = self.color
+		self.color = self.ProxyColor()
 		
 		module.enableInputFor(self)
 		
@@ -243,7 +255,9 @@ class TextMenu(TextButton):
 		super()._mouseClick()
 		global _cursor_relative
 		if self in _cursor_relative.keys(): del _cursor_relative[self]
+		if self._active == True: self.select()
 	
+	def select(self): pass
 	def move(self, position): menuMove(self, position)
 	def moveWithCursor(self): menuMoveWithCursor(self)
 	def resize(self, scale, noparent = False):

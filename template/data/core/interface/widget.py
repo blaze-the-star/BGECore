@@ -40,7 +40,9 @@ dict = module.widget_dict
 
 #TODO: Style Mistake, all methods should be mouseOver() not mouse_over()
 class Widget():
-	""" This is a widget 
+	""" This is a widget.
+	
+	Widgets usually are 2D objects that represent a GUI element. To make a widget in blender you can just use a plane with an image texture. 
 	
 	.. attribute:: obj
 		
@@ -69,7 +71,6 @@ class Widget():
 		:type: mathutils.Euler
 	
 	"""
-	_active = True
 	_immuse_keyboard = True
 
 	def __init__(self, obj):
@@ -84,6 +85,7 @@ class Widget():
 		self._scale = self.ProxyScale()
 		self._rotation = self.ProxyRotation()
 		self._color = self.ProxyColor()
+		self._active = True
 		self.transformable = [self.obj]
 		
 		global dict
@@ -135,7 +137,7 @@ class Widget():
 	def _mouseOut(self):
 		pass
 		
-	def mousePressed(self, keys):
+	def mousePressed(self):
 		pass
 		
 	def onKeyUp(self, keys):
@@ -230,5 +232,11 @@ class Widget():
 	def color(self, color):
 		for obj in self.transformable: obj.color = color
 		self._color = self.ProxyColor()
+		
+	@property
+	def active(self): return self._active
+	
+	@active.setter
+	def active(self, x): self._active = x
 	
 	

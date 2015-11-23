@@ -6,6 +6,7 @@ import core.interface.window
 import core.interface.widget
 import core.interface.button
 import core.interface.label
+import core.interface.flabel
 import script.constant
 
 Window = window.Window

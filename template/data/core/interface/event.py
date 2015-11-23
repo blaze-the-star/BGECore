@@ -66,7 +66,7 @@ def _click_event_loop(status):
 				list[selected]._mouseClick()
 				if module.window.cursorInsideFrustum(): list[selected].mouseClick()
 		except:
-			utils.debug("_click_event_loop: Forgot to disable collisions?")
+			#utils.debug("_click_event_loop: Forgot to disable collisions?")
 			utils.debug(traceback.format_exc())
 		
 	_hold = False

@@ -98,54 +98,6 @@ def rand10():
 	""" Generates a rondom integer from 0 to 9 """
 	return randint(0,9)
 
-#3D Math
-class LinearInterpolation:
-	""" Makes a linear interpolation over time, uses a callback to apply changes.
-	
-	This class can be used as a function, the garabage collector will not delete its instances until the interpolation ends. The callbacks are done at 10Hz.
-	
-	:param float A: The start value.
-	:param float B: The end value.
-	:param float time: The time it takes, in seconds.
-	:param callback: The function to call to apply changes, it's first argument will be the value of the interpolation (A <= value <= B).
-	:param final: The function to call when the interpolation ends.
-	
-	.. attribute:: x
-	
-		The time since the interpolation started, in seconds.
-	
-		:type: float
-	"""
-	def __init__(self, A, B, time, callback, final = None):
-		module.low_frequency_callbacks.append(self.update)
-		self.A = A
-		self.B = B
-		self.m = B-A
-		self.x = 0
-		self.y = time
-		self.callback = callback
-		self.final = final
-		
-	def update(self):
-		if self.x < 0 or self.x > self.y: self.delete()
-		self.x += module.LOW_FREQUENCY_TICK
-		x = self.x/self.y
-		y = self.m*x + self.A
-		
-		if self.m > 0:
-			if y < self.A: y = self.A
-			if y > self.B: y = self.B
-		if self.m < 0:
-			if y > self.A: y = self.A
-			if y < self.B: y = self.B 
-		self.callback(y)
-		
-	def delete(self):
-		""" Deletes/Stops the interpolation. Automatically called once x >= time. """
-		module.low_frequency_callbacks.remove(self.update)
-		if self.final: self.final()
-		del self
-
 def vectorFrom2Points(origin, dest, module = None):
 	""" Returns a |Vector|  form 2 points in the space.
 	
@@ -275,7 +227,7 @@ def setCamera(scene, camera_name):
 	.. note::
 		Use instead of ``KX_Scene.active_camera = KX_GameObject``.
 	
-	:param scene: Scene where to change the active camera.
+	:param scene: Scene behavior where to change the active camera.
 	:type scene: |KX_Scene|
 	:param string camera_name: Name of the new active camera.
 	"""
@@ -284,6 +236,7 @@ def setCamera(scene, camera_name):
 	#Spawn camera if in hidden layer?
 	#...
 	
+	scene = scene.scene #I know
 	scene.active_camera = camera
 	if scene == module.scene_gui:
 		win = module.window
@@ -308,10 +261,10 @@ def setFilter2D(name, camera, slot):
 	"""
 	try:
 		try: cont = camera.controllers["Python"]
-		except: return
+		except: verbose("Filter2D failed, the camera doesn't have a controller named Python")
 		if cont != logic.getCurrentController():
 			module.filter_queue.append((name, camera, slot))
-			camera.sensors["Always"].usePosPulseMode=1 
+			camera.sensors["Always"].usePosPulseMode=1
 			return
 		
 		path = logic.expandPath("//core/glsl/" + name + ".filter2D")
@@ -341,24 +294,3 @@ def removeFilter2D(camera, slot):
 	except:
 		import traceback
 		traceback.print_exc()
-		
-#LibLoad
-def libLoad(filepath, mode, camera):
-	""" Loads an blend dinamically.
-	
-	Blends loaded with this method must have only 1 scene. They also need to have a Python controller conected with an always on module mode with the following string: ``main.libload``.
-	This logic bricks are recomended to be used in an object that clearly is the main object of the scene or a camera if any.
-	
-	:param string filepath: Relative path from the *data* folder where the blend file is placed.
-	:param mode: The same mode that will be used on ``bge.logic.LibLoad()``, it's recomended to use "Scene".
-	:param camera: The main camera of the scene (where logic bricks are used).
-	:type camera: |KX_GameObject|
-	"""
-	path = logic.expandPath("//../data/" + filepath)
-	scene_to = camera.scene
-	if scene_to == module.scene_gui:
-		logic.LibLoad(path, mode, load_actions = True, load_scripts = False)
-	elif scene_to == module.scene_game:
-		module.libload_queue.append((path, mode))
-		camera.sensors["Always"].usePosPulseMode=1
-	else: debug("utils.libLoad failed, the scene provided is not running.")

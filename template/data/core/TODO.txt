@@ -2,6 +2,14 @@ LAUNCHER
 - Compile Linux version & edit to work with installed blender in Debian and derivated systems.
 
 GUI
+- Replace font objects with blf.
+	It's compatibe with object color (including alpha).
+	You can get the text dimensions, it means corrected alignation.
+	No pexelation.
+	The deep of the plane can be adjusted on blf.position.z, it works fine but
+	its value != object.position.z, instead a transformation to camera coords is needed,
+	it may requiere further investigation to found the proper value.	
+
 - Add a LoadingBar widget.
 - Make buttons with press layer (not only over)
 - Make default start game menu.

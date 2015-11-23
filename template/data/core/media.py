@@ -1,5 +1,5 @@
 from bge import logic, texture
-from core import module, interface, utils
+from core import module, interface, utils, sequencer
 import aud
 
 #=====================================
@@ -55,9 +55,9 @@ class Screen(interface.widget.Widget):
 	def replaceTexture(self, filepath):
 		""" Change the texture of the object by another, external, texture.
 		
-		:param string filepath: The relative path (to the game folder) of the texture/image to replace.		
+		:param string filepath: The relative path (from the data folder) of the texture/image to replace.		
 		"""
-		path = logic.expandPath("//../" + filepath)
+		path = logic.expandPath("//../data/" + filepath)
 		self.texture = texture.Texture(self.obj, 0)
 		self.texture.source = texture.ImageFFmpeg(path)
 		self.texture.refresh(False)
@@ -65,11 +65,11 @@ class Screen(interface.widget.Widget):
 	def play(self, video, callback=None):
 		""" Plays a video on this screen, also makes the *speaker* aviable.
 		
-		:param string video: The relative path (to the game folder) of the video to use.
+		:param string video: The relative path (from the data folder) of the video to use.
 		:param function callback: Function to call once the video ends.
 		"""
 		#Video
-		path = logic.expandPath("//../" + video)
+		path = logic.expandPath("//../data/" + video)
 		self.video = texture.Texture(self.obj, 0)
 		self.video.source = texture.VideoFFmpeg(path)
 		self.video.source.scale = True
@@ -88,14 +88,14 @@ class Screen(interface.widget.Widget):
 		
 		:param float time: How long the fadein lasts.
 		"""
-		utils.LinearInterpolation(self.obj.color.w, 1, time, self._interpol)
+		sequencer.LinearInterpolation(self.obj.color.w, 1, time, self._interpol)
 	
 	def fadeOut(self, time):
 		"""Starts to make fadeout now. It actuates over the alpha chanel of the |KX_GameObject| representing this screen. In order to work it needs *object color* enabled on the material.
 		
 		:param float time: How long the fadein lasts.
 		"""
-		utils.LinearInterpolation(self.obj.color.w, 0, time, self._interpol)
+		sequencer.LinearInterpolation(self.obj.color.w, 0, time, self._interpol)
 	
 	def _interpol(self, x):
 		self.obj.color.w = x
@@ -120,7 +120,7 @@ device = aud.device()
 class AudioFile():
 	""" A object representating an audio file. Initializating this won't play the file.
 	
-	:param string filepath: Relative path (to the game folder) of the audio file to use.
+	:param string filepath: Relative path (from the data folder) of the audio file to use.
 	:param function callback: Function to call once the playback ends.
 	
 	.. attribute:: handle
@@ -148,7 +148,7 @@ class AudioFile():
 	def play(self, filepath=None, loop=False, volume = None, pitch = 1, callback = None):
 		""" Method to play the an audio file.
 		
-		:param string filepath: Relative path (to the game folder) of the audio file to use.
+		:param string filepath: Relative path (from the data folder) of the audio file to use.
 		:param bool loop: If true the audio will be played in loop.
 		:param float volume: The volume of the audio file relative to the master device. (Default = 1.0)
 		:param float pitch: The pitch.
@@ -157,7 +157,7 @@ class AudioFile():
 		
 		self.callback = callback
 		if not filepath: filepath = self.filepath
-		path = logic.expandPath("//../" + filepath)
+		path = logic.expandPath("//../data/" + filepath)
 		factory = aud.Factory(path)
 		
 		self.factory = factory
@@ -175,14 +175,14 @@ class AudioFile():
 		
 		:param float time: How long the fadeout lasts.
 		"""
-		utils.LinearInterpolation(self.volume, self.volume_min, time, self._interpol)
+		sequencer.LinearInterpolation(self.volume, self.volume_min, time, self._interpol)
 		
 	def fadeIn(self, time):
 		"""Starts to make fadein now.
 		
 		:param float time: How long the fadein lasts.
 		"""
-		utils.LinearInterpolation(self.volume, 1, time, self._interpol)
+		sequencer.LinearInterpolation(self.volume, 1, time, self._interpol)
 	
 	def _interpol(self, x):
 		self.volume = x
@@ -203,8 +203,8 @@ class AudioFile():
 			self.handle.volume = x
 		except: self._volume = x
 	
-	def update(self):
-		self.time += module.LOW_FREQUENCY_TICK
+	def update(self, time):
+		self.time += time
 	
 		if self.handle and self.handle.status == False:
 			module.low_frequency_callbacks.remove(self.update)
@@ -213,3 +213,17 @@ class AudioFile():
 			
 		
 music = AudioFile("")
+sui = {}
+
+class AudioEffect:
+	def __init__(self, filepath):
+		path = logic.expandPath("//../data/" + filepath)
+		factory = aud.Factory(path)
+		self.factory = factory.buffer()
+		self.handle = None
+		
+	def play(self, volume = 1, pitch = 1):
+		self.handle = device.play(self.factory)
+		self.handle.volume = volume
+		self.handle.pitch = pitch
+		
