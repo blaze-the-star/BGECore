@@ -10,8 +10,8 @@ class MouseLook(Object):
 		self.sensitivity = 0.75
 		self.invertx = -1
 		self.inverty = -1
-		self.speedx = 0.01
-		self.speedz = 0.03
+		self.speedx = 0.1
+		self.speedz = 0.3
 		module.enableInputFor(self)
 		
 	def update(self):

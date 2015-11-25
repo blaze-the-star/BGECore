@@ -2,29 +2,16 @@ LAUNCHER
 - Compile Linux version & edit to work with installed blender in Debian and derivated systems.
 
 GUI
-- Replace font objects with blf.
-	It's compatibe with object color (including alpha).
-	You can get the text dimensions, it means corrected alignation.
-	No pexelation.
-	The deep of the plane can be adjusted on blf.position.z, it works fine but
-	its value != object.position.z, instead a transformation to camera coords is needed,
-	it may requiere further investigation to found the proper value.	
-
 - Add a LoadingBar widget.
 - Make buttons with press layer (not only over)
-- Make default start game menu.
 - Make a pause system.
 - Make SplitWindow system for Window.
 
 MEDIA
-- Add SoundEffect class (3D short sound, remaining in RAM, deleted when setScene)
 - Add adjustable latterbox with transition effect.
 - Add backgroundColor and make fadeIn work with this color and fadeOut with it's inverse.
 - window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
 moved/scaled/rotated when you swich a GUI camera.
-
-UTILS
-- Check overall.
 
 BEHAVIOR
 - Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).
@@ -36,8 +23,7 @@ BEHAVIOR
 - Make update() wait until all LibLoad on the initialization are complete.
 
 DYNAMIC
-- Put LibLoad api here. So: core.dynamic.load("file.blend")
-- Better usage of self.objects.
 - Add core.dynamic.remove("file.blend")
 - Add KX_GameObject = core.dynamic.copy(KX_GameObject)
 - LOD will be here too.
+- Make lebel editor

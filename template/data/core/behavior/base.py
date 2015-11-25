@@ -86,6 +86,7 @@ class Scene():
 		self.sun_position = None
 		self.scene = None
 		self.objects = {}
+		self.objectsInactive = {}
 		
 	def init(self):
 		""" Override this with your behavior initialization. """

@@ -1,6 +1,7 @@
 from bge import logic, texture
 from core import module, interface, utils, sequencer
 import aud
+import os.path
 
 #=====================================
 #			DEFAULT SCREEN
@@ -160,12 +161,16 @@ class AudioFile():
 		path = logic.expandPath("//../data/" + filepath)
 		factory = aud.Factory(path)
 		
-		self.factory = factory
-		self.handle = device.play(self.factory)
-		self.handle.pitch = pitch
-		if volume == None: self.volume = self._volume
-		else: self.volume = volume
-		if loop: self.handle.loop_count = -1
+		try:
+			self.factory = factory
+			self.handle = device.play(self.factory)
+			self.handle.pitch = pitch
+			if volume == None: self.volume = self._volume
+			else: self.volume = volume
+			if loop: self.handle.loop_count = -1
+		except:
+			if os.path.isfile(path) == False: utils.debug("Audio File, Not Found: " + path)
+			else: utils.debug("AudioFile Load Error: " + path)
 		
 		module.low_frequency_callbacks.append(self.update)
 		return self

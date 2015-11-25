@@ -4,6 +4,7 @@ from random import randint
 from time import sleep
 from script import constant
 from core import module
+import bisect
 
 def loadGameProperty(name):
 	""" Loads a property from your :file:`config.txt` file.
@@ -94,6 +95,36 @@ def randRGB(r = None, g = None, b = None, a = 1):
 	if not a: a = randint(0,100)/100
 	return Vector((r,g,b,a))
 
+#Math
+#Returns a list of multiples of d form num. Ex 32, 2: 32, 16, 8, 4, 2
+def getMultiples(num, d = [2]):
+	l = []
+	if len(d) > 1:
+		for i in d: l.extend(getMultiples(num, [i]))
+		return l
+	
+	d = d[0]
+	while(num >= d):
+		if num % d == 0: l.append(num)
+		num /= d
+	return l
+	
+def getPrimes(limit):
+	l = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
+	if limit <= 101:
+		i = bisect.bisect_left(l, limit)
+		return l[:i]
+	else:
+		i = 102
+		while(i <= limit):
+			isp = True
+			for x in l:
+				if i % x == 0: isp = False; break
+			if isp: l.append(i)
+			i += 1
+			
+		return l
+	
 def rand10():
 	""" Generates a rondom integer from 0 to 9 """
 	return randint(0,9)

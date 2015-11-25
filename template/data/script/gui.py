@@ -8,7 +8,7 @@ class GUI(behavior.Scene):
 		interface.window.setCursor("Cursor")
 		
 		#Start the game with intro video
-		if not constant.GAME_DEBUG:
+		if not constant.GAME_DEBUG and False:
 			interface.window.hideCursor()
 			utils.setCamera(self, "GUICamera.001") #Makes the menu desapear.
 			media.showScreen()
@@ -23,16 +23,22 @@ class GUI(behavior.Scene):
 		utils.setCamera(self, "GUICamera.000")
 		interface.window.showCursor()
 		media.hideScreen()
-		sequencer.Wait(1, self.setupMainMenu)
+		if constant.GAME_DEBUG == True: self.setupMainMenu()
+		else: sequencer.Wait(1, self.setupMainMenu)
 		
 	def setupMainMenu(self):
-		MainMenu.fadeinref = sequencer.LinearInterpolation(0, 1, 2, MainMenu.xcolor)
 		MainMenu(0, "MItem.000", "New Game")
-		MainMenu(1, "MItem.001", "Options")
+		MainMenu(1, "MItem.001", "Editor")
 		MainMenu(2, "MItem.002", "Exit")
+		if constant.GAME_DEBUG == True:
+			MainMenu.xcolor(1)
+		else: MainMenu.fadeinref = sequencer.LinearInterpolation(0, 1, 2, MainMenu.xcolor)
 		
 	def startGame(self):
 		dynamic.loadScene("scene/intro.blend", "Intro")
+		
+	def startEditor(self):
+		dynamic.loadSceneEditor()
 		
 	def update(self):
 		pass
@@ -65,11 +71,20 @@ class MainMenu(interface.TextMenu):
 			self.fadeinref.delete()
 			
 		if self.index == 0:
-			sequencer.LinearInterpolation(s, 0, 2, MainMenu.xcolor, sb.startGame)
+			if constant.GAME_DEBUG == False:
+				sequencer.LinearInterpolation(s, 0, 2, MainMenu.xcolor, sb.startGame)
+			else:
+				MainMenu.xcolor(0)
+				sb.startGame()
 			self.xactive(False)
 			
 		if self.index == 1:
-			print("OP1")
+			if constant.GAME_DEBUG == False:
+				sequencer.LinearInterpolation(s, 0, 2, MainMenu.xcolor, sb.startEditor)
+			else:
+				MainMenu.xcolor(0)
+				sb.startEditor()
+			self.xactive(False)
 		
 		if self.index == 2:
 			sequencer.LinearInterpolation(s, 0, 0.5, MainMenu.xcolor, logic.endGame)

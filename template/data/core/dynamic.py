@@ -1,4 +1,5 @@
 from core import utils, module
+from core.editor import behavior
 from bge import logic
 
 #LibLoad
@@ -25,6 +26,7 @@ def loadIntoScene(filepath, mode, camera):
 	
 _change_scene_name = ""
 _change_scene_path = ""
+
 def loadScene(filepath, name):
 	global _change_scene_name
 	global _change_scene_path
@@ -50,7 +52,13 @@ def loadScene(filepath, name):
 		module.change_scene_dynamic_state += 1
 		module.scene_game = scene
 		loadIntoScene(_change_scene_path, "Scene", scene.active_camera)
+		if name in module.scene_behavior_dict:
+			module.scene_behavior = (module.scene_behavior_dict[name])()
+			b = module.scene_behavior
+			b.scene = scene
 		return
+		
+	if state == 2: return
 	
 	if state == 3: #+1 on main.libload
 		module.change_scene_dynamic_state = 0
@@ -59,10 +67,12 @@ def loadScene(filepath, name):
 	module.change_scene_dynamic = False
 
 	if name in module.scene_behavior_dict:
-		module.scene_behavior = (module.scene_behavior_dict[name])()
 		b = module.scene_behavior
-		b.scene = scene
 		for ob in scene.objects: b.objects[ob.name] = ob
+		for ob in scene.objectsInactive: b.objectsInactive[ob.name] = ob
 		b.init()
 		b.baseInit()
 		for bh in b.behaviors: bh.init()
+		
+def loadSceneEditor():
+	loadScene("core/editor/base.blend", "SceneEditor")
