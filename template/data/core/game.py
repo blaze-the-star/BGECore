@@ -14,8 +14,9 @@ elapsed = done - start
 _state = 0
 _last_time = time.time()
 _last_time2 = _last_time
+_last_traceback = ""
 def loop():
-	global _state, _last_time, _last_time2
+	global _state, _last_time, _last_time2, _last_traceback
 	
 	#Set scene
 	if module.change_scene_frame == True:
@@ -56,8 +57,11 @@ def loop():
 				if not module.scene_behavior: return #When removing the scene
 	except:
 		if module.scene_behavior: module.scene_behavior.paused = True
-		utils.debug("Error during runtime. Scene behavior suspended!")
-		traceback.print_exc()
+		s = traceback.format_exc()
+		if s != _last_traceback:
+			utils.debug("Error during runtime. Scene behavior suspended!")
+			print(s)
+		_last_traceback = s
 	
 	#Other callbacks
 	for v in module.video_playback_list: v.updateVideo()
