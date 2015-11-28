@@ -1,8 +1,0 @@
-Download: http://www.angusj.com/resourcehacker/resource_hacker.zip
-
-1- Open the .exe file (the launcher).
-2- Go to Action --> Replace Icon --> Open file with new icon.
-3- Click replace icon.
-4- Save.
-
-Icons must be ".ico" files or be packed inside another .exe file. You can create your custom icon with Gimp.
