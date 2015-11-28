@@ -1,0 +1,7 @@
+version 0.0.2
+
++ui warning if values exceed format limits
++display size of the image in pixels
++file dialogs open last chosen directory (session only)
++.png extension check for saved files
++some cleaning and refactoring to code
