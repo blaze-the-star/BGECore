@@ -16,5 +16,4 @@ Thumbs.db
 _static/
 _templates/
 *.png.map
-template/data/script/constant.py
 documentation/build/
