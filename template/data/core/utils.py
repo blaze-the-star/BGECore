@@ -181,6 +181,16 @@ def moveObjectToPosition(origin, dest, speed = 1):
 		return True
 	else: return False
 	
+def removeAll(original_list, sublist):
+	""" Removes all ocurrences of any of the values of sublist from original_list"""
+	l = []
+	for x in original_list:
+		inl = False
+		for y in sublist:
+			if x == y: inl = True
+		if not inl and x not in l: l.append(x)
+			
+	return l
 
 #Scene Managment
 def getSceneByName(name):

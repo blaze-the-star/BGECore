@@ -16,7 +16,11 @@ change_scene_dynamic_state = 0
 filter_queue = []
 
 #Static of core.utils.libLoad()
-libload_queue = []
+libload_queue = [] #(filepath, mode)
+
+#Static for core.dynamic.ObjectGenerator
+libload_gqueue = [] #(data, path, id, callback)
+inload_gqueue = [] #(path, id, callback)
 
 #Interface
 window = None

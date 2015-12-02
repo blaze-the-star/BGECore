@@ -6,6 +6,7 @@ GUI
 - Make buttons with press layer (not only over)
 - Make a pause system.
 - Make SplitWindow system for Window.
+- Fix bug with Labels scale/position on Render->Display->Scale Mode.
 
 MEDIA
 - Add adjustable latterbox with transition effect.
@@ -25,5 +26,6 @@ BEHAVIOR
 DYNAMIC
 - Add core.dynamic.remove("file.blend")
 - Add KX_GameObject = core.dynamic.copy(KX_GameObject)
-- LOD will be here too.
 - Make lebel editor
+- Thread the loading of the file in memory with the "data" option of LibLoad and async.
+

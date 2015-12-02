@@ -102,7 +102,7 @@ class Scene():
 		
 	#Like "update" but for preseted behaviors.
 	def baseUpdate(self):
-		if "Sun" in self.scene.objects:
+		if "Sun" in self.scene.objects and self.sun_position:
 			self.scene.objects["Sun"].worldPosition = self.scene.active_camera.worldPosition + self.sun_position
 		if "Sky" in self.scene.objects:
 			self.scene.objects["Sky"].worldPosition = self.scene.active_camera.worldPosition

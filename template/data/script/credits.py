@@ -3,7 +3,7 @@ from core import sequencer, utils, module, media
 class IntroCredits:
 	text = [
 	["Story", "Robert Planas"],
-	["Music", "Inigo Saez"],
+	["Music", "Iñigo Sáez"],
 	["Programming", "Robert Planas"],
 	["Powered by", "Blender Game Engine"]
 	]
@@ -17,8 +17,9 @@ class IntroCredits:
 		self.creditN.color.w = 0
 		self.icredit = 0
 		self.n = 0
-		self.interpolCamOrth = None
+		
 		utils.setCamera(gui, "GUICamera.002")
+		self.interpolCamOrth = None
 		sequencer.Wait(5, self.nextCredit)
 		sequencer.Wait(1, lambda: media.music.play("sound/music/Iñigo Sáenz - The Crusader.mp3"))
 		

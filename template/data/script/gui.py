@@ -8,10 +8,10 @@ class GUI(behavior.Scene):
 		interface.window.setCursor("Cursor")
 		
 		#Start the game with intro video
-		if not constant.GAME_DEBUG and False:
+		if not constant.GAME_DEBUG:
 			interface.window.hideCursor()
 			utils.setCamera(self, "GUICamera.001") #Makes the menu desapear.
-			media.showScreen()
+			media.showScreen() #Spawns screen
 			media.screen.play("video/intro.avi", callback=self.afterVideo)
 			media.screen.obj.color.w = 0 #Sets the screen alpha to 0 (invisible).
 			media.screen.fadeIn(2) #Sets the screen alpha to 1 with a linear interpolation over 2 seconds.
@@ -39,6 +39,7 @@ class GUI(behavior.Scene):
 		
 	def startEditor(self):
 		dynamic.loadSceneEditor()
+		self.objects["GUIBlackScreen"].color.w = 0
 		
 	def update(self):
 		pass
@@ -94,7 +95,6 @@ class MainMenu(interface.TextMenu):
 	def xcolor(self, x):
 		for n, m in MainMenu.button.items():
 			m.color.w = x
-			
 	
 	@classmethod
 	def xactive(self, x):
