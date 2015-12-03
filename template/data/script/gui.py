@@ -27,7 +27,7 @@ class GUI(behavior.Scene):
 		else: sequencer.Wait(1, self.setupMainMenu)
 		
 	def setupMainMenu(self):
-		MainMenu(0, "MItem.000", "New Game")
+		MainMenu(0, "MItem.000", "Start")
 		MainMenu(1, "MItem.001", "Editor")
 		MainMenu(2, "MItem.002", "Exit")
 		if constant.GAME_DEBUG == True:
