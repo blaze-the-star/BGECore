@@ -6,3 +6,5 @@ Download: http://www.angusj.com/resourcehacker/resource_hacker.zip
 4- Save.
 
 Icons must be ".ico" files or be packed inside another .exe file. You can create your custom icon with Gimp.
+
+Linux doesn't use executable icons!

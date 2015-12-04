@@ -42,7 +42,7 @@ Compilation commands:
 #define VAL_SIZE 100
 #define COM_SIZE 600
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 #if defined(_WIN32) || defined(WIN32)
 	#define _WIN32_IE 0x0400
@@ -77,6 +77,25 @@ int file_exist (char *filename) {
 	pFile = fopen(filename , "r");
 	if (pFile == NULL) return 0;
 	else {fclose(pFile); return 1;}
+}
+
+/*int length_string(char *text) {
+	int n; for(n = 0; *text != 0; text++) n++;	
+	return n;
+}*/
+
+void substr(char *text, int i, int j) {
+	if (j < 0) j = strlen(text) - i;	
+
+	char * tmp = strdup(text);
+	while(i != 0) {
+		tmp++; i--;
+	}
+	while(j != 0 && (*tmp) != '\0') {
+		(*text) = (*tmp);
+		text++; tmp++; j--;	
+	}
+	(*text) = '\0';
 }
 
 void replace_char(char *text, char a, char b) {
@@ -130,17 +149,10 @@ void parseConfig(FILE *pFile, char * command, char * filename, char * exepath) {
 		mode=ARGUMENT; n=0;
 		
 		//Commands
-		#ifdef WIN32
 		if (strcmp(arg, "player")==0) {
 			strncat(exepath, val, val_p);
 			if (VERBOSE) printf("EXEPATH (player): %s\n", exepath);
 		}
-		#else
-		if (strcmp(arg, "player")==0) {
-			strncat(command, val, val_p);
-			if (VERBOSE) printf("COMMAND (player): %s\n", command);
-		}	
-		#endif
 		if (strcmp(arg, "blend")==0) {
 			strncat(filename, val, val_p);
 			if (VERBOSE) printf("FILENAME (blend): %s\n", filename);
@@ -184,7 +196,12 @@ void parseConfig(FILE *pFile, char * command, char * filename, char * exepath) {
 		if (strcmp(arg, "blender_material")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g blender_material = 1");
 		if (strcmp(arg, "ignore_deprecation_warnings")==0 && strncmp(val, "false", 4)==0) strcat(command, " -g ignore_deprecation_warnings = 0");
 		
-		if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {strcpy(command, val); strcpy(filename, ""); break;}
+		if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {
+			memset(command, 0, COM_SIZE);
+			strncpy(command, val, val_p);
+			strncpy(filename, "", 0);
+			break;
+		}
 		
 		//Clean
 		memset(arg, 0, sizeof(arg));
@@ -234,7 +251,6 @@ void getCommand(char * command, char * filename, char * exepath) {
 		strcat(pf, "/Blender Foundation/Blender/blenderplayer.exe");
 		strcat(pf86, "/Blender Foundation/Blender/blenderplayer.exe");
 		char ** paths = (char *[]) {pf, pf86, "engine/Blender/blenderplayer.exe", NULL};
-		char ** paths = (char *[]) {NULL};
 		
 		char * path = findPlayerPath(paths);
 
@@ -253,7 +269,30 @@ void getCommand(char * command, char * filename, char * exepath) {
 }
 #else
 void getCommand(char * command, char * filename, char * exepath) {
-	return;
+	char tmp[COM_SIZE] = "./";
+	if (file_exist(exepath) == 0) {
+		char noexe[COM_SIZE];
+		strncpy(noexe, exepath, COM_SIZE-3);
+		substr(noexe, 0, strlen(noexe) - 4);
+		char ** paths = (char *[]) {noexe, "engine/Blender/blenderplayer",
+		"/usr/bin/blenderplayer", "/opt/blender/blenderplayer", NULL};
+		char * path = findPlayerPath(paths);
+		if (path == NULL) {
+			printf("No blenderplayer has been found!\n");
+			system("xmessage -center \"Error: No Blenderplayer has been found in this computer. Please install Blender from the repositories\nor put a copy of Blender in the engine folder of the game directory.\n\nhttp://www.blender.org\"");
+			return;		
+		}
+		else strcpy(exepath, path);
+		//strncpy(exepath, path, COM_SIZE-strlen(path));
+	}
+	else {
+		strcat(tmp, exepath);
+		strcpy(exepath, tmp);
+	}	
+	strcat(exepath, command);
+	strncat(exepath, " ", 1);
+	strcat(exepath, filename);
+	strcpy(command, exepath);
 }
 #endif
 
@@ -268,27 +307,23 @@ int main(int argc, char * argv[])
 	}	
 	
 	// --- normal use -------------------------------------------
-	 #ifdef WIN32
-	 	char command[COM_SIZE] = "";
-	 #else
-		char command[COM_SIZE] = "./";
-	 #endif
-	 char filename[VAL_SIZE] = {0};
-	 char exepath[VAL_SIZE] = {0};
-	 
-	 FILE * pFile;
-	 pFile = fopen ("config.txt" , "r");
-	 if (pFile == NULL) {perror ("Error opening config file. Try -help or -h\n"); return 0;} 
-	 else {
+    char command[COM_SIZE] = "";
+	char filename[VAL_SIZE] = "";
+	char exepath[COM_SIZE] = "";
+	
+	FILE * pFile;
+	pFile = fopen ("config.txt" , "r");
+	if (pFile == NULL) {perror ("Error opening config file. Try -help or -h\n"); return 0;} 
+	else {
 		parseConfig(pFile, command, filename, exepath);
 		fclose (pFile);
 	}
 	
 	//printf("COMMAND: %s FILENAME: %s EXEPATH: %s\n", command, filename, exepath);
-	printf("COMMAND: %s \nFILENAME: %s\n", command, filename);
+	//printf("COMMAND: %s \nFILENAME: %s\n", command, filename);
 	
 	getCommand(command, filename, exepath);
-	//printf("Command: %s\n", command);
+	printf("Command: %s\n", command);
 	system(command);
 	 
 	return 0;
