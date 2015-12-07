@@ -1,0 +1,32 @@
+LAUNCHER
+- Compile Linux version & edit to work with installed blender in Debian and derivated systems.
+
+GUI
+- Add a LoadingBar widget.
+- Make buttons with press layer (not only over)
+- Make a pause system.
+- Make SplitWindow system for Window.
+- Fix bug with Labels scale/position on Render->Display->Scale Mode.
+- Fix bug with Labels \n and \t characters.
+
+MEDIA
+- Add adjustable latterbox with transition effect.
+- Add backgroundColor and make fadeIn work with this color and fadeOut with it's inverse.
+- window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
+moved/scaled/rotated when you swich a GUI camera.
+
+BEHAVIOR
+- Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).
+- Make an animator (class, not behavior, used by control behavior).
+	NOTE:
+	Skyrim Behavior contains 3 classes/behaviors: Animator, InputControl, CameraView.
+	GTA ````
+	AssasinsCreed ````
+- Make update() wait until all LibLoad on the initialization is complete.
+
+DYNAMIC
+- Add core.dynamic.remove("file.blend") or core.dynamic.remove("libname")
+# - Add KX_GameObject = core.dynamic.copy(KX_GameObject) -> Use ObjectGenerator instead.
+- Make lebel editor
+# - Thread the loading of the file in memory with the "data" option of LibLoad and async. -> Not nesscesary, probably overkill.
+
