@@ -1,5 +1,9 @@
+IMPORTANT
+- Change main loop system, scene behaviors and their object behaviors should be executed on
+a controller of that scene, not the GUI. Otherwise a lot of BGE API breaks.
+
 LAUNCHER
-- Compile Linux version & edit to work with installed blender in Debian and derivated systems.
+- Compile Mac version
 
 GUI
 - Add a LoadingBar widget.

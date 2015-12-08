@@ -13,6 +13,7 @@ class TileManager:
 		self.tiles_index = (0, 0)
 
 		self.i = 0
+		self.j = 0
 
 		x = int(x/2)
 		y = int(y/2)
@@ -26,6 +27,25 @@ class TileManager:
 		module.height_frequency_callbacks.append(self.update)
 
 	def update(self, time):
+		self.update_lazy()
+
+	def update_lazy(self, maxfac = 2):
+		s = Tile.size
+		p = Tile.focus.worldPosition
+		self.tiles_index = int(p.x/s), int(p.y/s)
+		sx, sy = self.tiles_scale
+
+		fac = 0
+		if self.i <= 0: self.i = abs(sx*2)
+		while(self.i > 0):
+			self.i -= 1
+			if self.j <= 0: self.j = abs(sy*2)
+			while(self.j > 0):
+					self.j -= 1
+					fac += self.tiles[self.i][self.j].update()
+					if fac > maxfac: return
+
+	def update_boxmethod(self, time):
 		#if self.i == -1: return
 		#update coords
 		s = Tile.size
@@ -63,9 +83,7 @@ class TileManager:
 class Tile:
 	size = 200
 	focus = None
-	STABLE = 0
-	LOADING = 1
-	LOADED = 2
+	minlod = 2
 	generator = []
 
 	def __init__(self, x, y):
@@ -85,42 +103,69 @@ class Tile:
 		self.y = y * Tile.size
 		self.o = None
 		self.n = -1
-		self.state = Tile.STABLE
+		self._n = self.n
 
 		#And finally, we initializate all tiles in the first frame.
-		#self.update()
+		self.update()
 
 	def update(self):
-		""" Updates a tile chink based on it's distance from the focus """
+		""" Updates a tile chink based on it's distance from the focus
+
+		:return int factor: The inverse of the LOD level that will be applied,
+		no mesh = 0, most low poly = 1, most high poly = maxium lod.
+		"""
 		#print("U: " + str(self.x/self.size) + ' ' + str(self.y/self.size))
 		distance = Tile.focus.getDistanceTo([self.x, self.y, 0])
+		m = Tile.minlod
 
-		if distance <= Tile.size: 		self.check(0, self.x, self.y)
-		elif distance <= Tile.size*2:	self.check(1, self.x, self.y)
-		#elif distance <= Tile.size*3:	self.check(2, self.x, self.y)
-		#elif distance <= Tile.size*6:	self.check(3, self.x, self.y)
+		if distance <= Tile.size: n = m
+		elif distance <= Tile.size*2: n = m+1
+		elif distance <= Tile.size*3: n = m+2
+		elif distance <= Tile.size*6: n = m+3
 		#elif distance <= Tile.size*10:	self.check(4, self.x, self.y)
-		else:							self.check(-1, self.x, self.y)
+		elif distance > Tile.size*2: n = -1
+
+		if n < 5:
+			s = self.check(n, self.x, self.y)
+		else:
+			self.check(-1, self.x, self.y)
+			s = 0.2
+		return s
 
 	def check(self, n, x, y):
 		if self.n != n:
 			filepath = "core/editor/LOD" + str(n) + ".blend"
-			if self.o and self.n >= 0:
-				self.o = None
-				Tile.generator[self.n].remove((self.x, self.y))
 			if n >= 0:
 				Tile.generator[n].new((x, y), self.tileJustLoaded)
+			else:
+				if self.o and self.n >= 0:
+					self.o = None
+					Tile.generator[self.n].remove((self.x, self.y))
 			self.n = n
+			if n == -1: return 0.5
+			else: return 5-n+Tile.minlod
+		return 0.05
 
 	def tileJustLoaded(self, obj, time): #Add time
 		obj.worldPosition = (self.x, self.y, 0)
+		obj.visible = True
+		if self.o and self._n >= 0:
+			self.o = None
+			Tile.generator[self._n].remove((self.x, self.y))
+
 		self.o = obj
-		print(str(obj) + " Time: " + str(time))
-		#self.updateMesh(obj, self.n)
+		self._n = self.n
+		#print(str(obj) + " Time: " + str(time))
+		self.updateMesh(obj, self.n)
 
 	def updateMesh(self, obj, lod):
-		if lod == 1:
+		if lod > 0:
 			mesh = obj.meshes[0]
-			v = mesh.getVertex(0, 15)
-			v.XYZ = [v.x, v.y, utils.randint(0, 100)]
+			for v_index in range(mesh.getVertexArrayLength(0)):
+				v = mesh.getVertex(0, v_index)
+				r = randint(0,50)
+				v.XYZ = [v.x, v.y, 0] #Move pointer (KX_GameObject) here.
+
+		if lod < 2:
 			obj.reinstancePhysicsMesh(obj, mesh)
+			obj.restoreDynamics()

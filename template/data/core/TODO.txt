@@ -1,5 +1,9 @@
+IMPORTANT
+- Change main loop system, scene behaviors and their object behaviors should be executed on
+a controller of that scene, not the GUI. Otherwise a lot of BGE API breaks.
+
 LAUNCHER
-- Compile Linux version & edit to work with installed blender in Debian and derivated systems.
+- Compile Mac version
 
 GUI
 - Add a LoadingBar widget.
@@ -11,7 +15,6 @@ GUI
 
 MEDIA
 - Add adjustable latterbox with transition effect.
-- Add backgroundColor and make fadeIn work with this color and fadeOut with it's inverse.
 - window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
 moved/scaled/rotated when you swich a GUI camera.
 

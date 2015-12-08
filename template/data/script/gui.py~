@@ -5,7 +5,7 @@ from bge import logic
 class GUI(behavior.Scene):
 	def init(self):
 		#Set the cursor, hide for the intro video.
-		interface.window.setCursor("GUICursor")
+		interface.window.setCursor("Cursor")
 
 		#Start the game with intro video
 		if not constant.GAME_DEBUG:

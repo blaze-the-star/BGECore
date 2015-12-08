@@ -56,7 +56,8 @@ class CameraBorder(behavior.Object):
 class BasicControl(behavior.Object):
 	def init(self):
 		module.enableInputFor(self)
-		self.speed = 4
+		#self.speed = 4
+		self.speed = 1
 
 	def onKeyPressed(self, keys):
 		s = self.speed
@@ -66,9 +67,16 @@ class BasicControl(behavior.Object):
 		if key.H in keys: self.obj.worldPosition.x -= s
 
 
+class Cursor(behavior.Object):
+	def update(self):
+		try: self.obj.worldPosition = module.window.hitpoint
+		except:
+			print("hitpoint failed: " + str(module.window.hitpoint))
+			
 class SceneEditor(behavior.Scene):
 	def init(self):
 		self.addBehavior(CameraBorder, self.scene.active_camera)
+		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
 		self.tm = TileManager(focus, 20, 20)
