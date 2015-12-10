@@ -35,6 +35,7 @@ Compilation commands:
 	gcc -o launcher.exe launcher.o xyz.rc.o
 */
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -240,6 +241,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 	replace_char(abspath, '\\', '/');
 	strcat(quoted, command);
 	sprintf(quoted, "\"%s%s\"\0", abspath, exepath);
+
 	strcpy(abspath, quoted);
 	remove_char(abspath, '"');
 
@@ -262,10 +264,10 @@ void getCommand(char * command, char * filename, char * exepath) {
 		sprintf(quoted, "\"%s\"\0", path);
 	}
 	
-	strcat(quoted, command);
+	strncat(quoted, command, COM_SIZE);
 	sprintf(command, "\"%s%s\"\0", quoted, filename);
 
-	strcat(command, filename);
+	strncat(command, filename, COM_SIZE);
 }
 #else
 void getCommand(char * command, char * filename, char * exepath) {
@@ -275,12 +277,17 @@ void getCommand(char * command, char * filename, char * exepath) {
 		strncpy(noexe, exepath, COM_SIZE-3);
 		substr(noexe, 0, strlen(noexe) - 4);
 		char ** paths = (char *[]) {noexe, "engine/Blender/blenderplayer",
+        "engine/blenderplayer.app/Contents/MacOS/blenderplayer",
 		"/usr/bin/blenderplayer", "/opt/blender/blenderplayer", NULL};
 		char * path = findPlayerPath(paths);
 		if (path == NULL) {
 			printf("No blenderplayer has been found!\n");
-			system("xmessage -center \"Error: No Blenderplayer has been found in this computer. Please install Blender from the repositories\nor put a copy of Blender in the engine folder of the game directory.\n\nhttp://www.blender.org\"");
-			return;		
+#if __APPLE__ && __MACH__
+			system("osascript -e 'tell app \"System Events\" to display dialog \"No blenderplayer found! \nPlease install Blender on your system or put a copy in the 'engine' directory.\n\nwww.blender.org \"'");
+#else
+            system("xmessage -center \"Error: No Blenderplayer has been found in this computer. Please install Blender from the repositories\nor put a copy of Blender in the engine folder of the game directory.\n\nhttp://www.blender.org\"");
+#endif
+            return;
 		}
 		else strcpy(exepath, path);
 		//strncpy(exepath, path, COM_SIZE-strlen(path));
