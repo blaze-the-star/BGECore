@@ -184,6 +184,10 @@ class Label():
 		bgl.glMatrixMode(bgl.GL_MODELVIEW)
 		bgl.glLoadIdentity()
 		
+		bgl.glEnable(bgl.GL_BLEND)
+		bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
+		bgl.glAlphaFunc(bgl.GL_SRC_ALPHA, 1)
+		
 		#Z AXIS
 		oh = (far-near)/2
 		ortho_unit = 1/oh

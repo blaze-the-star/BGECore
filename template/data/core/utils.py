@@ -124,6 +124,12 @@ def getPrimes(limit):
 			i += 1
 			
 		return l
+		
+def recalculateNormals(obj):
+	mesh = obj.meshes[0]
+	
+	#Iterate throught Faces and make a list with all the vertex and the normals of the faces the are part of.
+	#Iterate throught the list recalculating the normal of each vertex.
 	
 def rand10():
 	""" Generates a rondom integer from 0 to 9 """

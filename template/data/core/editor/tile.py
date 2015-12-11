@@ -166,9 +166,10 @@ class Tile:
 			mesh = obj.meshes[0]
 			for v_index in range(mesh.getVertexArrayLength(0)):
 				v = mesh.getVertex(0, v_index)
+				if v.z < 9000: continue
 				r = randint(0,50)
 				v.XYZ = [v.x, v.y, 0] #Move pointer (KX_GameObject) here.
 
 		if lod > 0:
-			#obj.reinstancePhysicsMesh(obj, mesh)
+			obj.reinstancePhysicsMesh(obj, mesh)
 			obj.restoreDynamics()

@@ -1,5 +1,6 @@
 from script import constant
-from bge import logic, render
+from bge import logic, render, texture
+from bgl import *
 from core import utils, module
 from core.interface import event
 
@@ -68,7 +69,12 @@ class Window():
 		self.generateEvents(to, tto)
 
 		self.cursor_position = [tto[0], tto[1], self.camera_height]
-		if self.cursor: self.cursor.worldPosition = self.cursor_position
+		if self.cursor:
+			if type(self.cursor) is ImageCursor:
+				self.cursor.position = x, y
+				self.cursor.scale = 0.5, 0.5
+			else:
+				self.cursor.worldPosition = self.cursor_position
 
 		winx = render.getWindowWidth()
 		winy = render.getWindowHeight()
@@ -86,9 +92,7 @@ class Window():
 			vec = gcam.getScreenVect(x, y)
 			vec.negate()
 			vec = vec + gcam.position
-			#render.drawLine(gcam.position, vec, [0, 1, 0])
-			#render.drawLine([0,0,0], vec, [0.6, 0.2, 0.5])
-			obj, self.hitpoint, self.hitnormal = gcam.rayCast(vec, gcam, gcam.far)
+			self.hitobj, self.hitpoint, self.hitnormal = gcam.rayCast(vec, gcam, gcam.far)
 
 		else:
 			#Needs revision, rotation doesn't work
@@ -96,8 +100,7 @@ class Window():
 			scy = gcam.ortho_scale * render.getWindowHeight()/render.getWindowWidth()
 
 			to = [(x-0.5)*scx + cx, (-y+0.5)*scy + cy, 0]
-			obj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far)
-			if not self.hitobj: self.hitobj = obj
+			self.hitobj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far)
 
 	def cursorInsideFrustum(self):
 		""" Checks if the custom is inside the frustum of the camera.
@@ -133,9 +136,9 @@ class Window():
 		scene_gui = self.scene_gui
 
 		if scene_gui:
-			self.hitobj = self.camera.rayCast(tto, (to[0], to[1], self.camera.position.z), self.camera.far)[0]
+			obj = self.camera.rayCast(tto, (to[0], to[1], self.camera.position.z), self.camera.far)[0]
 
-		event._over_event_call(self.hitobj)
+		event._over_event_call(obj)
 
 	def hideCursor(self):
 		""" Turns the cursor visibility Off """
@@ -147,19 +150,160 @@ class Window():
 		if self.cursor: self.cursor.visible = True
 		else: logic.mouse.visible = True
 
-	def setCursor(self, objName):
-		""" Changes the cursor to a game object, usually the sprite of a new cursor.
+	def setCursor(self, obj):
+		""" Changes the cursor to a game object or image.
 
-			:param string objName: Name of the game object to use as a cursor. It must be a object of the GUI scene in an inactive layer.
+			:param string objName: Name of the game object to use as a cursor.
+			It must be a object of the GUI scene in an inactive layer.
+			Or the filepath of the image to use, relative to the data directory.
 		"""
 		own = self.camera
-		if self.cursor: self.cursor.endObject()
+		if self.cursor and not type(self.cursor) is ImageCursor: self.cursor.endObject()
 
-		if objName:
-			obj = self.scene_gui.objectsInactive[objName]
-			self.cursor = self.scene_gui.addObject(obj, own)
-			self.cursor.position.z = 9.9
-			logic.mouse.visible = False
+		if obj:
+			if type(obj) is str:
+				self.cursor = ImageCursor(obj)
+			else:
+				self.cursor = self.scene_gui.addObject(obj, own)
+				self.cursor.position.z = 9.9
+				logic.mouse.visible = False
 		else:
 			self.cursor = None
 			logic.mouse.visible = True
+			
+class ImageCursor:
+	def __init__(self, path):
+		self.worldPosition = [0,0,0]
+		self.visible = True
+		self.path = path
+		self.fullpath = logic.expandPath("//../data/" + path)
+		self.texture = texture.ImageFFmpeg(self.fullpath)
+		
+		self._tex_id = glGenTextures(1)
+		self.size = [0, 0]
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+		
+		self.reload()
+		
+		self.texco = [(0, 0), (1, 0), (1, 1), (0, 1)]
+		self.color = [1, 1, 1, 1]
+		
+		x = 0
+		y = 0
+
+		size = [50, 50]
+		
+		width = size[0]
+		height = size[1]
+		self._size = [width, height]
+		# The "private" position returned by setter
+		self._position = [x, y]
+		self.calculate_glposition()
+		module.scene_gui.post_draw.append(self.draw)
+
+	@property
+	def position(self):
+		return self._position
+	
+	@position.setter
+	def position(self, val):
+		x, y = val
+		winx = render.getWindowWidth()
+		winy = render.getWindowHeight()
+		
+		self._position = x*winx, -y*winy + winy
+		
+	@property
+	def scale(self):
+		return self._size
+	
+	@position.setter
+	def scale(self, val):
+		x, y = val
+		winx = render.getWindowWidth()/module.scene_gui.active_camera.ortho_scale
+		
+		self._size = x*winx, y*winx
+	
+	def calculate_glposition(self):
+		# OpenGL starts at the bottom left and goes counter clockwise
+		x, y = self._position
+		width, height = self._size
+		
+		self.gl_position = [
+					[x, y],
+					[x + width, y],
+					[x + width, y + height],
+					[x, y + height]
+				]
+		
+	def reload(self):
+		img = self.texture
+		
+		data = img.image
+		if data == None:
+			raise RuntimeError("Image not loaded correctly!")
+
+		glBindTexture(GL_TEXTURE_2D, self._tex_id)
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.size[0], img.size[1], 0,
+						GL_RGBA, GL_UNSIGNED_BYTE, data)
+
+		self.image_size = img.size[:]
+		
+	def draw(self):
+		if self.visible == False: return
+		height = render.getWindowHeight()
+		width = render.getWindowWidth()
+	
+		glMatrixMode(GL_PROJECTION)
+		glLoadIdentity()
+		gluOrtho2D(0, width, 0, height)
+		glMatrixMode(GL_MODELVIEW)
+		glLoadIdentity()
+	
+		# Enable textures
+		glEnable(GL_TEXTURE_2D)
+
+		# Enable alpha blending
+		glEnable(GL_BLEND)
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+		#glAlphaFunc(GL_SRC_ALPHA, 1)
+
+		# Bind the texture
+		glBindTexture(GL_TEXTURE_2D, self._tex_id)
+
+		# Fix position
+		w, h = self._size
+		glTranslatef(0, -h, 1)
+
+		#MipLevel
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+		
+		# Draw the textured quad
+		glColor4f(*self.color)
+
+		glBegin(GL_QUADS)
+		self.calculate_glposition()
+		for i in range(4):
+			glTexCoord2f(self.texco[i][0], self.texco[i][1])
+			glVertex2f(self.gl_position[i][0], self.gl_position[i][1])
+		glEnd()
+
+		glBindTexture(GL_TEXTURE_2D, 0)
+		
+		#glDisable(GL_TEXTURE_2D)
+		#glPopMatrix()
+		glMatrixMode(GL_PROJECTION)
+		glPopMatrix()
+		glMatrixMode(GL_MODELVIEW)
+		
+#Hacks
+_glGenTextures = glGenTextures
+def glGenTextures(n, textures=None):
+	id_buf = Buffer(GL_INT, n)
+	_glGenTextures(n, id_buf)
+
+	if textures:
+		textures.extend(id_buf.to_list())
+
+	return id_buf.to_list()[0] if n == 1 else id_buf.to_list()

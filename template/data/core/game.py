@@ -63,9 +63,12 @@ def loop():
 		for call in module.height_frequency_callbacks:
 			call(dtime)
 
+#BUG: Fix performance issues.
 _fatal_error = False
 def secondary_loop():
 	global _last_traceback, _fatal_error
+	
+	#It takes 0.6ms when with the editor. (Without tile replacing)
 	try:
 		if _fatal_error: return 
 		if module.change_scene_frame == False:
@@ -85,6 +88,7 @@ def secondary_loop():
 			_fatal_error = True
 		_last_traceback = s
 		
+	#It takes about 0.3ms (As much as the main loop)
 	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_game]
 	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
 	event._key_event_loop(listen_list)

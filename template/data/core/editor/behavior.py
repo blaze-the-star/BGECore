@@ -48,7 +48,9 @@ class CameraBorder(behavior.Object):
 
 		#Max speed is dependent of the Tile sizes, ex (200m/s = size) / 50fps = 4m/tick
 		#Since we are using an extra radius we can guarante a speed of 8m/tick without glitches: 8*60fps = 480m/s = 1728 km/h
-		if pos.length > 8: pos.length = 8
+		#if pos.length > 8: pos.length = 8
+		#But we don't care for now
+		if pos.length > 50: pos.length = 50
 		pos.rotate(self.obj.worldOrientation)
 		self.obj.worldPosition += pos
 		self.obj.worldOrientation = rot
@@ -56,7 +58,6 @@ class CameraBorder(behavior.Object):
 class BasicControl(behavior.Object):
 	def init(self):
 		module.enableInputFor(self)
-		#self.speed = 4
 		self.speed = 1
 
 	def onKeyPressed(self, keys):
@@ -68,11 +69,46 @@ class BasicControl(behavior.Object):
 
 
 class Cursor(behavior.Object):
+	def init(self):
+		module.enableInputFor(self)
+
 	def update(self):
-		render.drawLine([0,0,100], [0,0,1], [1, 0, 0])
-		try: self.obj.worldPosition = module.window.hitpoint
-		except:
-			print("hitpoint failed: " + str(module.window.hitpoint))
+		if module.window.hitpoint:
+			self.obj.worldPosition = module.window.hitpoint
+			
+	def onKeyPressed(self, keys):
+		if key.LEFTMOUSE in keys:
+			hitobj = module.window.hitobj
+			if not hitobj or not hitobj.name.startswith("DYN_Terrain."): return
+			
+			mesh = hitobj.meshes[0]
+			o = self.obj
+			m = None
+			v = None
+			for v_index in range(mesh.getVertexArrayLength(0)):
+				vertex = mesh.getVertex(0, v_index)
+				r = utils.vectorFrom2Points(vertex.XYZ, o.worldPosition - hitobj.worldPosition).length
+				if m == None:
+					m = r
+					v = vertex
+				else:
+					if r < m:
+						m = r
+						v = v_index
+
+			v = mesh.getVertex(0, v)
+			v.XYZ = [v.x, v.y, v.z+0.1]
+			o.worldPosition.z = v.z
+			
+			#TODO:
+			#Reset normals & Use hitpoly if possible. We well make a function to recalculate all the normals of a mesh anyway. Because we can.
+	
+	def onKeyUp(self, keys):
+		if key.LEFTMOUSE in keys:
+			obj = module.window.hitobj
+			if not obj: return
+			obj.reinstancePhysicsMesh(obj, obj.meshes[0])
+			
 			
 class SceneEditor(behavior.Scene):
 	def init(self):
@@ -80,7 +116,7 @@ class SceneEditor(behavior.Scene):
 		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
-		self.tm = TileManager(focus, 50, 50)
+		self.tm = TileManager(focus, 15, 15)
 
 
 #behavior.addScene(SceneEditor, "SceneEditor") #This is done on dynamic, so that we can still import dynamic here.
