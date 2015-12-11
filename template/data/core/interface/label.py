@@ -1,7 +1,7 @@
 from core.interface import widget, flabel
 from core import module, utils
 from bge import logic, render
-from mathutils import Vector
+from mathutils import Vector, Euler
 import blf, bgl, math
 
 ALIGN_LEFT = 0
@@ -31,9 +31,8 @@ def replaceBlenderText(obj):
 	align = ["Left", "Center", "Right"].index(align)
 	
 	wp = obj.worldPosition
-	label = Label(font, obj["Text"], sx, align, wp)
 	xyz = obj.worldOrientation.to_euler()
-	label.rotation = xyz
+	label = Label(font, obj["Text"], sx, align, wp, xyz)
 	
 	label.visible = obj.visible
 	label.color = obj.color
@@ -116,13 +115,13 @@ class Label():
 	"""
 	_fontname_id = {}
 
-	def __init__(self, font, text, size = 16, align = ALIGN_LEFT, position = [0,0,0]):
+	def __init__(self, font, text, size = 16, align = ALIGN_LEFT, position = [0,0,0], rotation = [0,0,0]):
 		position = Vector(position)
 		
 		self.scene = module.scene_gui
 		self._font = font
 		self._position = self.ProxyPosition(position)
-		self._rotation = self.ProxyRotation([0,0,0])
+		self._rotation = self.ProxyRotation(rotation)
 		
 		self._glposition = [0,0,0]
 		self._glscale = None
@@ -130,11 +129,13 @@ class Label():
 		self._glzunit = None
 		self._scale = self.ProxyScale([size/100, size/100, size/100])
 		self._color = self.ProxyColor([1,1,1,1])
+		self._lines = [] #The labels containing child lines on a multiline label.
 		
+		self.align = align
+		self.leading = 1
 		self.text = text
 		self.font = self._font
 		self.visible = True
-		self.align = align
 		self.scene.post_draw.append(self.draw)
 		self.middle_height = False
 		
@@ -159,7 +160,11 @@ class Label():
 		
 	def delete(self):
 		""" """
-		scene.post_draw.remove(self.draw)
+		try: module.scene_gui.post_draw.remove(self.draw)
+		except ValueError:
+			raise ValueError("Trying to delete a Label that should be already deleted. Possible memory leak.")
+		
+		self.visible = False
 		del self
 		
 	def draw(self):
@@ -169,7 +174,6 @@ class Label():
 		cam = self.scene.active_camera
 		orth = cam.ortho_scale
 		
-		#TO IMPROVE
 		height = render.getWindowHeight()
 		width = render.getWindowWidth()
 		near = cam.near
@@ -208,7 +212,7 @@ class Label():
 			else:
 				self._lastorth = orth
 		
-		x, y = blf.dimensions(font_id, self.text) #NOTE: Always after blf.size()
+		x, y = blf.dimensions(font_id, self._text) #NOTE: Always after blf.size()
 		
 		if self.align == ALIGN_CENTER:
 			pos[0] -= (x)/2 * math.cos(self._rotation.z)
@@ -229,7 +233,7 @@ class Label():
 			blf.rotation(font_id, 0)
 		
 		bgl.glColor4f(self._color.x, self._color.y, self._color.z, self._color.w)
-		blf.draw(font_id, self.text)
+		blf.draw(font_id, self._text)
 		blf.disable(font_id, blf.ROTATION)
 		
 		self._lastscale = self.scale
@@ -242,6 +246,8 @@ class Label():
 	@position.setter
 	def position(self, xyz):
 		self._position = self.ProxyPosition(xyz)
+		for line in self._lines:
+			line.position = xyz
 		
 	@property
 	def scale(self):
@@ -251,6 +257,8 @@ class Label():
 	@scale.setter
 	def scale(self, xyz):
 		self._scale = self.ProxyScale(xyz)
+		for line in self._lines:
+			line.scale = xyz
 		
 	@property
 	def rotation(self):
@@ -259,7 +267,14 @@ class Label():
 		
 	@rotation.setter
 	def rotation(self, xyz):
+		xyz = Euler(xyz, 'XYZ')
 		self._rotation = self.ProxyRotation(xyz)
+		for line in self._lines:
+			line.rotation = xyz
+			length = (line.position - self.position).length
+			pos = Vector([0,-length,0])
+			pos.rotate(xyz)
+			line.position = pos + self.position
 		
 	@property
 	def color(self):
@@ -269,6 +284,8 @@ class Label():
 	@color.setter
 	def color(self, color):
 		self._color = self.ProxyColor(color)
+		for line in self._lines:
+			line.color = color
 	
 	@property
 	def font(self):
@@ -282,3 +299,38 @@ class Label():
 	def font(self, font):
 		font_path = logic.expandPath('//gui/font/' + font + '.ttf')
 		if font not in Label._fontname_id: Label._fontname_id[font] = blf.load(font_path)
+		
+	@property
+	def text(self):
+		""" The text of the label """
+		text = self._text
+		for line in self._lines:
+			text += "\n" + line.text
+		return text
+		
+	@text.setter
+	def text(self, text):
+		lines = text.splitlines()
+		self._text = lines[0]
+		lines = lines[1:]
+		for l in self._lines: l.delete()
+		self._lines = []
+		for i, line in enumerate(lines):
+			new = self.copy(line, [0,-self.leading*self.scale.x*(i+1),0])
+			self._lines.append(new)
+				
+	def copy(self, text = None, offset = [0,0,0]):
+		""" Retuns a copy of the label
+		
+		:param string text: The text of the new Label or None to copy the current text.
+		:param offset: A vector representing the desplacment to be applied on the new Label from this Label position in local coordinates.
+		"""
+		
+		if text == None: text = self._text
+		size = self.scale.x * 100
+		offset = Vector(offset)
+		offset.rotate(self.rotation)
+		
+		label = Label(self.font, text, size, self.align, self.position + offset, self.rotation)
+		label.color = self.color
+		return label

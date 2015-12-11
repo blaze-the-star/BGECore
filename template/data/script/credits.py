@@ -5,7 +5,7 @@ class IntroCredits:
 	["Story", "Robert Planas"],
 	["Music", "Iñigo Sáez"],
 	["Programming", "Robert Planas"],
-	["Powered by", "Blender Game Engine"]
+	["Powered by", "Blender Game Engine\n Core Framework"]
 	]
 	def __init__(self):
 		gui = module.scene_gui_behavior

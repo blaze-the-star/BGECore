@@ -10,7 +10,6 @@ GUI
 - Make a pause system.
 - Make SplitWindow system for Window.
 - Fix bug with Labels scale/position on Render->Display->Scale Mode.
-- Fix bug with Labels \n and \t characters.
 
 MEDIA
 - Add adjustable latterbox with transition effect.
