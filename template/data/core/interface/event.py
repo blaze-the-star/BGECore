@@ -72,11 +72,9 @@ def _click_event_loop(status):
 	_hold = False
 	
 last_keyevents = [[],[],[],[]]
-def _key_event_loop():
+def _key_event_loop(listen_list):
 	global last_keyevents
 	
-	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True]
-	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
 	keyevents = [[],[],[],[]]
 	for key, status in logic.keyboard.active_events.items(): keyevents[status].append(key)
 	for key, status in logic.mouse.active_events.items():

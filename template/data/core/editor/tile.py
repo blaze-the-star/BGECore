@@ -1,7 +1,7 @@
-from core import module, utils, dynamic
+from core import module, utils, dynamic, behavior
 from random import randint
 
-class TileManager:
+class TileManager(behavior.Object):
 	def __init__(self, focus, x, y):
 		Tile.focus = focus
 
@@ -24,9 +24,12 @@ class TileManager:
 			for j in range(-y, y+1):
 				self.tiles[i+x].append(Tile(i, j))
 
-		module.height_frequency_callbacks.append(self.update)
+		#module.height_frequency_callbacks.append(self.update)
+		super().__init__()
+		self.scene = module.scene_game
+		module.scene_behavior.behaviors.append(self)
 
-	def update(self, time):
+	def update(self):
 		self.update_lazy()
 
 	def update_lazy(self, maxfac = 2):
@@ -83,7 +86,7 @@ class TileManager:
 class Tile:
 	size = 200
 	focus = None
-	minlod = 2
+	minlod = 0
 	generator = []
 
 	def __init__(self, x, y):
@@ -122,7 +125,7 @@ class Tile:
 		elif distance <= Tile.size*2: n = m+1
 		elif distance <= Tile.size*3: n = m+2
 		elif distance <= Tile.size*6: n = m+3
-		#elif distance <= Tile.size*10:	self.check(4, self.x, self.y)
+		#elif distance <= Tile.size*10: n = m+4
 		elif distance > Tile.size*2: n = -1
 
 		if n < 5:
@@ -166,6 +169,6 @@ class Tile:
 				r = randint(0,50)
 				v.XYZ = [v.x, v.y, 0] #Move pointer (KX_GameObject) here.
 
-		if lod < 2:
-			obj.reinstancePhysicsMesh(obj, mesh)
+		if lod > 0:
+			#obj.reinstancePhysicsMesh(obj, mesh)
 			obj.restoreDynamics()

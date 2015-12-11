@@ -14,7 +14,6 @@ class IntroScene(behavior.Scene):
 		self.addBehavior(behavior.MouseLook, self.camtrack)
 		utils.setCamera(self, "IntroCamera")
 		
-		
 	def update(self):
 		pass
 

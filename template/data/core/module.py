@@ -38,6 +38,10 @@ HEIGHT_FREQUENCY_TICK = 0.02
 
 cont = None
 
+#Static for main.autoPlay
+_arecallbacks = True
+_started = False
+
 def enableInputFor(behavior):
 	global listen_input_list
 	behavior.use_keyboard = True

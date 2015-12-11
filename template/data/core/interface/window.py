@@ -48,6 +48,7 @@ class Window():
 		self.camera = self.scene_gui.active_camera
 		self.camera_height = self.camera.worldPosition.z - 0.5
 		self.cursor_position = None
+		self.hitobj = None
 		self.hitpoint = None
 		self.hitnormal = None
 
@@ -73,6 +74,30 @@ class Window():
 		winy = render.getWindowHeight()
 		if winx == self.width and winy == self.height: return
 		else: self.resize(winx, winy)
+		
+	def secondary_update(self):
+		scene_game = module.scene_game
+		if not scene_game: return
+		x, y = logic.mouse.position
+		gcam = scene_game.active_camera
+		cx, cy, cz = gcam.position
+		if gcam.perspective:
+			lens = gcam.lens
+			vec = gcam.getScreenVect(x, y)
+			vec.negate()
+			vec = vec + gcam.position
+			#render.drawLine(gcam.position, vec, [0, 1, 0])
+			#render.drawLine([0,0,0], vec, [0.6, 0.2, 0.5])
+			obj, self.hitpoint, self.hitnormal = gcam.rayCast(vec, gcam, gcam.far)
+
+		else:
+			#Needs revision, rotation doesn't work
+			scx = gcam.ortho_scale
+			scy = gcam.ortho_scale * render.getWindowHeight()/render.getWindowWidth()
+
+			to = [(x-0.5)*scx + cx, (-y+0.5)*scy + cy, 0]
+			obj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far)
+			if not self.hitobj: self.hitobj = obj
 
 	def cursorInsideFrustum(self):
 		""" Checks if the custom is inside the frustum of the camera.
@@ -105,39 +130,12 @@ class Window():
 		self.height= winy
 
 	def generateEvents(self, to, tto):
-		scene_game = module.scene_game
 		scene_gui = self.scene_gui
 
 		if scene_gui:
-			obj = self.camera.rayCast(tto, (to[0], to[1], self.camera.position.z), self.camera.far)[0]
+			self.hitobj = self.camera.rayCast(tto, (to[0], to[1], self.camera.position.z), self.camera.far)[0]
 
-		if scene_game:
-			x, y = logic.mouse.position
-			gcam = scene_game.active_camera
-			cx, cy, cz = gcam.position
-			if gcam.perspective:
-				lens = gcam.lens
-				vec = gcam.getScreenVect(x, y)
-				vec.length = 100
-				render.drawLine([1,1,100], [0,0,1], [1, 0, 0])
-				#TODO: O shit! It's being drawn on the GUI.
-				#We need to change the way BGECore handles the main loop,
-				#We should make each scene have it's own loop, with the GUI being
-				#For everything and the others for their respective scene behaviors.
-				#So everything in their scene behavior is executed on a controller on that scene.
-				#It means changing a lot of code but it's a must, otherwise a lot of BGE API is
-				#breked, e.j: logic.getCurrentScene(), render.drawLine(), logic.getCurrentController(), etc...
-
-			else:
-				#Needs revision, rotation doesn't work
-				scx = gcam.ortho_scale
-				scy = gcam.ortho_scale * render.getWindowHeight()/render.getWindowWidth()
-
-				to = [(x-0.5)*scx + cx, (-y+0.5)*scy + cy, 0]
-				tmp_obj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far)
-				if not obj: obj = tmp_obj
-
-		event._over_event_call(obj)
+		event._over_event_call(self.hitobj)
 
 	def hideCursor(self):
 		""" Turns the cursor visibility Off """

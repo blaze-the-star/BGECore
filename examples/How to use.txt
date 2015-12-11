@@ -1,1 +1,3 @@
 - Extract the example file on the template/data folder of the game replacing the default content.
+
+NOTE: Current examples are outdated! Sorry.

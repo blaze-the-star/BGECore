@@ -23,7 +23,7 @@ def loadIntoScene(filepath, mode, camera):
 		logic.LibLoad(path, mode, load_actions = True, load_scripts = False)
 	elif scene_to == module.scene_game:
 		module.libload_queue.append((path, mode))
-		camera.sensors["Always"].usePosPulseMode=1
+		module._arecallbacks = True
 	else: utils.debug("utils.loadIntoScene failed, the scene " + scene_to.name + " is not running.")
 
 _change_scene_name = ""
@@ -42,6 +42,7 @@ def loadScene(filepath, name):
 	global _change_scene_path
 
 	if module.change_scene_dynamic == False:
+		module._started = False
 		module.change_scene_dynamic = True
 		utils.setScene("Dynamic")
 		_change_scene_name = name
@@ -142,7 +143,7 @@ class ObjectGenerator:
 				module.libload_gqueue.append(arg)
 				self.ids.append(id)
 			else: raise KeyError("Object with id " + str(id) + " already in this generator.")
-		module.game_owner.sensors["Always"].usePosPulseMode=1
+		module._arecallbacks = True
 		ObjectGenerator.time = time.time()
 
 	def remove(self, id):

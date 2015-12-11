@@ -22,9 +22,9 @@ class Object():
 		
 	"""
 
-	def __init__(self, object):
+	def __init__(self, object = None):
 		self.obj = object
-		self.scene = object.scene
+		if self.obj: self.scene = object.scene
 		self.paused = False
 		self.use_keyboard = False
 		self._immuse_keyboard = True

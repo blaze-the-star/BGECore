@@ -1,9 +1,8 @@
-IMPORTANT
-- Change main loop system, scene behaviors and their object behaviors should be executed on
-a controller of that scene, not the GUI. Otherwise a lot of BGE API breaks.
-
 LAUNCHER
-- Compile Mac version
+- Test MacOS version.
+- Make Launcher use local config.txt file if possible (to avoid possible permision denied errors).
+	Automatically generate it of it doesn't exist
+	Use only when there are no permisions to edit the file.
 
 GUI
 - Add a LoadingBar widget.
@@ -15,6 +14,7 @@ GUI
 
 MEDIA
 - Add adjustable latterbox with transition effect.
+- Make loading of new sounds/music on a new thread, so it doesn't lag on the game.
 - window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
 moved/scaled/rotated when you swich a GUI camera.
 

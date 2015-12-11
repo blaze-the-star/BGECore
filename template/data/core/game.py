@@ -16,7 +16,7 @@ _last_time = time.time()
 _last_time2 = _last_time
 _last_traceback = ""
 def loop():
-	global _state, _last_time, _last_time2, _last_traceback
+	global _state, _last_time, _last_time2
 
 	#Set scene
 	if module.change_scene_frame == True:
@@ -35,35 +35,19 @@ def loop():
 		media.device.volume = float(utils.loadGameProperty("volume"))
 		module.cont = logic.getCurrentController()
 
-	if module.cont.owner.sensors["Always"].status != logic.KX_SENSOR_ACTIVE: return
-
-	#Key events
-	event._key_event_loop()
+	if module._arecallbacks == True: return
 
 	#GUI Behavior
 	if module.scene_gui_behavior.paused == False: module.scene_gui_behavior.update()
 	for b in module.scene_gui_behavior.behaviors:
 		if b.paused == False: b.update()
+		
+	#Key events
+	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_gui]
+	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
+	event._key_event_loop(listen_list)
 
-	#Game Behavior
-	try:
-		if module.scene_behavior and module.change_scene_frame == False:
-			if module.scene_behavior.paused == False:
-				module.scene_behavior.update()
-				module.scene_behavior.baseUpdate()
-			if not module.scene_behavior: return #When removing the scene
-			for b in module.scene_behavior.behaviors:
-				if b.paused == False: b.update()
-				if not module.scene_behavior: return #When removing the scene
-	except:
-		if module.scene_behavior: module.scene_behavior.paused = True
-		s = traceback.format_exc()
-		if s != _last_traceback:
-			utils.debug("Error during runtime. Scene behavior suspended!")
-			print(s)
-		_last_traceback = s
-
-	#Other callbacks
+	#Frequency callbacks
 	for v in module.video_playback_list: v.updateVideo()
 
 	done = time.time()
@@ -78,3 +62,30 @@ def loop():
 		_last_time2 = done
 		for call in module.height_frequency_callbacks:
 			call(dtime)
+
+_fatal_error = False
+def secondary_loop():
+	global _last_traceback, _fatal_error
+	try:
+		if _fatal_error: return 
+		if module.change_scene_frame == False:
+			if module.scene_behavior.paused == False:
+				module.scene_behavior.update()
+				module.scene_behavior.baseUpdate()
+			if not module.scene_behavior: return #When removing the scene
+			for b in module.scene_behavior.behaviors:
+				if b.paused == False: b.update()
+				if not module.scene_behavior: return #When removing the scene
+	except:
+		module.scene_behavior.paused = True
+		s = traceback.format_exc()
+		if s != _last_traceback:
+			utils.debug("Error during runtime. Scene behavior suspended!")
+			print(s)
+			_fatal_error = True
+		_last_traceback = s
+		
+	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_game]
+	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
+	event._key_event_loop(listen_list)
+	module.window.secondary_update()

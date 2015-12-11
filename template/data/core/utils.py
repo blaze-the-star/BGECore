@@ -219,6 +219,7 @@ def setScene(name):
 	global _change_scene_name
 	
 	if module.change_scene_frame == False:
+		module._started = False
 		if module.scene_game == None:
 			logic.addScene(name, 0)
 		else:
@@ -305,7 +306,7 @@ def setFilter2D(name, camera, slot):
 		except: verbose("Filter2D failed, the camera doesn't have a controller named Python")
 		if cont != logic.getCurrentController():
 			module.filter_queue.append((name, camera, slot))
-			camera.sensors["Always"].usePosPulseMode=1
+			module._arecallbacks = True
 			return
 		
 		path = logic.expandPath("//core/glsl/" + name + ".filter2D")

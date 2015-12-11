@@ -1,6 +1,6 @@
 from core import behavior, module, utils, key
 from .tile import TileManager
-from bge import logic, types
+from bge import logic, types, render
 from mathutils import Vector
 import math
 
@@ -69,6 +69,7 @@ class BasicControl(behavior.Object):
 
 class Cursor(behavior.Object):
 	def update(self):
+		render.drawLine([0,0,100], [0,0,1], [1, 0, 0])
 		try: self.obj.worldPosition = module.window.hitpoint
 		except:
 			print("hitpoint failed: " + str(module.window.hitpoint))
@@ -79,7 +80,7 @@ class SceneEditor(behavior.Scene):
 		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
-		self.tm = TileManager(focus, 20, 20)
+		self.tm = TileManager(focus, 50, 50)
 
 
 #behavior.addScene(SceneEditor, "SceneEditor") #This is done on dynamic, so that we can still import dynamic here.
