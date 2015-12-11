@@ -164,6 +164,7 @@ class Label():
 		
 	def draw(self):
 		if self.visible == False: return
+		module.post_draw_step += 1
 		
 		cam = self.scene.active_camera
 		orth = cam.ortho_scale

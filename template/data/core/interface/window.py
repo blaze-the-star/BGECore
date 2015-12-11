@@ -62,6 +62,8 @@ class Window():
 		logic.mouse.position = (0.5,0.5)
 
 	def update(self):
+		module.post_draw_step = 0
+
 		x, y = logic.mouse.position
 		to = [(x-0.5)*self.scx, (-y+0.5)*self.scy, 0]
 		cx, cy, cz = self.camera.worldPosition
@@ -251,6 +253,17 @@ class ImageCursor:
 		
 	def draw(self):
 		if self.visible == False: return
+		s = module.scene_gui
+		end = len(s.post_draw)-1
+		
+		if module.post_draw_step < end:
+			s.post_draw.insert(end, s.post_draw.pop(module.post_draw_step))
+			module.post_draw_step += 1
+			return
+			#We will come back at the end of the drawing pipeline
+		
+		module.post_draw_step += 1
+		
 		height = render.getWindowHeight()
 		width = render.getWindowWidth()
 	

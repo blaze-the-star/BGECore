@@ -26,6 +26,8 @@ inload_gqueue = [] #(path, id, callback)
 window = None
 widget_dict = {}
 
+post_draw_steps = 0
+
 listen_input_list = []
 labels = {}
 

@@ -34,9 +34,10 @@ def loop():
 		for b in module.scene_gui_behavior.behaviors: b.init()
 		media.device.volume = float(utils.loadGameProperty("volume"))
 		module.cont = logic.getCurrentController()
+		module._arecallbacks = False
 
 	if module._arecallbacks == True: return
-
+	
 	#GUI Behavior
 	if module.scene_gui_behavior.paused == False: module.scene_gui_behavior.update()
 	for b in module.scene_gui_behavior.behaviors:
