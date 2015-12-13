@@ -1,5 +1,5 @@
-from bge import logic
-from mathutils import Vector
+from bge import logic, types
+from mathutils import Vector, geometry
 from random import randint, choice
 from time import sleep
 from script import constant
@@ -126,12 +126,84 @@ def getPrimes(limit):
 			
 		return l
 		
-def recalculateNormals(obj):
-	mesh = obj.meshes[0]
+def getNearestVertexToPoly(object, poly, point):
+	if not type(point) is Vector: point = Vector(point)
+	mesh = poly.getMesh()
+	s = poly.getNumVertex()
+	v1 = mesh.getVertex(0, poly.v1)
+	v2 = mesh.getVertex(0, poly.v2)
+	v3 = mesh.getVertex(0, poly.v3)
+	if s == 4: v4v = mesh.getVertex(0, poly.v4).XYZ
+	else: v4 = None
 	
+	min = None
+	f = None
+	for i in range(poly.getNumVertex()):
+		v = mesh.getVertex(0, poly.getVertexIndex(i))
+		r = vectorFrom2Points(v.XYZ, point - object.worldPosition).length
+		if not min or r < min:
+			min = r
+			f = v
+	
+	return f
+	
+def getPolyNormal(poly):
+	""" Returns the normal of a KX_PolyProxy """
+
+	mesh = poly.getMesh()
+	s = poly.getNumVertex()
+	v1 = mesh.getVertex(0, poly.v1)
+	v2 = mesh.getVertex(0, poly.v2)
+	v3 = mesh.getVertex(0, poly.v3)
+	if s == 4: v4v = mesh.getVertex(0, poly.v4).XYZ
+	else: v4 = None
+	
+	normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ, v4v)
+	return normal
+		
+def recalculateNormals(obj):
+	""" Recalculates the normals of a KX_GameObject, KX_MeshProxy or KX_PolyProxy """
+
+	if type(obj) is types.KX_GameObject:
+		mesh = obj.meshes[0]
+	elif type(obj) is types.KX_MeshProxy: mesh = obj
+	elif type(obj) is types.KX_PolyProxy: mesh = obj.getMesh()
+	else: raise ValueError("Argument must be KX_GameObject, KX_MeshPoxy or KX_PolyProxy, not " + str(type(obj)))
+	verdict = {} #Vertex Dictionary LOL
 	
 	#Iterate throught Faces and make a list with all the vertex and the normals of the faces the are part of.
+	if type(obj) is not types.KX_PolyProxy:
+		for i in range(mesh.numPolygons):
+			poly = mesh.getPolygon(i)
+			normal = getPolyNormal(poly)
+			
+			for j in range(poly.getNumVertex()):
+				try:
+					verdict[poly.getVertexIndex(j)].append(normal)
+				except KeyError:
+					verdict[poly.getVertexIndex(j)] = [normal]
+	else:
+		poly = obj
+		normal = getPolyNormal(poly)
+		
+		for j in range(poly.getNumVertex()):
+			try:
+				verdict[poly.getVertexIndex(j)].append(normal)
+			except KeyError:
+				verdict[poly.getVertexIndex(j)] = [normal]
+		
 	#Iterate throught the list recalculating the normal of each vertex.
+	for i, normals in verdict.items():
+		normal = Vector([0,0,0])
+		for n in normals:
+			normal += n
+		s = len(normals)
+		if s == 0: continue
+		normal.x /= s
+		normal.y /= s
+		normal.z /= s
+		normal.normalize()
+		mesh.getVertex(0, i).setNormal(normals[0].to_tuple())
 	
 def rand10():
 	""" Generates a rondom integer from 0 to 9 """

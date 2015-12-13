@@ -52,6 +52,7 @@ class Window():
 		self.hitobj = None
 		self.hitpoint = None
 		self.hitnormal = None
+		self.hitpoly = None
 
 		#Scale Camera X/Y
 		if self.camera:
@@ -94,7 +95,7 @@ class Window():
 			vec = gcam.getScreenVect(x, y)
 			vec.negate()
 			vec = vec + gcam.position
-			self.hitobj, self.hitpoint, self.hitnormal = gcam.rayCast(vec, gcam, gcam.far)
+			self.hitobj, self.hitpoint, self.hitnormal, self.hitpoly = gcam.rayCast(vec, gcam, gcam.far, "", 0, 0, 1)
 
 		else:
 			#Needs revision, rotation doesn't work

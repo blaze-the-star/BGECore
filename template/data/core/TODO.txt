@@ -13,11 +13,11 @@ GUI
 
 MEDIA
 - Add adjustable latterbox with transition effect.
-- Make loading of new sounds/music on a new thread, so it doesn't lag on the game.
 - window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
 moved/scaled/rotated when you swich a GUI camera.
 
 BEHAVIOR
+- Update functions should also include the last time they were executed.
 - Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).
 - Make an animator (class, not behavior, used by control behavior).
 	NOTE:
@@ -26,9 +26,10 @@ BEHAVIOR
 	AssasinsCreed ````
 - Make update() wait until all LibLoad on the initialization is complete.
 
+UTILS
+- updateNormals function. KX_MeshProxy
+
 DYNAMIC
 - Add core.dynamic.remove("file.blend") or core.dynamic.remove("libname")
-# - Add KX_GameObject = core.dynamic.copy(KX_GameObject) -> Use ObjectGenerator instead.
-- Make lebel editor
-# - Thread the loading of the file in memory with the "data" option of LibLoad and async. -> Not nesscesary, probably overkill.
+
 

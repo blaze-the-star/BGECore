@@ -71,40 +71,33 @@ class BasicControl(behavior.Object):
 class Cursor(behavior.Object):
 	def init(self):
 		module.enableInputFor(self)
+		self.force = 0.5
 
 	def update(self):
 		if module.window.hitpoint:
 			self.obj.worldPosition = module.window.hitpoint
 			
+			
 	def onKeyPressed(self, keys):
+		if not (key.LEFTMOUSE in keys or key.RIGHTMOUSE in keys): return
+		
+		hitobj = module.window.hitobj
+		hitpoly = module.window.hitpoly
+		if not hitobj or not hitobj.name.startswith("DYN_Terrain."): return
+		
+		v = utils.getNearestVertexToPoly(hitobj, hitpoly, self.obj.worldPosition)
+		
 		if key.LEFTMOUSE in keys:
-			hitobj = module.window.hitobj
-			if not hitobj or not hitobj.name.startswith("DYN_Terrain."): return
-			
-			mesh = hitobj.meshes[0]
-			o = self.obj
-			m = None
-			v = None
-			for v_index in range(mesh.getVertexArrayLength(0)):
-				vertex = mesh.getVertex(0, v_index)
-				r = utils.vectorFrom2Points(vertex.XYZ, o.worldPosition - hitobj.worldPosition).length
-				if m == None:
-					m = r
-					v = vertex
-				else:
-					if r < m:
-						m = r
-						v = v_index
+			v.XYZ = [v.x, v.y, v.z+self.force]
+		if key.RIGHTMOUSE in keys:
+			v.XYZ = [v.x, v.y, v.z-self.force]
 
-			v = mesh.getVertex(0, v)
-			v.XYZ = [v.x, v.y, v.z+0.1]
-			o.worldPosition.z = v.z
-			
-			#TODO:
-			#Reset normals & Use hitpoly if possible. We well make a function to recalculate all the normals of a mesh anyway. Because we can.
+		self.obj.worldPosition = module.window.hitobj.worldPosition + v.XYZ
+		utils.recalculateNormals(hitobj)
+		hitobj.reinstancePhysicsMesh(hitobj, hitobj.meshes[0])
 	
 	def onKeyUp(self, keys):
-		if key.LEFTMOUSE in keys:
+		if key.LEFTMOUSE in keys or key.RIGHTMOUSE in keys:
 			obj = module.window.hitobj
 			if not obj: return
 			obj.reinstancePhysicsMesh(obj, obj.meshes[0])
