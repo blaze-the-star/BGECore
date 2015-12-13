@@ -19,6 +19,7 @@ class Wait:
 		self.x = 0
 		self.time = time
 		self.callback = callback
+		self.status = True
 		module.low_frequency_callbacks.append(self.update)
 		
 	def update(self, time):
@@ -30,7 +31,7 @@ class Wait:
 	def delete(self):
 		""" Deletes/Stops the effect. Automatically called once x >= time. """
 		module.low_frequency_callbacks.remove(self.update)
-		del self
+		self.status = False
 
 class AlphaFade:
 	def __init__(self, obj, A, B, xtime, ytime, mtime = 0, xcallback = None, mcallback = None, ycallback = None):
@@ -127,6 +128,7 @@ class LinearInterpolation:
 		self.callback = callback
 		self.final = final
 		self.transform = transform
+		self.status = True
 		
 	def func(self, x):
 		return self.m*x+self.A
@@ -158,6 +160,8 @@ class LinearInterpolation:
 		if self.update in module.height_frequency_callbacks:
 			module.height_frequency_callbacks.remove(self.update)
 			if self.final: self.final()
+			
+		self.status = False
 		del self
 		
 class QuadraticInterpolation(LinearInterpolation):

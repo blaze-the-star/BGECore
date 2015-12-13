@@ -121,6 +121,9 @@ device = aud.device()
 class AudioFile():
 	""" A object representating an audio file. Initializating this won't play the file.
 	
+	Recomended formats: .mp3
+	Supported Formats: .mp3, .ogg, .wav
+	
 	:param string filepath: Relative path (from the data folder) of the audio file to use.
 	:param function callback: Function to call once the playback ends.
 	
@@ -145,9 +148,24 @@ class AudioFile():
 		self.volume_min = 0
 		self.callback = None
 		self._volume = 1
+
+		#LinearInterpolation Objects
+		self.fadein = None
+		self.fadeout = None
+		
+		#Status
+		self.playing = False
+		self.waiting = False
 	
-	def play(self, filepath=None, loop=False, volume = None, pitch = 1, callback = None):
-		""" Method to play the an audio file.
+	def _transition_callback(self, n):
+		self.volume = 0
+		self.playing = False
+		self.waiting = False
+		self.play()
+		self.fadeIn(n)
+	
+	def play(self, filepath=None, loop=False, volume = None, pitch = 1, callback = None, transition = (3, 2, 3)):
+		""" Method to play an audio file.
 		
 		:param string filepath: Relative path (from the data folder) of the audio file to use.
 		:param bool loop: If true the audio will be played in loop.
@@ -158,6 +176,24 @@ class AudioFile():
 		
 		self.callback = callback
 		if not filepath: filepath = self.filepath
+		else: self.filepath = filepath
+		
+		if self.waiting == True: #Replace sound that will be played.
+			self.filepath = filepath
+			return
+			
+		if self.playing == True: #FadeOut this sound and fadeIn the new one.
+			x, y, z = transition
+			
+			dummy = self.moveInstance()
+			dummy.fadeOut(x, stop=True)
+
+			if filepath: self.filepath = filepath
+			self.waiting = True
+			
+			sequencer.Wait(y, lambda: self._transition_callback(z))
+			return
+		
 		path = logic.expandPath("//../data/" + filepath)
 		factory = aud.Factory(path)
 		
@@ -172,35 +208,77 @@ class AudioFile():
 			if os.path.isfile(path) == False: utils.debug("Audio File, Not Found: " + path)
 			else: utils.debug("AudioFile Load Error: " + path)
 		
+		self.playing = True
 		module.low_frequency_callbacks.append(self.update)
 		return self
 		
-	def fadeOut(self, time):
+	def fadeOut(self, time, stop = False):
 		"""Starts to make fadeout now.
 		
 		:param float time: How long the fadeout lasts.
+		:param bool stop: If True it will automatically stop the reproduction at the end.
 		"""
-		sequencer.LinearInterpolation(self.volume, self.volume_min, time, self._interpol)
+		if self.fadein and self.fadein.status != False:
+			self.fadein.delete()
+			
+		if stop:
+			self.fadeout = sequencer.LinearInterpolation(self.volume, self.volume_min, time, self._interpol, self.stop)
+		else:
+			self.fadeout = sequencer.LinearInterpolation(self.volume, self.volume_min, time, self._interpol)
 		
 	def fadeIn(self, time):
 		"""Starts to make fadein now.
 		
 		:param float time: How long the fadein lasts.
 		"""
-		sequencer.LinearInterpolation(self.volume, 1, time, self._interpol)
+		if self.fadeout and self.fadeout.status != False:
+			self.fadeout.delete()
+			
+		self.fadein = sequencer.LinearInterpolation(self.volume, 1, time, self._interpol)
 	
 	def _interpol(self, x):
 		self.volume = x
+		
+	def moveInstance(self):
+		""" Returns a new instance of this class and gives it control over the audiofile, this instance returns to its original state.
+		
+		.. Note:: This function is used internally to replace sounds with a fadeIn/fadeOut effect were they can be mixed during the transition.
+		"""
+	
+		dummy = AudioFile()
+		dummy.__dict__ = self.__dict__.copy()
+		self.handle = None
+		self.factory = None
+		self.time = 0
+		self.playing = False
+		self.waiting = False
+		module.low_frequency_callbacks.remove(self.update)
+		module.low_frequency_callbacks.append(dummy.update)
+		return dummy
+	
+	def resume(self):
+		self.handle.play()
+		self.playing = True
+	
+	def pause(self):
+		pass
 	
 	def stop(self):
-		""" Stops the sound. Equivalent of calling ``audioFile.handle.stop()``"""
+		""" Stops the sound. """
+		
+		module.low_frequency_callbacks.remove(self.update)
+		self.playing = False
 		self.handle.stop()
 		self.time = 0
+		if self.callback: self.callback()
+		elif self.rcall:  self.rcall()
 	
 	@property
 	def volume(self):
 		""" """
-		return self.handle.volume
+		try: return self.handle.volume
+		except: return 0
+		
 	@volume.setter
 	def volume(self, x):
 		try:
@@ -209,13 +287,10 @@ class AudioFile():
 		except: self._volume = x
 	
 	def update(self, time):
-		self.time += time
-	
 		if self.handle and self.handle.status == False:
-			module.low_frequency_callbacks.remove(self.update)
-			if self.callback: self.callback()
-			elif self.rcall:  self.rcall()
-			
+			self.stop()
+		else:
+			self.time += time
 		
 music = AudioFile("")
 sui = {}
@@ -232,3 +307,44 @@ class AudioEffect:
 		self.handle.volume = volume
 		self.handle.pitch = pitch
 		
+class RandomMusic:
+	def __init__(self, directory = "sound/music", loop = True, audiofile = music, transition = (5, 2, 4)):
+		self.loop = loop
+		if not directory.endswith('/'): directory += '/'
+		self.directory = directory
+		self.transition = transition
+		
+		self.playing = False
+		self.audiofile = audiofile
+		if loop: module.low_frequency_callbacks.append(self.update)
+		
+	def play(self, directory = None):
+		if directory: self.directory = directory
+		if self.audiofile.waiting == False:
+			self.next()
+			self.playing = True
+		
+	def stop(self):
+		if self.playing:
+			try:
+				module.low_frequency_callbacks.remove(self.update)
+				self.audiofile.fadeOut(self.transition[2], True)
+				self.playing = False
+			except IndexError:
+				pass
+		
+	def next(self):
+		try:
+			self.audiofile.play(self.directory + self.getRandomFileTrack(), transition = self.transition)
+		except IndexError: utils.debug("No music found in directory " + self.directory)
+		
+	def getRandomFileTrack(self):
+		current_song = os.path.basename(self.audiofile.filepath)
+		path = logic.expandPath("//../data/" + self.directory)
+		files = [x for x in os.listdir(path) if x.endswith(".mp3") and current_song != x]
+		if files: return utils.choice(files)
+		else: return current_song
+		
+	def update(self, time):
+		if self.audiofile.playing == False and self.playing == True:
+			self.play()

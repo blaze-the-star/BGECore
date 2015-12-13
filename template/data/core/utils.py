@@ -1,10 +1,11 @@
 from bge import logic
 from mathutils import Vector
-from random import randint
+from random import randint, choice
 from time import sleep
 from script import constant
 from core import module
 import bisect
+import os
 
 def loadGameProperty(name):
 	""" Loads a property from your :file:`config.txt` file.
@@ -127,6 +128,7 @@ def getPrimes(limit):
 		
 def recalculateNormals(obj):
 	mesh = obj.meshes[0]
+	
 	
 	#Iterate throught Faces and make a list with all the vertex and the normals of the faces the are part of.
 	#Iterate throught the list recalculating the normal of each vertex.

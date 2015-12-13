@@ -12,16 +12,25 @@ class MouseLook(Object):
 		self.inverty = -1
 		self.speedx = 0.1
 		self.speedz = 0.3
+		self.lock_rotation = 1
 		module.enableInputFor(self)
 		
 	def update(self):
 		x, y = logic.mouse.position
-		rot = self.obj.worldOrientation.to_euler()
+		tmp = self.obj.worldOrientation.to_euler()
+		rot = tmp.copy()
 		xdif = (y-0.5)*self.inverty*self.sensitivity
 		zdif = (x-0.5)*self.invertx*self.sensitivity
-		if abs(xdif) > self.deathzone and abs(xdif) < 0.1: rot.x += xdif
-		if abs(zdif) > self.deathzone and abs(zdif) < 0.1: rot.z += zdif
-		self.obj.localOrientation = rot.to_matrix()
+		if abs(xdif) > self.deathzone: tmp.x += xdif
+		if abs(zdif) > self.deathzone: tmp.z += zdif
+		if self.lock_rotation == None: rot = tmp
+		else:
+			rot.z = tmp.z
+			print(tmp.x)
+			if abs(tmp.x-1.57) <= self.lock_rotation:
+				rot.x = tmp.x
+		
+		self.obj.localOrientation = rot
 		logic.mouse.position = (0.5, 0.5)
 		
 	def onKeyPressed(self, keys):

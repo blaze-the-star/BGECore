@@ -29,7 +29,8 @@ class GUI(behavior.Scene):
 	def setupMainMenu(self):
 		MainMenu(0, "MItem.000", "Start")
 		MainMenu(1, "MItem.001", "Editor")
-		MainMenu(2, "MItem.002", "Exit")
+		#MainMenu(2, "MItem.002", "Exit")
+		MainMenu(2, "MItem.002", "Play music")
 		if constant.GAME_DEBUG == True:
 			MainMenu.xcolor(1)
 		else: MainMenu.fadeinref = sequencer.LinearInterpolation(0, 1, 2, MainMenu.xcolor)
@@ -42,6 +43,7 @@ class GUI(behavior.Scene):
 		self.objects["GUIBlackScreen"].color.w = 0
 
 	def update(self):
+		module.labels["CreditName"].rotation.z += 0.01
 		pass
 
 behavior.addScene(GUI, constant.CORE_SCENE_GUI)
@@ -59,6 +61,7 @@ class MainMenu(interface.TextMenu):
 		media.sui["click"] = media.AudioEffect("sound/ui/click_back.wav")
 		self.color = [1, 1, 1, 0]
 		self.obj.visible = True
+		self.music = media.RandomMusic()
 
 	def mouseIn(self):
 		if self.active: media.sui["select"].play()
@@ -87,10 +90,13 @@ class MainMenu(interface.TextMenu):
 				sb.startEditor()
 			self.xactive(False)
 
+		#if self.index == 2:
+		#	sequencer.LinearInterpolation(s, 0, 0.5, MainMenu.xcolor, logic.endGame)
+		#	self.xactive(False)
+		
 		if self.index == 2:
-			sequencer.LinearInterpolation(s, 0, 0.5, MainMenu.xcolor, logic.endGame)
-			self.xactive(False)
-
+			self.music.play()
+			
 	@classmethod
 	def xcolor(self, x):
 		for n, m in MainMenu.button.items():
