@@ -109,7 +109,7 @@ class SceneEditor(behavior.Scene):
 		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
-		self.tm = TileManager(focus, 15, 15)
+		self.tm = TileManager(focus, 20, 20)
 
 
 #behavior.addScene(SceneEditor, "SceneEditor") #This is done on dynamic, so that we can still import dynamic here.

@@ -349,7 +349,7 @@ def setCamera(scene, camera_name):
 	.. note::
 		Use instead of ``KX_Scene.active_camera = KX_GameObject``.
 	
-	:param scene: Scene behavior where to change the active camera.
+	:param scene: Scene behavior where to change the active camera or KX_Scene
 	:type scene: |KX_Scene|
 	:param string camera_name: Name of the new active camera.
 	"""
@@ -358,7 +358,7 @@ def setCamera(scene, camera_name):
 	#Spawn camera if in hidden layer?
 	#...
 	
-	scene = scene.scene #I know
+	if not type(scene) is types.KX_Scene: scene = scene.scene #I know
 	scene.active_camera = camera
 	if scene == module.scene_gui:
 		win = module.window

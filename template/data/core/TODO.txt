@@ -17,7 +17,6 @@ MEDIA
 moved/scaled/rotated when you swich a GUI camera.
 
 BEHAVIOR
-- Update functions should also include the last time they were executed.
 - Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).
 - Make an animator (class, not behavior, used by control behavior).
 	NOTE:

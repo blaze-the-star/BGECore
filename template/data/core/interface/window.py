@@ -48,6 +48,7 @@ class Window():
 		module.scene_gui = self.scene_gui
 		self.camera = self.scene_gui.active_camera
 		self.camera_height = self.camera.worldPosition.z - 0.5
+		self.cursor = None
 		self.cursor_position = None
 		self.hitobj = None
 		self.hitpoint = None
@@ -75,7 +76,6 @@ class Window():
 		if self.cursor:
 			if type(self.cursor) is ImageCursor:
 				self.cursor.position = x, y
-				self.cursor.scale = 0.5, 0.5
 			else:
 				self.cursor.worldPosition = self.cursor_position
 
@@ -169,7 +169,7 @@ class Window():
 			else:
 				self.cursor = self.scene_gui.addObject(obj, own)
 				self.cursor.position.z = 9.9
-				logic.mouse.visible = False
+			logic.mouse.visible = False
 		else:
 			self.cursor = None
 			logic.mouse.visible = True
@@ -199,10 +199,12 @@ class ImageCursor:
 		width = size[0]
 		height = size[1]
 		self._size = [width, height]
+		
 		# The "private" position returned by setter
 		self._position = [x, y]
 		self.calculate_glposition()
 		module.scene_gui.post_draw.append(self.draw)
+		self.scale = 0.5, 0.5
 
 	@property
 	def position(self):
@@ -254,14 +256,6 @@ class ImageCursor:
 		
 	def draw(self):
 		if self.visible == False: return
-		s = module.scene_gui
-		end = len(s.post_draw)-1
-		
-		if module.post_draw_step < end:
-			s.post_draw.insert(end, s.post_draw.pop(module.post_draw_step))
-			module.post_draw_step += 1
-			return
-			#We will come back at the end of the drawing pipeline
 		
 		module.post_draw_step += 1
 		

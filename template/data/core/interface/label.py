@@ -196,7 +196,7 @@ class Label():
 		#Z AXIS
 		oh = (far-near)/2
 		ortho_unit = 1/oh
-		dh = oh - h
+		dh = oh
 
 		pos = list([width/2+rpos[0]*unit, height/2+rpos[1]*unit, dh*ortho_unit + rpos[2]*ortho_unit])
 		if self._lastscale != self.scale or True:
@@ -246,8 +246,9 @@ class Label():
 	@position.setter
 	def position(self, xyz):
 		self._position = self.ProxyPosition(xyz)
-		for line in self._lines:
-			line.position = xyz
+		x, y, z = xyz
+		for i, line in enumerate(self._lines):
+			line.position = x, y-self.leading*self.scale.x*(i+1), z
 		
 	@property
 	def scale(self):
