@@ -1,5 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
+#This value contains a list of modules to be mocked up. This is useful when some 
+#external dependencies are not met at build time and break the building process.
+autodoc_mock_imports = ["bge", "mathutils", "bgl", "Rasterizer", "aud", "blf", "gpu", "bpy"]
+
+import sys
+from unittest import mock
+ 
+MOCK_MODULES = autodoc_mock_imports
+for mod_name in MOCK_MODULES:
+	sys.modules[mod_name] = mock.Mock()
+
 #
 # BGECore documentation build configuration file, created by
 # sphinx-quickstart on Wed Oct 14 22:45:27 2015.
@@ -13,7 +25,6 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
 import shlex
 
@@ -34,7 +45,7 @@ sys.path.insert(0, os.path.abspath('../../template/data/'))
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'sphinx.ext.viewcode',
+#    'sphinx.ext.viewcode',
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
 ]
@@ -87,7 +98,14 @@ rst_epilog = """
 .. |Vector| raw:: html
 
 	<a href="http://www.blender.org/api/blender_python_api_2_76_2/mathutils.html#mathutils.Vector" target="_blank"><code class="xref py py-class docutils literal">mathutils.Vector</code></a>
+	
+..	|KX_PolyProxy| raw:: html
 
+	<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_PolyProxy.html" target="_blank"><code class="xref py py-class docutils literal">KX_PolyProxy</code></a>
+	
+..	|KX_MeshProxy| raw:: html
+
+	<a href="http://www.blender.org/api/blender_python_api_2_76_2/bge.types.KX_MeshProxy.html" target="_blank"><code class="xref py py-class docutils literal">KX_MeshProxy</code></a>
 """
 
 # There are two options for replacing |today|: either, you set today to some
@@ -127,17 +145,14 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = True
 
-#This value contains a list of modules to be mocked up. This is useful when some 
-#external dependencies are not met at build time and break the building process.
-autodoc_mock_imports = ["bge", "mathutils", "bgl", "Rasterizer", "aud", "blf", "gpu", "bpy"]
-
 autodoc_member_order = 'bysource'
 
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'classic'
+#html_theme = 'classic'
+html_theme = 'sphinx_rtd_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

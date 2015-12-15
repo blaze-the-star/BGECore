@@ -1,3 +1,5 @@
+You can get the documentation online at: http://bgecore.16mb.com/
+
 To generate/update the documentation you need the following dependences:
 
 Python3 (Not BGE-Python, but the original): https://www.python.org/downloads/

@@ -64,10 +64,7 @@ class Button(Widget):
 		pass
 	
 	def mouseOver(self):
-		""" Called when the mouse is over the button space.
-		
-		TODO
-		"""
+		""" Called when the mouse is over the button space. """
 		pass
 	
 	def mouseClick(self):
@@ -81,7 +78,6 @@ class Button(Widget):
 		self._active = False
 	
 	def enable(self):
-		print("Enable!")
 		""" It enables the button events. (Enabled by default) """
 		self.obj.visible = False
 		self._active = True
@@ -102,7 +98,7 @@ class TextButton(Button):
 	
 	.. attribute:: label
 	
-	Reference to the Label of this TextButton
+		Reference to the Label of this TextButton
 	
 	"""
 
@@ -129,7 +125,7 @@ class TextButton(Button):
 		self.label.visible = True
 
 	def disable(self):
-		""" It dishables the button events. """
+		""" It disables the button events. """
 		super().disable()
 		self.label.visible = False
 	
@@ -181,12 +177,9 @@ def menuScale(self, scale, point = None):
 			
 _cursor_relative = {}
 def menuMoveWithCursor(self):
-	"""Moves a menu to a given position. 
+	"""Moves a menu to the cursor position. 
 	
-	Also accesible from *Menu* and *TextMenu* with: ``self.move(position)``
-	
-	:param position: The position in world coordinates.
-	:type position: |Vector|
+	Also accesible from *Menu* and *TextMenu* with: ``self.moveWithCursor()``
 	"""
 	global _cursor_relative
 	ccp = module.window.cursor.position
@@ -199,8 +192,15 @@ def menuMoveWithCursor(self):
 class Menu(Button):
 	""" A Button with an index, so you con do ``if self.index == ...:``
 	
-	:var integer index: The index.
-	:var dictionary button: Acces to other instances of the menu by their index. 
+	.. Note:: Menus have input events enabled by default in order for ``moveWithCursor`` to work.
+	
+	.. attribute:: index
+
+		The index.
+	
+	.. attribute:: button
+
+		A dictionary of the other instances of the menu indexed with their index. 
 	"""
 	
 	button = {}
@@ -211,6 +211,8 @@ class Menu(Button):
 		super().__init__(sprite, over)
 		self.index = index
 		self.button[index] = self
+		
+		module.enableInputFor(self)
 	
 	def _mouseClick(self):
 		super()._mouseClick()
@@ -218,16 +220,28 @@ class Menu(Button):
 		if self in _cursor_relative.keys(): del _cursor_relative[self]
 		self.select()
 	
-	def select(self): pass
+	def select(self):
+		""" Called when the mouse clicks an item. """
+		pass
+		
 	def move(self, position): menuMove(self, position)
 	def moveWithCursor(self): menuMoveWithCursor(self)
-	def resize(self, scale): menuScale(self, scale)
+	def resize(self, scale, noparent = False):
+		if noparent: menuScale(self, scale)
+		else: menuScale(self, scale, self.position)
 	
 class TextMenu(TextButton):
 	""" A TextButton with an index, so you con do ``if self.index == ...:``
 	
-	:var integer index: The index.
-	:var dictionary button: Acces to other instances of the menu by their index. 
+	.. Note:: Menus have input events enabled by default in order for ``moveWithCursor`` to work.
+	
+	.. attribute:: index
+
+		The index.
+	
+	.. attribute:: button
+
+		A dictionary of the other instances of the menu indexed with their index. 
 	"""
 	
 	button = {}
@@ -257,7 +271,10 @@ class TextMenu(TextButton):
 		if self in _cursor_relative.keys(): del _cursor_relative[self]
 		if self._active == True: self.select()
 	
-	def select(self): pass
+	def select(self):
+		""" Called when the mouse clicks an item """
+		pass
+		
 	def move(self, position): menuMove(self, position)
 	def moveWithCursor(self): menuMoveWithCursor(self)
 	def resize(self, scale, noparent = False):

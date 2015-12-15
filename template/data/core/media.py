@@ -38,12 +38,19 @@ class Screen(interface.widget.Widget):
 	
 	.. attribute:: obj
 	
-	The |KX_GameObject| used as screen.
+		The |KX_GameObject| used as screen.
 	
 	.. attribute:: speaker
 	
-	The AudioFile of the video if used, otherwise None.
+		The AudioFile of the video if used, otherwise None.
 	
+	.. attribute:: frame
+	
+		The number of the frame being played.
+	
+	.. attribute:: callback
+	
+		A function to call once the reproduction ends. Will be overwrited with the paramater specified on the ``play`` method, even if it's ``None``.
 	"""
 	
 	def __init__(self, obj):
@@ -121,23 +128,25 @@ device = aud.device()
 class AudioFile():
 	""" A object representating an audio file. Initializating this won't play the file.
 	
-	Recomended formats: .mp3
-	Supported Formats: .mp3, .ogg, .wav
+	* Recomended formats: **.mp3**
+	* Supported Formats: **.mp3**, **.ogg**, **.wav**
+	
+	.. note:: This is done in a new thread, changing scenes or a low framerate won't alter the sound.
 	
 	:param string filepath: Relative path (from the data folder) of the audio file to use.
 	:param function callback: Function to call once the playback ends.
 	
 	.. attribute:: handle
 	
-	The *aud.Handle*, be coutious while tweaking with this.
+		The *aud.Handle*, be coutious while tweaking with this.
 		
 	.. attribute:: volume_min
 	
-	Minium volume of the audio.
+		Minium volume of the audio.
 	
 	.. attribute:: time
 	
-	The amount of time in seconds since the file start playing.
+		The amount of time in seconds since the file start playing.
 	
 	"""
 	def __init__(self, filepath = "", callback = None):
@@ -167,11 +176,14 @@ class AudioFile():
 	def play(self, filepath=None, loop=False, volume = None, pitch = 1, callback = None, transition = (3, 2, 3)):
 		""" Method to play an audio file.
 		
+		If an audio file is being played while calling this, it will be replaced by a new one. During the transation a *fadeOut->FadeIn* effect will occur.
+		
 		:param string filepath: Relative path (from the data folder) of the audio file to use.
 		:param bool loop: If true the audio will be played in loop.
 		:param float volume: The volume of the audio file relative to the master device. (Default = 1.0)
 		:param float pitch: The pitch.
 		:param function callback: Function to call once the playback ends.
+		:param tuple transition: The times for the fade effect during transations. In order: Duration of the fadeout, time for the fadein to start, duration of the fadein. In sconds.
 		"""
 		
 		self.callback = callback
@@ -199,7 +211,7 @@ class AudioFile():
 		
 		try:
 			self.factory = factory
-			self.handle = device.play(self.factory)
+			self.handle = device.play(self.factory) #It sends a callback that will play the music on a new theread.
 			self.handle.pitch = pitch
 			if volume == None: self.volume = self._volume
 			else: self.volume = volume
@@ -296,6 +308,11 @@ music = AudioFile("")
 sui = {}
 
 class AudioEffect:
+	""" It buffers a sound file in memory for faster usage.
+	
+	:param string filepath: The relative path to the sound file.
+	"""
+
 	def __init__(self, filepath):
 		path = logic.expandPath("//../data/" + filepath)
 		factory = aud.Factory(path)
@@ -303,11 +320,29 @@ class AudioEffect:
 		self.handle = None
 		
 	def play(self, volume = 1, pitch = 1):
+		""" Plays the sound """
 		self.handle = device.play(self.factory)
 		self.handle.volume = volume
 		self.handle.pitch = pitch
 		
 class RandomMusic:
+	""" Plays random music from a directory.
+	
+	To use it correctly initialize it somewere and call ``play()`` when you want to start playing music or you want to go to the next song.
+	
+	.. Note:: It only checks for ``.mp3`` files. Other formats may produce lag during runtime. 
+	
+	:param string directory: The path of the directory.
+	:param bool loop: If true it continues playing new songs until ``stop()`` is called.
+	:param AudioFile audiofile: The AudioFile object to use. By the default ``media.music``.
+	:param transition: The times for the fade effect when changing songs.
+	
+	.. attribute:: playing
+	
+		No songs will be played if it is not True.
+		:type: bool
+	"""
+	
 	def __init__(self, directory = "sound/music", loop = True, audiofile = music, transition = (5, 2, 4)):
 		self.loop = loop
 		if not directory.endswith('/'): directory += '/'
@@ -319,12 +354,14 @@ class RandomMusic:
 		if loop: module.low_frequency_callbacks.append(self.update)
 		
 	def play(self, directory = None):
+		""" Plays a song, or replaces the current song. """
 		if directory: self.directory = directory
 		if self.audiofile.waiting == False:
 			self.next()
 			self.playing = True
 		
 	def stop(self):
+		""" Stops playing songs and stops the current song """
 		if self.playing:
 			try:
 				module.low_frequency_callbacks.remove(self.update)
@@ -334,11 +371,13 @@ class RandomMusic:
 				pass
 		
 	def next(self):
+		""" Plays a song, or replaces the current song. """
 		try:
 			self.audiofile.play(self.directory + self.getRandomFileTrack(), transition = self.transition)
 		except IndexError: utils.debug("No music found in directory " + self.directory)
 		
 	def getRandomFileTrack(self):
+		""" Returns a random filename with ``.mp3`` extension. """
 		current_song = os.path.basename(self.audiofile.filepath)
 		path = logic.expandPath("//../data/" + self.directory)
 		files = [x for x in os.listdir(path) if x.endswith(".mp3") and current_song != x]

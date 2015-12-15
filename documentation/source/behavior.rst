@@ -1,6 +1,7 @@
 Behaviors
 ==========
 
+.. currentmodule:: core.behavior
 .. code-block:: python
 
 	import core
@@ -24,11 +25,11 @@ Behaviors
 				print("S pressed.")
 
 	behavior.addScene(MySceneBehavior, "MainScene")
+	
+.. autofunction:: addScene
 
 Scene Behavior
 --------------
-
-.. autofunction:: core.behavior.addScene
 
 .. autoclass:: core.behavior.Scene
 	:members:
@@ -38,3 +39,10 @@ Object Behavior
 	
 .. autoclass:: core.behavior.Object
 	:members:
+	
+Preseted Behaviors
+------------------
+
+.. autoclass:: core.behavior.camera.MouseLook
+	:members:
+	

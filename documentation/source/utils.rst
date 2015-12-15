@@ -19,12 +19,13 @@ Math and movement
 -----------------
 .. autofunction:: rand10
 .. autofunction:: randRGB
-.. autoclass:: LinearInterpolation
-	:members:
-
+.. autofunction:: getNearestVertexToPoly
+.. autofunction:: getPolyNormal
+.. autofunction:: recalculateNormals
 .. autofunction:: vectorFrom2Points
 .. autofunction:: moveObjectToObject
 .. autofunction:: moveObjectToPosition
+.. autofunction:: removeAll
 
 Scene Managment
 ---------------
@@ -34,4 +35,3 @@ Scene Managment
 .. autofunction:: setCamera
 .. autofunction:: setFilter2D
 .. autofunction:: removeFilter2D
-.. autofunction:: libLoad

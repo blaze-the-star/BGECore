@@ -124,7 +124,7 @@ class Tile:
 		if distance <= Tile.size: n = m
 		elif distance <= Tile.size*2: n = m+1
 		elif distance <= Tile.size*3: n = m+2
-		elif distance <= Tile.size*6: n = m+3
+		elif distance <= Tile.size*7: n = m+3
 		#elif distance <= Tile.size*10: n = m+4
 		elif distance > Tile.size*2: n = -1
 

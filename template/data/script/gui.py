@@ -39,7 +39,7 @@ class GUI(behavior.Scene):
 		dynamic.loadScene("scene/intro.blend", "Intro")
 
 	def startEditor(self):
-		dynamic.loadLebelEditor()
+		dynamic.loadLevelEditor()
 		self.objects["GUIBlackScreen"].color.w = 0
 
 	def update(self):

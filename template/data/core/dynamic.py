@@ -85,8 +85,8 @@ def loadScene(filepath, name):
 		b.baseInit()
 		for bh in b.behaviors: bh.init()
 
-def loadLebelEditor():
-	""" Loads BGECore Lebel Editor as a new game scene."""
+def loadLevelEditor():
+	""" Loads BGECore Level Editor as a new game scene."""
 	from core.editor.behavior import SceneEditor
 	module.scene_behavior_dict["SceneEditor"] = SceneEditor
 	loadScene("core/editor/editor.blend", "SceneEditor")
@@ -94,13 +94,12 @@ def loadLebelEditor():
 class ObjectGenerator:
 	""" Uses dynamic loading to create new objects from other blend files.
 
-	Now objects created with this method have thier own mesh and properties, usually
+	New objects created with this method have thier own mesh and properties, usually
 	you don't want to do this unless you are going to modify their meshes in realtime.
 
-	If you don't want to modify their meshes in realtime, use KX_Scene.addObject() instead.
+	If you don't want to modify their meshes in realtime, use ``KX_Scene.addObject()`` instead.
 
-	Blends loaded with this method must have only 1 scene. Each object to be loaded needs to have a
-	Python controller conected with an always on module mode with the following string: ``main.generator``.
+	Blends loaded with this method must have only 1 scene and 1 object. The object to be loaded needs to have a Python controller conected with an always on module mode with the following string: ``main.generator``.
 
 	:param string filepath: Relative path from the *data* folder where the blend file is placed.
 
@@ -113,8 +112,9 @@ class ObjectGenerator:
 		The absolute path of the blend used in this generator.
 
 	.. attribute:: objects
+		
 		A dictionary containing tupules of the objects loaded. E.j:
-		*mygen.objects["ObjName"][id].worldPosition = 0,0,0*
+		``mygen.objects["ObjName"][id].worldPosition = 0,0,0``
 
 	 """
 	all = {}

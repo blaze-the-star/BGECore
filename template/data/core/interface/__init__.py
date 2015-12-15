@@ -12,7 +12,7 @@ import script.constant
 Window = window.Window
 winmod = window
 window = None
-""" *window.Window* unique instance, initialized in the first tic of the interface loop. """
+""" ``window.Window``  unique instance, initialized in the first tic of the interface loop. """
 
 Button = button.Button
 TextButton = button.TextButton

@@ -2,20 +2,18 @@ from core import module, utils
 
 #Effects
 class Wait:
+	""" Waits a certain amount of time, then calls the callback function.
+	
+	:param float time: The amount of time to wait in seconds.
+	:param function callback: The function to call once it ends.
+	
+	.. attribute:: x
+	
+		The time since the effect started, in seconds.
+	
+		:type: float
+	"""
 	def __init__(self, time, callback):
-		""" Waits a certain amount of time, then calls the callback function.
-		
-		This class can be used as a function, the garabage collector will not delete its instances until the effect ends.
-		
-		:param float time: The amount of time to wait in seconds.
-		:param function callback: The function to call once it ends.
-		
-		.. attribute:: x
-		
-			The time since the effect started, in seconds.
-		
-			:type: float
-		"""
 		self.x = 0
 		self.time = time
 		self.callback = callback
@@ -34,26 +32,26 @@ class Wait:
 		self.status = False
 
 class AlphaFade:
+	""" Makes a object fadeIn, wait, and fadeOut.
+	
+	:param obj: The object at wich apply the effect.
+	:param float A: On the LinearInterpolation, A->A when fadein, A->B when fadeout.
+	:param float B: On the LinearInterpolation, B->B when fadein, B->A when fadeout.
+	:param float xtime: The time it takes, in seconds for the fadein.
+	:param float ytime: The time it takes, in seconds for the fadeout.
+	:param float mtime: The time to wait in between.
+	:param xcallback: The function to call when fadein ends.
+	:param mcallback: The function to call when fadeout starts.
+	:param ycallback: The function to call when fadeout ends.
+	
+	.. attribute:: x
+	
+		The time since the effect started, in seconds.
+	
+		:type: float
+	"""
+	
 	def __init__(self, obj, A, B, xtime, ytime, mtime = 0, xcallback = None, mcallback = None, ycallback = None):
-		""" Makes a object fadeIn, wait, and fadeOut.
-		
-		This class can be used as a function, the garabage collector will not delete its instances until the effect ends.
-		
-		:param float A: On the LinearInterpolation, A->A when fadein, A->B when fadeout.
-		:param float B: On the LinearInterpolation, B->B when fadein, B->A when fadeout.
-		:param float xtime: The time it takes, in seconds for the fadein.
-		:param float ytime: The time it takes, in seconds for the fadeout.
-		:param float mtime: The time to wait in between.
-		:param xcallback: The function to call when fadein ends.
-		:param mcallback: The function to call when fadeout starts.
-		:param ycallback: The function to call when fadeout ends.
-		
-		.. attribute:: x
-		
-			The time since the effect started, in seconds.
-		
-			:type: float
-		"""
 		self.obj = obj
 		self.A = A
 		self.B = B
@@ -87,6 +85,7 @@ class AlphaFade:
 			else: self.next()
 			
 	def xchange(self, x):
+		""" The callback that changes the color of the object. If the class is extended, this method can be overwritten to modify any property. """
 		self.obj.color.w = x
 	
 	def next(self):
@@ -103,13 +102,12 @@ class AlphaFade:
 class LinearInterpolation:
 	""" Makes a linear interpolation over time, uses a callback to apply changes.
 	
-	This class can be used as a function, the garabage collector will not delete its instances until the interpolation ends. The callbacks are done at 10Hz.
-	
 	:param float A: The start value.
 	:param float B: The end value.
 	:param float time: The time it takes, in seconds.
-	:param callback: The function to call to apply changes, it's first argument will be the value of the interpolation (A <= value <= B).
+	:param callback: The function to call to apply changes, its first argument will be the value of the interpolation (A <= value <= B).
 	:param final: The function to call when the interpolation ends.
+	:param bool transform: If True a hight_frequecy_callback will be used.
 	
 	.. attribute:: x
 	

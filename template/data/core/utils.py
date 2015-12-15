@@ -33,6 +33,8 @@ def saveGameProperty(name, value):
 		
 	:param string name: Name of the property to load.
 	:param value: Value to save, will be converted into a string.
+	
+	.. warning:: Moving your game in a directory without file permissions will throw an exception. E.j: :file:`C:/Program Files/`. This will be solved using a copy on the user directory in future versions of BGECore, but for now please abstein from using system directories.
 	"""
 	path = logic.expandPath("//../config.txt")
 	with open(path, "r+") as input:
@@ -97,6 +99,8 @@ def randRGB(r = None, g = None, b = None, a = 1):
 	return Vector((r,g,b,a))
 
 #Math
+
+#THE SHAME BLOCK
 #Returns a list of multiples of d form num. Ex 32, 2: 32, 16, 8, 4, 2
 def getMultiples(num, d = [2]):
 	l = []
@@ -125,16 +129,19 @@ def getPrimes(limit):
 			i += 1
 			
 		return l
-		
+#END OF THE SHAME BLOCK	
+	
 def getNearestVertexToPoly(object, poly, point):
+	""" Returns the nearest vertext to a poligon.
+	
+	:param poly: The poligon if wich vertex you want to check.
+	:type poly: |KX_PolyProxy|
+	:param point: The point to check, in world coordinates.
+	:type point: |Vector|	
+	"""
+	
 	if not type(point) is Vector: point = Vector(point)
 	mesh = poly.getMesh()
-	s = poly.getNumVertex()
-	v1 = mesh.getVertex(0, poly.v1)
-	v2 = mesh.getVertex(0, poly.v2)
-	v3 = mesh.getVertex(0, poly.v3)
-	if s == 4: v4v = mesh.getVertex(0, poly.v4).XYZ
-	else: v4 = None
 	
 	min = None
 	f = None
@@ -148,7 +155,11 @@ def getNearestVertexToPoly(object, poly, point):
 	return f
 	
 def getPolyNormal(poly):
-	""" Returns the normal of a KX_PolyProxy """
+	""" Returns the normal of poligon based on the position of their vertex. It calculates the normal, it doesn't return manually modified normals.
+	
+	:param poly: The poligon.
+	:type poly: |KX_PolyProxy|
+	"""
 
 	mesh = poly.getMesh()
 	s = poly.getNumVertex()
@@ -162,7 +173,9 @@ def getPolyNormal(poly):
 	return normal
 		
 def recalculateNormals(obj):
-	""" Recalculates the normals of a KX_GameObject, KX_MeshProxy or KX_PolyProxy """
+	""" Recalculates the normals of a |KX_GameObject|, |KX_MeshProxy| or |KX_PolyProxy|.
+	
+	It iterates through all the given vertex, it may be a slow operation, use with caution. """
 
 	if type(obj) is types.KX_GameObject:
 		mesh = obj.meshes[0]

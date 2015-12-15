@@ -1,6 +1,6 @@
 Media
 =========
-This module contains useful objects for easy us of video and audio.
+This module contains useful objects for easy use of video and audio.
 
 .. currentmodule:: core.media
 
@@ -24,6 +24,16 @@ Audio
 .. data:: music
 	
 	Default instance of AudioFile for music.
+	
+.. data:: sui
+
+	Sound User Interface. A dictionary specific for AudioEffects that will be used on the GUI. Files listed here should be inside the ``data/sound/ui/`` directory.
 
 .. autoclass:: AudioFile
+	:members:
+	
+.. autoclass:: AudioEffect
+	:members:
+	
+.. autoclass:: RandomMusic
 	:members:

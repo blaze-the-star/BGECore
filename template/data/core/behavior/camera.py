@@ -3,7 +3,35 @@ from core import key, module
 from mathutils import Vector, Euler
 import math
 from core.behavior.base import *
+
 class MouseLook(Object):
+	""" Preset of a mouse look behavior. To be used with a camera.
+	
+	You can control the camera orientation with the mouse and move arround with WASD.
+
+	.. attribute:: sensitivity
+	
+	The sensitivity of the mouse. *Default: 0.75*
+	
+	.. attribute:: deathzone
+	
+	The radious of a the zone in wich mouse movements are considered noise and therfore ignored. *Default: 0.002*
+	
+	.. attribute:: speedx
+	
+	The speed of movement on the x axis. (Left/Right) *Default: 0.1*
+	
+	.. attribute:: speedz
+	
+	The speed of movement on the z axis. (Front/Back) *Default: 0.3*
+	
+	.. attribute:: lock_rotation
+	
+	It can be used to ensure a maixum rotation on the x axis, so avoiding an inverted view. If ``None`` no limit will be applied, otherwise a float representing the angle in radiants (for one direction) will be used. *Default: 1*
+	
+	
+	"""
+
 	def __init__(self, object):
 		super().__init__(object)
 		self.deathzone = 0.002
@@ -26,7 +54,6 @@ class MouseLook(Object):
 		if self.lock_rotation == None: rot = tmp
 		else:
 			rot.z = tmp.z
-			print(tmp.x)
 			if abs(tmp.x-1.57) <= self.lock_rotation:
 				rot.x = tmp.x
 		

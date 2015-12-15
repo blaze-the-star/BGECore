@@ -52,24 +52,6 @@ class Widget():
 		
 		List of objects that will be also tranformed with the widget (Recursive).
 	
-	.. attribute:: position
-		
-		The position of the widget in world coordinates.
-		
-		:type: |Vector|
-	
-	.. attribute:: scale
-		
-		The scale of the widget.
-		
-		:type: |Vector|
-	
-	.. attribute:: rotation
-		
-		The rotation of the widget in world coordinates.
-		
-		:type: mathutils.Euler
-	
 	"""
 	_immuse_keyboard = True
 

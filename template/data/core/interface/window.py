@@ -1,39 +1,37 @@
 from script import constant
-from bge import logic, render, texture
-from bgl import *
+from bge import logic, render, texture, types
+import bgl
 from core import utils, module
 from core.interface import event
-
-# Window Class:
-#	This class handles the game window. It allows you to use of a custom cursor and generates mouse events.
-#	Internally the class throws a raycast from the cursor position in the GUI scene and the GAME scene.
-#	The current implementation only works with orthographic cameras facing the ground (0,0,0). The recomended height
-#	from the world origin is 10.
-#	The current implementation forces the same scale ratio on the window. This is nescesary to work properly.
 
 class Window():
 	""" Handles the game window and cursor.
 
-	Internally it throws a raycast from the cursor position in the *scene_gui* and the *scene_game* (if aviable) to generate mouse events.
-	The current implementation only works with orthographic cameras with orientation (0,0,0). The recomended height
-	from the world origin is 10.
+	Internally it throws a raycast from the cursor position in the *scene_gui* and the *scene_game* (if aviable) to generate mouse events. The current implementation only allows to use orthographic cameras with orientation (0,0,0) on the GUI scene. The recomended height from the world origin is 10.
 
 	.. attribute:: cursor
 
-	The |KX_GameObject| of a custom cursor is used, otherwise *None*
+		The |KX_GameObject| or :class:`.ImageCursor` of a custom cursor if used, otherwise *None*
 
 	.. attribute:: cursor_position
 
-	A |Vector| representing the position of the cursor. Same as *cursor.position* if using a custom cursor, otherwise the position it would have.
+		A |Vector| representing the position of the cursor. Same as *cursor.position* if using a custom cursor, otherwise the position it would have.
 
+	.. attribute:: hitobj
+
+		The object returned along the hitpoint on the window raycast, or ``None``.
+	
 	.. attribute:: hitpoint
 
-	When using a game scene a 3D Vector representing the position of the cursor in 3D space. If the raycast doesn't collide
-	or there is no game scene loaded, None.
+		When using a game scene, a 3D Vector representing the position of the cursor in 3D space. If the raycast doesn't collide or there is no game scene loaded, ``None``.
 
 	.. attribute:: hitnormal
 
-	The normal vector returned along the hitpoint on the window raycast, or None.
+		The normal vector returned along the hitpoint on the window raycast, or ``None``.
+	
+	.. attribute:: hitpoly
+
+		The |KX_PolyProxy| returned along the hitpoint on the window raycast, or ``None``.
 
 	"""
 
@@ -154,14 +152,18 @@ class Window():
 		else: logic.mouse.visible = True
 
 	def setCursor(self, obj):
-		""" Changes the cursor to a game object or image.
+		""" Changes the cursor by a game object or a :class:`.ImageCursor`.
 
-			:param string objName: Name of the game object to use as a cursor.
+			:param obj: Cursor to use. Path if :class:`.ImageCursor`.
+			:type obj: String or |KX_GameObject|
+			
 			It must be a object of the GUI scene in an inactive layer.
 			Or the filepath of the image to use, relative to the data directory.
 		"""
 		own = self.camera
-		if self.cursor and not type(self.cursor) is ImageCursor: self.cursor.endObject()
+		if self.cursor:
+			if type(self.cursor) is ImageCursor: self.cursor.delete()
+			if type(self.cursor) is types.KX_GameObject: self.cursor.endObject()
 
 		if obj:
 			if type(obj) is str:
@@ -175,6 +177,33 @@ class Window():
 			logic.mouse.visible = True
 			
 class ImageCursor:
+	""" A cursor made from an external texture. 
+	
+	This cursor is rendered using BGL after all other post_draw calls. Therefore we can render it with alpha blend over BLF texts (Labels).
+	
+	:param string path: The path to the texture, relative to the *data* directory.
+	
+	.. attribute:: visible
+	
+		Boolean indicating the visibility of the cursor. 
+	
+	.. attribute:: color
+	
+		A 4-val list RGBA indicating the scale of each color channel to use with the cursor. *Default: [1,1,1,1]*
+	
+	.. attribute:: position
+	
+		A pair containing the positon in screen coordinates. Equal to ``bge.logic.mouse.position``. Altering this value will not modify the mouse position and the cursor will be returned to the mouse position at the next frame.
+	
+	.. attribute:: scale
+	
+		A pair containing the scale of the cursor. *Default: (0.5, 0.5)*
+
+	.. attribute:: texture
+	
+		A bitmap containing the texture data to use for the cursor. The date has been loaded using ``bge.texture.ImageFFmpeg``.
+	"""
+
 	def __init__(self, path):
 		self.worldPosition = [0,0,0]
 		self.visible = True
@@ -184,7 +213,7 @@ class ImageCursor:
 		
 		self._tex_id = glGenTextures(1)
 		self.size = [0, 0]
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE)
+		bgl.glTexEnvf(bgl.GL_TEXTURE_ENV, bgl.GL_TEXTURE_ENV_MODE, bgl.GL_MODULATE)
 		
 		self.reload()
 		
@@ -242,15 +271,17 @@ class ImageCursor:
 				]
 		
 	def reload(self):
+		""" Reloads the texture contained in the ``texture`` attribute. Can be used to create animated cursors. """
+		
 		img = self.texture
 		
 		data = img.image
 		if data == None:
 			raise RuntimeError("Image not loaded correctly!")
 
-		glBindTexture(GL_TEXTURE_2D, self._tex_id)
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img.size[0], img.size[1], 0,
-						GL_RGBA, GL_UNSIGNED_BYTE, data)
+		bgl.glBindTexture(bgl.GL_TEXTURE_2D, self._tex_id)
+		bgl.glTexImage2D(bgl.GL_TEXTURE_2D, 0, bgl.GL_RGBA, img.size[0], img.size[1], 0,
+						bgl.GL_RGBA, bgl.GL_UNSIGNED_BYTE, data)
 
 		self.image_size = img.size[:]
 		
@@ -262,53 +293,62 @@ class ImageCursor:
 		height = render.getWindowHeight()
 		width = render.getWindowWidth()
 	
-		glMatrixMode(GL_PROJECTION)
-		glLoadIdentity()
-		gluOrtho2D(0, width, 0, height)
-		glMatrixMode(GL_MODELVIEW)
-		glLoadIdentity()
+		bgl.glMatrixMode(bgl.GL_PROJECTION)
+		bgl.glLoadIdentity()
+		bgl.gluOrtho2D(0, width, 0, height)
+		bgl.glMatrixMode(bgl.GL_MODELVIEW)
+		bgl.glLoadIdentity()
 	
 		# Enable textures
-		glEnable(GL_TEXTURE_2D)
+		bgl.glEnable(bgl.GL_TEXTURE_2D)
 
 		# Enable alpha blending
-		glEnable(GL_BLEND)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-		#glAlphaFunc(GL_SRC_ALPHA, 1)
+		bgl.glEnable(bgl.GL_BLEND)
+		bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
+		#glAlphaFunc(bgl.GL_SRC_ALPHA, 1)
 
 		# Bind the texture
-		glBindTexture(GL_TEXTURE_2D, self._tex_id)
+		bgl.glBindTexture(bgl.GL_TEXTURE_2D, self._tex_id)
 
 		# Fix position
 		w, h = self._size
-		glTranslatef(0, -h, 1)
+		bgl.glTranslatef(0, -h, 1)
 
 		#MipLevel
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BASE_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_BASE_LEVEL, 0);
+		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAX_LEVEL, 0);
 		
 		# Draw the textured quad
-		glColor4f(*self.color)
+		bgl.glColor4f(*self.color)
 
-		glBegin(GL_QUADS)
+		bgl.glBegin(bgl.GL_QUADS)
 		self.calculate_glposition()
 		for i in range(4):
-			glTexCoord2f(self.texco[i][0], self.texco[i][1])
-			glVertex2f(self.gl_position[i][0], self.gl_position[i][1])
-		glEnd()
+			bgl.glTexCoord2f(self.texco[i][0], self.texco[i][1])
+			bgl.glVertex2f(self.gl_position[i][0], self.gl_position[i][1])
+		bgl.glEnd()
 
-		glBindTexture(GL_TEXTURE_2D, 0)
+		bgl.glBindTexture(bgl.GL_TEXTURE_2D, 0)
 		
-		#glDisable(GL_TEXTURE_2D)
+		#glDisable(bgl.GL_TEXTURE_2D)
 		#glPopMatrix()
-		glMatrixMode(GL_PROJECTION)
-		glPopMatrix()
-		glMatrixMode(GL_MODELVIEW)
+		bgl.glMatrixMode(bgl.GL_PROJECTION)
+		bgl.glPopMatrix()
+		bgl.glMatrixMode(bgl.GL_MODELVIEW)
+		
+	def delete(self):
+		""" Deletes the cursor. Usually you should use interface.window.setCursor(None) but this is for crazy bastards that have deleted the refernce on the window object. """
+		
+		self.visible = False
+		try:
+			module.scene_gui.post_draw.remove(self.draw)
+		except KeyError:
+			pass
 		
 #Hacks
-_glGenTextures = glGenTextures
+_glGenTextures = bgl.glGenTextures
 def glGenTextures(n, textures=None):
-	id_buf = Buffer(GL_INT, n)
+	id_buf = bgl.Buffer(bgl.GL_INT, n)
 	_glGenTextures(n, id_buf)
 
 	if textures:

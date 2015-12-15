@@ -18,8 +18,6 @@ class Object():
 			The scene that's using this behavior. Typically :obj:`core.module.scene_game`
 			
 			:type: |KX_Scene|
-			
-		
 	"""
 
 	def __init__(self, object = None):
@@ -76,7 +74,26 @@ class Object():
 		pass
 		
 class Scene():
-	""" Scene behavior. Each scene can have one, the GUI scene must. This behavior is automatically instancied when the scene is loaded. """
+	""" Scene behavior. Each scene can have one, the GUI scene must. This behavior is automatically instancied when the scene is loaded.
+	
+	.. attribute:: objects
+	
+		A list of objects in this scene.
+	
+	.. Note:: Fixes bug where KX_Scene.objects is not updated after dynamic loading.
+	
+	.. attribute:: objectsInactive
+	
+		A list of inactive objects (objects in hidden layers) in this scene.
+	
+	.. attribute:: scene
+	
+		The |KX_Scene| of this scene behavior. Should be equal to ``module.scene_game``.
+	
+	.. attribute:: paused
+	
+		If *True* the update event of this behavior or any object behavior attached to this scene won't be called.
+	"""
 	
 	def __init__(self):
 		self.behaviors = []

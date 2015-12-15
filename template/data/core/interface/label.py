@@ -105,12 +105,14 @@ class Label():
 	.. attribute:: align
 	
 		Alignation of the text, on the following contants: ``ALIGN_LEFT``, ``ALIGN_CENTER`` or ``ALIGN_RIGHT``
-
-	.. attribute:: text
 	
 	.. attribute:: middle_height
 	
 		**Bool**, if True the text will be Y-Axis centered to the origin. Useful for widgets.
+		
+	.. attribute:: leading
+	
+		The space between two lines of text on a multiline label. *Default: 1*
 	
 	"""
 	_fontname_id = {}
@@ -159,7 +161,7 @@ class Label():
 		P.obj = self; return P
 		
 	def delete(self):
-		""" """
+		""" Removes the label from the ``post_draw`` pipeline. """
 		try: module.scene_gui.post_draw.remove(self.draw)
 		except ValueError:
 			raise ValueError("Trying to delete a Label that should be already deleted. Possible memory leak.")
@@ -240,7 +242,7 @@ class Label():
 	
 	@property
 	def position(self):
-		""" """
+		""" A |Vector| indicating the position of the label. """
 		return self._position
 		
 	@position.setter
@@ -252,7 +254,7 @@ class Label():
 		
 	@property
 	def scale(self):
-		"""  """
+		""" A |Vector| indicating the scale of the label. Only the x axis will be considered. """
 		return self._scale
 		
 	@scale.setter
@@ -263,7 +265,7 @@ class Label():
 		
 	@property
 	def rotation(self):
-		"""  """
+		""" A |Vector| indicating the orientation of the label. Only the z axis will be considered. """
 		return self._rotation
 		
 	@rotation.setter
@@ -279,7 +281,7 @@ class Label():
 		
 	@property
 	def color(self):
-		"""  """
+		""" A |Vector| indicating the color of the label. """
 		return self._color
 		
 	@color.setter
@@ -290,7 +292,7 @@ class Label():
 	
 	@property
 	def font(self):
-		""" Font name to use from the `data/gui/font` directory. Ecpected ``.ttf`` file extension.
+		""" Font name to use from the `data/gui/font` directory. Expected ``.ttf`` file extension.
 		
 		:type: String
 		"""
@@ -303,7 +305,7 @@ class Label():
 		
 	@property
 	def text(self):
-		""" The text of the label """
+		""" The text of the label. You can use ``\\n`` to make a new line. """
 		text = self._text
 		for line in self._lines:
 			text += "\n" + line.text
