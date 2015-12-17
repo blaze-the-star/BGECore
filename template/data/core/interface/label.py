@@ -289,6 +289,17 @@ class Label():
 		self._color = self.ProxyColor(color)
 		for line in self._lines:
 			line.color = color
+			
+	@property
+	def visible(self):
+		""" A |Vector| indicating the color of the label. """
+		return self._visible
+		
+	@visible.setter
+	def visible(self, val):
+		self._visible = val
+		for line in self._lines:
+			line.visible = val
 	
 	@property
 	def font(self):
