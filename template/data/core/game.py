@@ -72,6 +72,7 @@ def secondary_loop():
 	global _last_traceback, _fatal_error
 	
 	#It takes 0.6ms when with the editor. (Without tile replacing)
+	if not module.scene_behavior: return
 	try:
 		if _fatal_error: return 
 		if module.change_scene_frame == False:

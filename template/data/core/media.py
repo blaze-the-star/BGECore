@@ -186,10 +186,6 @@ class AudioFile():
 		:param tuple transition: The times for the fade effect during transations. In order: Duration of the fadeout, time for the fadein to start, duration of the fadein. In sconds.
 		"""
 		
-		self.callback = callback
-		if not filepath: filepath = self.filepath
-		else: self.filepath = filepath
-		
 		if self.waiting == True: #Replace sound that will be played.
 			self.filepath = filepath
 			return
@@ -206,6 +202,9 @@ class AudioFile():
 			sequencer.Wait(y, lambda: self._transition_callback(z))
 			return
 		
+		self.callback = callback
+		if not filepath: filepath = self.filepath
+		else: self.filepath = filepath
 		path = logic.expandPath("//../data/" + filepath)
 		factory = aud.Factory(path)
 		
@@ -230,6 +229,9 @@ class AudioFile():
 		:param float time: How long the fadeout lasts.
 		:param bool stop: If True it will automatically stop the reproduction at the end.
 		"""
+		if self.fadeout and self.fadeout.status != False:
+			self.fadeout.delete()
+		
 		if self.fadein and self.fadein.status != False:
 			self.fadein.delete()
 			
@@ -243,6 +245,9 @@ class AudioFile():
 		
 		:param float time: How long the fadein lasts.
 		"""
+		if self.fadein and self.fadein.status != False:
+			self.fadein.delete()
+		
 		if self.fadeout and self.fadeout.status != False:
 			self.fadeout.delete()
 			
