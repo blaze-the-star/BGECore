@@ -1,5 +1,16 @@
 from core import module, utils, dynamic, behavior
 from random import randint
+from . import format
+
+class DynamicTerrain:
+	""" Creates a new terrain from a file. """
+	sizeX = 20
+	sizeY = 20
+
+	def __init__(self, focus, filepath):
+		self.focus = focus
+		self.filepath = filepath
+		self.tile_manager = TileManager(self.focus, self.sizeX, self.sizeY)
 
 class TileManager(behavior.Object):
 	def __init__(self, focus, x, y):
@@ -159,17 +170,11 @@ class Tile:
 		self.o = obj
 		self._n = self.n
 		#print(str(obj) + " Time: " + str(time))
+		
 		self.updateMesh(obj, self.n)
 
 	def updateMesh(self, obj, lod):
-		if lod > 0:
-			mesh = obj.meshes[0]
-			for v_index in range(mesh.getVertexArrayLength(0)):
-				v = mesh.getVertex(0, v_index)
-				if v.z < 9000: continue
-				r = randint(0,50)
-				v.XYZ = [v.x, v.y, 0] #Move pointer (KX_GameObject) here.
+		mesh = obj.meshes[0]
 
-		if lod > 0:
-			obj.reinstancePhysicsMesh(obj, mesh)
-			obj.restoreDynamics()
+		
+		utils.recalculateNormals(obj)

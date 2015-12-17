@@ -72,27 +72,35 @@ def _click_event_loop(status):
 	_hold = False
 	
 last_keyevents = [[],[],[],[]]
+last_butstillthisframe_keyevents = None
+first_time_in_frame = True
 def _key_event_loop(listen_list):
-	global last_keyevents
+	global last_keyevents, first_time_in_frame
+	global last_butstillthisframe_keyevents
 	
-	keyevents = [[],[],[],[]]
-	for key, status in logic.keyboard.active_events.items(): keyevents[status].append(key)
-	for key, status in logic.mouse.active_events.items():
-		if key == events.MOUSEX: continue
-		if key == events.MOUSEY: continue
-		keyevents[status].append(key)
+	if first_time_in_frame == True:
+		keyevents = [[],[],[],[]]
+		for key, status in logic.keyboard.active_events.items(): keyevents[status].append(key)
+		for key, status in logic.mouse.active_events.items():
+			if key == events.MOUSEX: continue
+			if key == events.MOUSEY: continue
+			keyevents[status].append(key)
 
-	for si, status in enumerate(keyevents):
-		for i, k in enumerate(status):
-			if k in core_key.mod:
-				keyevents[si][i] = core_key.mod[k]
+		for si, status in enumerate(keyevents):
+			for i, k in enumerate(status):
+				if k in core_key.mod:
+					keyevents[si][i] = core_key.mod[k]
+		
+		last_butstillthisframe_keyevents = keyevents
+		first_time_in_frame = False
 	
+	else: keyevents = last_butstillthisframe_keyevents
+
 	if len(keyevents[1]) > 0 and keyevents[1] != last_keyevents[1]:
 		for b in listen_list: b.onKeyDown(keyevents[1])
+		print("Send! To: " + str(listen_list))
 	if len(keyevents[2]) > 0:
 		for b in listen_list: b.onKeyPressed(keyevents[2])
 	if len(keyevents[3]) > 0 and keyevents[3] != last_keyevents[3]:
 		for b in listen_list: b.onKeyUp(keyevents[3])
-
-	last_keyevents = keyevents
 	

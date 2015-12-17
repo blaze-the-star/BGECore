@@ -2,6 +2,9 @@ Welcome to BGECore's documentation!
 ===================================
 BGECore is a framework for BGE games. It makes Python the main system for adding logic to your games and changes completly the way Blender games are made. BGECore also provides common features to any kind of game so that you don't have to reinvent the wheel. 
 
+BGECore Framework can be downloaded or cloned from GitHub at `https://github.com/elmeunick9/BGECore/
+<https://github.com/elmeunick9/BGECore/>`_.
+
 Contents:
 
 .. toctree::

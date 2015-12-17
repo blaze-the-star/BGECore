@@ -1,4 +1,5 @@
-You can get the documentation online at: http://bgecore.16mb.com/
+You can get the documentation online at: http://bgecore.royalwebhosting.net/
+(Mirror) http://bgecore.16mb.com/
 
 To generate/update the documentation you need the following dependences:
 

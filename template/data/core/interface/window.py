@@ -138,6 +138,8 @@ class Window():
 
 		if scene_gui:
 			obj = self.camera.rayCast(tto, (to[0], to[1], self.camera.position.z), self.camera.far)[0]
+			
+		if not obj and self.hitobj: obj = self.hitobj
 
 		event._over_event_call(obj)
 

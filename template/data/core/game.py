@@ -47,6 +47,8 @@ def loop():
 	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_gui]
 	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
 	event._key_event_loop(listen_list)
+	event.first_time_in_frame = True
+	event.last_keyevents = event.last_butstillthisframe_keyevents
 
 	#Frequency callbacks
 	for v in module.video_playback_list: v.updateVideo()

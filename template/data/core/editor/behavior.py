@@ -1,5 +1,5 @@
 from core import behavior, module, utils, key
-from .tile import TileManager
+from .terrain import DynamicTerrain
 from bge import logic, types, render
 from mathutils import Vector
 import math
@@ -109,7 +109,7 @@ class SceneEditor(behavior.Scene):
 		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
-		self.tm = TileManager(focus, 20, 20)
+		self.terrain = DynamicTerrain(focus, "avalon.terrain")
 
 
 #behavior.addScene(SceneEditor, "SceneEditor") #This is done on dynamic, so that we can still import dynamic here.
