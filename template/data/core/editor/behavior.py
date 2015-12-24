@@ -77,12 +77,17 @@ class Cursor(behavior.Object):
 		if module.window.hitpoint:
 			self.obj.worldPosition = module.window.hitpoint
 			
+	def onKeyDown(self, keys):
+		if key.LEFTMOUSE in keys or key.RIGHTMOUSE in keys:
+			module.window.hitproperty = "DYN_Terrain.RAYDETECT"
+			module.window.hitxray = 1
 			
 	def onKeyPressed(self, keys):
 		if not (key.LEFTMOUSE in keys or key.RIGHTMOUSE in keys): return
 		
 		hitobj = module.window.hitobj
 		hitpoly = module.window.hitpoly
+		
 		if not hitobj or not hitobj.name.startswith("DYN_Terrain."): return
 		
 		v = utils.getNearestVertexToPoly(hitobj, hitpoly, self.obj.worldPosition)

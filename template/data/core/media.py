@@ -170,7 +170,7 @@ class AudioFile():
 		self.volume = 0
 		self.playing = False
 		self.waiting = False
-		self.play()
+		self.play(callback=self.callback)
 		self.fadeIn(n)
 	
 	def play(self, filepath=None, loop=False, volume = None, pitch = 1, callback = None, transition = (3, 2, 3)):
@@ -200,6 +200,7 @@ class AudioFile():
 			self.waiting = True
 			
 			sequencer.Wait(y, lambda: self._transition_callback(z))
+			self.callback = callback
 			return
 		
 		self.callback = callback

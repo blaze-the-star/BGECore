@@ -163,6 +163,8 @@ class Tile:
 	def tileJustLoaded(self, obj, time): #Add time
 		obj.worldPosition = (self.x, self.y, 0)
 		obj.visible = True
+		obj["DYN_Terrain.RAYDETECT"] = 0
+		
 		if self.o and self._n >= 0:
 			self.o = None
 			Tile.generator[self._n].remove((self.x, self.y))

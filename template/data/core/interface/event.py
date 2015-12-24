@@ -98,7 +98,6 @@ def _key_event_loop(listen_list):
 
 	if len(keyevents[1]) > 0 and keyevents[1] != last_keyevents[1]:
 		for b in listen_list: b.onKeyDown(keyevents[1])
-		print("Send! To: " + str(listen_list))
 	if len(keyevents[2]) > 0:
 		for b in listen_list: b.onKeyPressed(keyevents[2])
 	if len(keyevents[3]) > 0 and keyevents[3] != last_keyevents[3]:

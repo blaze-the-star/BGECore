@@ -32,6 +32,14 @@ class Window():
 	.. attribute:: hitpoly
 
 		The |KX_PolyProxy| returned along the hitpoint on the window raycast, or ``None``.
+		
+	.. attribute:: hitproperty
+	
+		The object property that objects need to have in order to be returned as hitobj on the window raycast, or an empty string to detect any object. See hitxray.
+		
+	.. attribute:: hitxray
+	
+		Use with hitproperty. If 0 *None* will be returned if the first object detected doesn't match the property, if 1 the raycast will continue until it finds a object that matchs the property or *camera.far* is reached.
 
 	"""
 
@@ -52,6 +60,8 @@ class Window():
 		self.hitpoint = None
 		self.hitnormal = None
 		self.hitpoly = None
+		self.hitproperty =  ""
+		self.hitxray = 0
 
 		#Scale Camera X/Y
 		if self.camera:
@@ -93,7 +103,7 @@ class Window():
 			vec = gcam.getScreenVect(x, y)
 			vec.negate()
 			vec = vec + gcam.position
-			self.hitobj, self.hitpoint, self.hitnormal, self.hitpoly = gcam.rayCast(vec, gcam, gcam.far, "", 0, 0, 1)
+			self.hitobj, self.hitpoint, self.hitnormal, self.hitpoly = gcam.rayCast(vec, gcam, gcam.far, self.hitproperty, 0, self.hitxray, 1)
 
 		else:
 			#Needs revision, rotation doesn't work
@@ -101,7 +111,7 @@ class Window():
 			scy = gcam.ortho_scale * render.getWindowHeight()/render.getWindowWidth()
 
 			to = [(x-0.5)*scx + cx, (-y+0.5)*scy + cy, 0]
-			self.hitobj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far)
+			self.hitobj, self.hitpoint, self.hitnormal = gcam.rayCast(to, (to[0], to[1], gcam.position.z), gcam.far, self.hitproperty, 0, self.hitxray)
 
 	def cursorInsideFrustum(self):
 		""" Checks if the custom is inside the frustum of the camera.
