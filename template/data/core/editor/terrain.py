@@ -1,25 +1,79 @@
 from core import module, utils, dynamic, behavior
 from random import randint
 from . import format
+import os
+from bge import logic
 
 class DynamicTerrain:
-	""" Creates a new terrain from a file. """
+	""" Creates a new terrain from a .terrain file. If the file doesn't exist creates a new terrain. """
 	sizeX = 20
 	sizeY = 20
 
 	def __init__(self, focus, filepath):
+		Tile.dynt = self
 		self.focus = focus
-		self.filepath = filepath
-		self.tile_manager = TileManager(self.focus, self.sizeX, self.sizeY)
+		self.filepath = logic.expandPath("//../data/" + filepath)
+		
+		if os.path.isfile(self.filepath) == False:
+			format.newTerrainFile(self.filepath, self.sizeX, self.sizeY, 5, [2696, 825, 180, 48, 36], [50, 25, 13, 10, 10], [50, 25, 13, 10, 10])
+			print("New file!")
+			
+		self.terrain_file = format.TerrainFile(self.filepath)
+		self.tile_manager = TileManager(self.focus, self.sizeX, self.sizeY, self.terrain_file)
+		
+	def writeChunk(self, obj):
+		""" Test method to write an entire chunk to the disk.
+
+		:param |KX_GameObject| obj: The Tile to store.
+		"""
+		
+		lod = int(obj.name[15:])
+		
+		x, y = (obj.worldPosition.x/Tile.size, obj.worldPosition.y/Tile.size)
+		msx, msy = self.terrain_file._msx, self.terrain_file._msy
+		chunkpos = (int(x)+int(msx/2), int(y)+int(msy/2))
+		
+		vlist = []
+		mesh = obj.meshes[0]
+		for i in range(mesh.getVertexArrayLength(0)):
+			vlist.append(mesh.getVertex(0, i))
+		
+		self.terrain_file.setChunkArray(lod, chunkpos, vlist)
+		
+	def updateChunk(self, obj):
+		""" Updates the hight of a lod chunk from the disk. """
+	
+		lod = int(obj.name[15:])
+		
+		x, y = (obj.worldPosition.x/Tile.size, obj.worldPosition.y/Tile.size)
+		msx, msy = self.terrain_file._msx, self.terrain_file._msy
+		chunkpos = (int(x)+int(msx/2), int(y)+int(msy/2))
+		
+		vlist = self.terrain_file.getChunkArray(lod, chunkpos)
+		
+		i = 0
+		mesh = obj.meshes[0]
+		for vertex in vlist:
+			z, nx, ny, nz = vertex
+			v = mesh.getVertex(0, i)
+			v.XYZ = (v.x, v.y, z)
+			v.setNormal((nx, ny, nz))
+			i += 1
+		
+	def __del__(self):
+		del self.terrain_file
+		del self.tile_manager
 
 class TileManager(behavior.Object):
-	def __init__(self, focus, x, y):
+	def __init__(self, focus, x, y, file):
 		Tile.focus = focus
+		self.file = file
 
 		path = "core/editor/LOD"
 		for i in range(0, 5):
 			Tile.generator.append(dynamic.ObjectGenerator(path+str(i)+".blend"))
 
+		Tile.file = file
 		self.tiles = [[]]
 		self.tiles_index = (0, 0)
 
@@ -34,12 +88,18 @@ class TileManager(behavior.Object):
 			self.tiles.append(l)
 			for j in range(-y, y+1):
 				self.tiles[i+x].append(Tile(i, j))
+				
+		self.updateAll()
 
 		#module.height_frequency_callbacks.append(self.update)
 		super().__init__()
 		self.scene = module.scene_game
 		module.scene_behavior.behaviors.append(self)
 
+	def updateAll(self):
+		for tx in self.tiles:
+			for x in tx: x.update()
+		
 	def update(self):
 		self.update_lazy()
 
@@ -99,7 +159,9 @@ class Tile:
 	focus = None
 	minlod = 0
 	generator = []
-
+	file = None
+	dynt = None
+	
 	def __init__(self, x, y):
 		""" Creates a new Tile
 
@@ -119,16 +181,13 @@ class Tile:
 		self.n = -1
 		self._n = self.n
 
-		#And finally, we initializate all tiles in the first frame.
-		self.update()
-
 	def update(self):
 		""" Updates a tile chink based on it's distance from the focus
 
 		:return int factor: The inverse of the LOD level that will be applied,
 		no mesh = 0, most low poly = 1, most high poly = maxium lod.
 		"""
-		#print("U: " + str(self.x/self.size) + ' ' + str(self.y/self.size))
+
 		distance = Tile.focus.getDistanceTo([self.x, self.y, 0])
 		m = Tile.minlod
 
@@ -136,7 +195,7 @@ class Tile:
 		elif distance <= Tile.size*2: n = m+1
 		elif distance <= Tile.size*3: n = m+2
 		elif distance <= Tile.size*7: n = m+3
-		#elif distance <= Tile.size*10: n = m+4
+		elif distance <= Tile.size*10: n = m+4
 		elif distance > Tile.size*2: n = -1
 
 		if n < 5:
@@ -177,6 +236,4 @@ class Tile:
 
 	def updateMesh(self, obj, lod):
 		mesh = obj.meshes[0]
-
-		
-		utils.recalculateNormals(obj)
+		Tile.dynt.updateChunk(obj)

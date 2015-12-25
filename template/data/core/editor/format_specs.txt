@@ -1,0 +1,42 @@
+UNSIGNED TYPES: uByte (0 : 255)		| uShort (0 : 65 535) 		| uInt (0 : 4 294 967 295) 	| uLong (0 : 18 446 744 073 709 551 615)
+SIGNED TYPES:	Byte (-127 : 128)	| Short (-32 767 : 32 768) 	| Int (-2 146 483 647 : .. 648) | Long (A lot!) 
+Extension: .terrain
+Fromat: Binary data
+Version: 0.1
+Segments: Index - Table - Data
+
+Index						ID	Multiply
+-----------------------------------------------------------------
+uShort Map Size X 				msx	1
+uShort Map Size Y 				msy	1
+uShort Vertex Size in Bytes			vsb	1
+uByte  LOD Bases Amount 			bN	1
+uInt   F.Pos. of the last chunk in (bytes/vsb)  fend	1
+uInt   LOD BaseN Total Vertex Amount		vN	bN
+uShort LOD BaseN Texture Size X			bNTsx	bN
+uShort LOD BaseN Texture Size Y			bNTsy	bN
+uInt   ChunkNM Position in (bytes/vsb)			msx*msy
+???    HeaderFin
+
+Table
+-----------------------------------------------------------------
+LOD Base N BLOCK
+
+Sorted by X-Position, then Y-Position: Vertex ID, [PolyID1, PolyID2, PolyID3, PolyID4]
+
+
+Data (Aleatory Block)
+-----------------------------------------------------------------
+LOD N BLOCK: bN
+
+	Vertex Array (Sorted by ID)
+	-----------------------------------------------------------------	
+		Vertex N Array: vN 				Multiply			
+		---------------------------------------------------------
+		float	Z-Position				1
+		float	XYZ-Normalized Normal Vector		3
+	
+	Texture ByteArray
+	-------------------------------------------------------------
+	uByte 	UV Position				2*bNTsx*bNTsy
+	

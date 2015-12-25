@@ -167,9 +167,10 @@ def getPolyNormal(poly):
 	v2 = mesh.getVertex(0, poly.v2)
 	v3 = mesh.getVertex(0, poly.v3)
 	if s == 4: v4v = mesh.getVertex(0, poly.v4).XYZ
-	else: v4 = None
+	else: v4v = None
 	
-	normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ, v4v)
+	if v4v: normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ, v4v)
+	else: normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ)
 	return normal
 		
 def recalculateNormals(obj):

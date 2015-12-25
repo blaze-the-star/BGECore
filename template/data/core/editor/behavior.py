@@ -102,10 +102,13 @@ class Cursor(behavior.Object):
 		hitobj.reinstancePhysicsMesh(hitobj, hitobj.meshes[0])
 	
 	def onKeyUp(self, keys):
+		sb = module.scene_behavior
+	
 		if key.LEFTMOUSE in keys or key.RIGHTMOUSE in keys:
 			obj = module.window.hitobj
 			if not obj: return
 			obj.reinstancePhysicsMesh(obj, obj.meshes[0])
+			sb.terrain.writeChunk(obj)
 			
 			
 class SceneEditor(behavior.Scene):
