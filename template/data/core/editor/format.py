@@ -170,7 +170,7 @@ class TerrainFile:
 		fpos = self._index[self.getChunkPositionInIndex(chunkpos)]
 		if fpos < self._endtable:
 			import itertools
-			return itertools.repeat((0,0,0,0), self._vN[LOD])
+			return itertools.repeat((0,None,None,None), self._vN[LOD])
 			
 		#Seek to the correct LOD in this chunk.
 		if LOD > 0: fpos += self._vN[LOD-1]

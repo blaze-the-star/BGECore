@@ -52,13 +52,18 @@ class DynamicTerrain:
 		vlist = self.terrain_file.getChunkArray(lod, chunkpos)
 		
 		i = 0
+		cn = False
 		mesh = obj.meshes[0]
 		for vertex in vlist:
 			z, nx, ny, nz = vertex
 			v = mesh.getVertex(0, i)
 			v.XYZ = (v.x, v.y, z)
-			v.setNormal((nx, ny, nz))
+			
+			#if nx != None: v.setNormal((nx, ny, nz))
+			#else: cn = True
 			i += 1
+			
+		if True: utils.recalculateNormals(obj)
 		
 	def __del__(self):
 		del self.terrain_file
