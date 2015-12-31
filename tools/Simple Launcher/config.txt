@@ -2,7 +2,7 @@
 player: engine/blenderplayer.exe
 
 
-blend: ../../../template/data/game.blend
+blend: ../../template/data/game.blend
 
 #game settings
 volume: 1.0

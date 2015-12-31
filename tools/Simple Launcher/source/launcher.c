@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 --------------------------------------------------------------------------------
 
-This launcher is compiled using gcc, with MinGW on windows. 
+This launcher is compiled using gcc, with MinGW on windows.
 Compilation commands:
 	windres xyz.rc xyz.rc.o
 	gcc -c launcher.c
@@ -52,6 +52,7 @@ Compilation commands:
 #endif
 
 char * launcher_name;
+int is_verbose = VERBOSE;
 
 char default_config_file[] = \
 "player: engine/blenderplayer\n"
@@ -73,6 +74,10 @@ char default_config_file[] = \
 "#Custom command line\n"
 "#exec: ./blenderplayer mygame.blend\n";
 
+short is_between(int value, int from, int to){
+	return value >= from && value <= to;
+}
+
 int file_exist (char *filename) {
 	FILE * pFile;
 	pFile = fopen(filename , "r");
@@ -80,13 +85,8 @@ int file_exist (char *filename) {
 	else {fclose(pFile); return 1;}
 }
 
-/*int length_string(char *text) {
-	int n; for(n = 0; *text != 0; text++) n++;	
-	return n;
-}*/
-
 void substr(char *text, int i, int j) {
-	if (j < 0) j = strlen(text) - i;	
+	if (j < 0) j = strlen(text) - i;
 
 	char * tmp = strdup(text);
 	while(i != 0) {
@@ -94,10 +94,21 @@ void substr(char *text, int i, int j) {
 	}
 	while(j != 0 && (*tmp) != '\0') {
 		(*text) = (*tmp);
-		text++; tmp++; j--;	
+		text++; tmp++; j--;
 	}
 	(*text) = '\0';
 }
+
+int  append(char*s, size_t size, char c) {
+     if(strlen(s) + 1 >= size) {
+          return 1;
+     }
+     int len = strlen(s);
+     s[len] = c;
+     s[len+1] = '\0';
+     return 0;
+}
+
 
 void replace_char(char *text, char a, char b) {
 	while (*text != 0) {
@@ -125,7 +136,7 @@ void printHelp() {
 
 void generateConfigFileText() {
 	char * code = default_config_file;
-	
+
 	FILE *f = fopen("config.txt", "w");
 	if (f == NULL) {perror("Error trying to write the config file. \n"); printf("So, it will be print here: \n\n%s", code);}
 	else fprintf(f, "%s", code);
@@ -136,95 +147,106 @@ void parseConfig(FILE *pFile, char * command, char * filename, char * exepath) {
 	char c, n = 0;
 	etype mode = ARGUMENT;
 	char arg[ARG_SIZE] = {0}, val[VAL_SIZE] = {0};
-	
+
 	fseek(pFile, 0, SEEK_END);
-	int length = ftell(pFile);
 	rewind(pFile);
-	
-	size_t s; for (s=0;s<=length-1;s++) {
-	c = fgetc (pFile);
-	
-	if (c=='\n') {
-		val[n] = '\0';
-		int val_p = n-1;
-		mode=ARGUMENT; n=0;
-		
-		//Commands
-		if (strcmp(arg, "player")==0) {
-			strncat(exepath, val, val_p);
-			if (VERBOSE) printf("EXEPATH (player): %s\n", exepath);
-		}
-		if (strcmp(arg, "blend")==0) {
-			strncat(filename, val, val_p);
-			if (VERBOSE) printf("FILENAME (blend): %s\n", filename);
-		}
-		
-		if (strcmp(arg, "resolution")==0) {			
-			strncat(command, " -w ", 4);
-			strncat(command, val, val_p);
-			if (VERBOSE) printf("COMMAND (resolution): %s\n", command);
-		}
-		if (strcmp(arg, "stereomode")==0) {
-			strncat(command, " -s ", 4);
-			strncat(command, val, val_p);
-			if (VERBOSE) printf("COMMAND (stereomode): %s\n", command);
-		} 
-		if (strcmp(arg, "anti-aliasing")==0) {
-			strncat(command, " -m ", 4);
-			strncat(command, val, val_p);
-			if (VERBOSE) printf("COMMAND (anti-aliasing): %s\n", command);
-		}
-		
-		//If you enable space offset then remember to enable this to.
-		//if (strcmp(arg, "resolution")==0)	{strcat(command, " -w "); char * r = strtok (val,"x"); strcat(command, r); 
-		//					 r = strtok (NULL,"x"); strcat(command, " "); strcat(command, r); } //Warning!
-		
-		if (strcmp(arg, "fullscreen")==0 && strncmp(val, "true", 4)==0) {
-			strncat(command, " -f", 3);
-			if (VERBOSE) printf("COMMAND (fullscreen): %s\n", command);
-		}
-		if (strcmp(arg, "debug")==0 && strncmp(val, "true", 4)==0) {
-			strncat(command, " -d", 3);
-			if (VERBOSE) printf("COMMAND (debug): %s\n", command);		
-		}
-		
-		
-		if (strcmp(arg, "fixedtime")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g fixedtime = 1");
-		if (strcmp(arg, "nomipmap")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g nomipmap = 1");
-		if (strcmp(arg, "show_framerate")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_framerate = 1");
-		if (strcmp(arg, "show_properties")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_properties = 1");
-		if (strcmp(arg, "show_profile")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_profile = 1");
-		if (strcmp(arg, "blender_material")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g blender_material = 1");
-		if (strcmp(arg, "ignore_deprecation_warnings")==0 && strncmp(val, "false", 4)==0) strcat(command, " -g ignore_deprecation_warnings = 0");
-		
-		if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {
-			memset(command, 0, COM_SIZE);
-			strncpy(command, val, val_p);
-			strncpy(filename, "", 0);
-			break;
-		}
-		
-		//Clean
-		memset(arg, 0, sizeof(arg));
-		memset(val, 0, sizeof(val));
-		continue;
-	}
+    do {
+        c = fgetc (pFile);
+        if(feof(pFile)) break;
+        if (c=='\r') continue;
+        if (c=='\n') {
+            int val_p = n;
+            mode=ARGUMENT; n=0;
+            if (is_verbose) printf("PARSING ARG: %s\n", arg);
+
+            //Commands
+            if (strcmp(arg, "player")==0) {
+                strncat(exepath, val, val_p);
+                if (is_verbose) printf("EXEPATH (player): %s\n", exepath);
+            }
+            if (strcmp(arg, "blend")==0) {
+                strncat(filename, val, val_p);
+                if (is_verbose) printf("FILENAME (blend): %s\n", filename);
+            }
+
+            if (strcmp(arg, "resolution")==0) {
+                strncat(command, " -w ", 4);
+                strncat(command, val, val_p);
+                if (is_verbose) printf("COMMAND (resolution): %s\n", command);
+            }
+            if (strcmp(arg, "stereomode")==0) {
+                strncat(command, " -s ", 4);
+                strncat(command, val, val_p);
+                if (is_verbose) printf("COMMAND (stereomode): %s\n", command);
+            }
+            if (strcmp(arg, "anti-aliasing")==0) {
+                strncat(command, " -m ", 4);
+                strncat(command, val, val_p);
+                if (is_verbose) printf("COMMAND (anti-aliasing): %s\n", command);
+            }
+
+            //If you enable space offset then remember to enable this to.
+            //if (strcmp(arg, "resolution")==0)	{strcat(command, " -w "); char * r = strtok (val,"x"); strcat(command, r);
+            //					 r = strtok (NULL,"x"); strcat(command, " "); strcat(command, r); } //Warning!
+
+            if (strcmp(arg, "fullscreen")==0 && strncmp(val, "true", 4)==0) {
+                strncat(command, " -f", 3);
+                if (is_verbose) printf("COMMAND (fullscreen): %s\n", command);
+            }
+            if (strcmp(arg, "debug")==0 && strncmp(val, "true", 4)==0) {
+                strncat(command, " -d", 3);
+                if (is_verbose) printf("COMMAND (debug): %s\n", command);
+            }
+
+
+            if (strcmp(arg, "fixedtime")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g fixedtime = 1");
+            if (strcmp(arg, "nomipmap")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g nomipmap = 1");
+            if (strcmp(arg, "show_framerate")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_framerate = 1");
+            if (strcmp(arg, "show_properties")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_properties = 1");
+            if (strcmp(arg, "show_profile")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_profile = 1");
+            if (strcmp(arg, "blender_material")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g blender_material = 1");
+            if (strcmp(arg, "ignore_deprecation_warnings")==0 && strncmp(val, "false", 4)==0) strcat(command, " -g ignore_deprecation_warnings = 0");
+
+            if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {
+                memset(command, 0, COM_SIZE);
+                strncpy(command, val, val_p);
+                strncpy(filename, "", 0);
+                break;
+            }
+
+		    //Clean
+	    	memset(arg, '\0', sizeof(arg));
+		    memset(val, '\0', sizeof(val));
+		    continue;
+	    }
 		if (mode == __IGNORE__) continue;
-	
-	//Select modes
-	if (c=='#') {mode = __IGNORE__; continue;}
-	if (c==':') {mode = VALUE; n=0; fseek(pFile, 1, SEEK_CUR); continue;}
-	if (mode==ARGUMENT) arg[n] = c;
-	if (mode==VALUE) val[n] = c;
-	
-	++n; 
-	}
-	if (VERBOSE) printf("COMMAND (ALL): %s\n", command);
+
+	    //Select modes
+	    if (c=='#') {mode = __IGNORE__; continue;}
+	    if (mode==ARGUMENT && c==':') {mode = VALUE; n=0; fseek(pFile, 1, SEEK_CUR); continue;}
+	    if (mode==ARGUMENT){
+            if(append(arg, ARG_SIZE, c) == 1){
+                printf("WARNING! option name have to have a length < %d(%d) chars : %s\n", ARG_SIZE, n, arg);
+                mode = __IGNORE__;
+                continue;
+            }
+	    }
+	    if (mode==VALUE) {
+            if(append(val, VAL_SIZE, c) == 1){
+                printf("WARNING! option value have to have a length < %d(%d) chars : %s\n", VAL_SIZE, n, val);
+                mode = __IGNORE__;
+                continue;
+            }
+        }
+	    ++n;
+	}while(1);
+	if (is_verbose) printf("COMMAND (ALL): %s\n", command);
 }
 
 char * findPlayerPath(char ** filepaths) {
 	while (*filepaths != NULL) {
 		char * path = (*filepaths);
+		if(is_verbose) printf("Checking launcher: %s\n", path);
 		if (file_exist(path)) return path;
 		filepaths++;
 	}
@@ -235,16 +257,20 @@ char * findPlayerPath(char ** filepaths) {
 void getCommand(char * command, char * filename, char * exepath) {
 	char abspath[VAL_SIZE];
 	char quoted[VAL_SIZE];
-	DWORD win_filename = GetModuleFileName(NULL, abspath, VAL_SIZE);
-	char * n = strrchr(abspath, '\\');
-	(*(++n)) = 0;
-	replace_char(abspath, '\\', '/');
-	strcat(quoted, command);
-	sprintf(quoted, "\"%s%s\"\0", abspath, exepath);
-
+	char buffer[COM_SIZE];
+	short is_absolute_exepath = (is_between(exepath[0], 'a', 'z') || is_between(exepath[0], 'A', 'Z')) && exepath[1] == ':' && exepath[2] == '/';
+	if(is_absolute_exepath){
+		sprintf(quoted, "\"%s\"", exepath);
+	}else{
+		GetModuleFileName(NULL, abspath, VAL_SIZE);
+		char * n = strrchr(abspath, '\\');
+		(*(++n)) = 0;
+		replace_char(abspath, '\\', '/');
+		sprintf(quoted, "\"%s%s\"", abspath, exepath);
+	}
 	strcpy(abspath, quoted);
 	remove_char(abspath, '"');
-
+	if (is_verbose) printf("ABSPATH: %s\n", abspath);
 	if (file_exist(abspath) == 0) {
 		TCHAR pf[MAX_PATH], pf86[MAX_PATH];
 		SHGetSpecialFolderPath(NULL, pf, CSIDL_PROGRAM_FILES, FALSE);
@@ -253,7 +279,6 @@ void getCommand(char * command, char * filename, char * exepath) {
 		strcat(pf, "/Blender Foundation/Blender/blenderplayer.exe");
 		strcat(pf86, "/Blender Foundation/Blender/blenderplayer.exe");
 		char ** paths = (char *[]) {pf, pf86, "engine/Blender/blenderplayer.exe", NULL};
-		
 		char * path = findPlayerPath(paths);
 
 		if (path == NULL) {
@@ -261,13 +286,12 @@ void getCommand(char * command, char * filename, char * exepath) {
 			MessageBox(NULL, "The blender player is missing. You can download a blender player form http://www.blender.org", launcher_name, MB_OK);
 			return;
 		}
-		sprintf(quoted, "\"%s\"\0", path);
+		sprintf(quoted, "%s", path);
 	}
-	
-	strncat(quoted, command, COM_SIZE);
-	sprintf(command, "\"%s%s\"\0", quoted, filename);
 
-	strncat(command, filename, COM_SIZE);
+	sprintf(buffer, "\"%s\"%s ", quoted, command);
+	strncat(buffer, filename, COM_SIZE);
+	strcpy(command, buffer);
 }
 #else
 void getCommand(char * command, char * filename, char * exepath) {
@@ -295,7 +319,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 	else {
 		strcat(tmp, exepath);
 		strcpy(exepath, tmp);
-	}	
+	}
 	strcat(exepath, command);
 	strncat(exepath, " ", 1);
 	strcat(exepath, filename);
@@ -308,30 +332,33 @@ int main(int argc, char * argv[])
 	// --- handle arguments -------------------------------
 	launcher_name = argv[0];
 	if (argc>1) {
-		if(strcmp(argv[1],"--help") || strcmp(argv[1],"-h")==0) printHelp();
-		if(strcmp(argv[1],"-g")==0) generateConfigFileText();
-		return 0;
-	}	
-	
+		if(strcmp(argv[1],"-v")==0){
+			is_verbose = 1;
+		}else{
+			if(strcmp(argv[1],"--help") || strcmp(argv[1],"-h")==0) printHelp();
+			if(strcmp(argv[1],"-g")==0) generateConfigFileText();
+			return 0;
+		}
+	}
 	// --- normal use -------------------------------------------
     char command[COM_SIZE] = "";
 	char filename[VAL_SIZE] = "";
 	char exepath[COM_SIZE] = "";
-	
+
 	FILE * pFile;
 	pFile = fopen ("config.txt" , "r");
-	if (pFile == NULL) {perror ("Error opening config file. Try -help or -h\n"); return 0;} 
+	if (pFile == NULL) {perror ("Error opening config file. Try -help or -h\n"); return 0;}
 	else {
 		parseConfig(pFile, command, filename, exepath);
 		fclose (pFile);
 	}
-	
+
 	//printf("COMMAND: %s FILENAME: %s EXEPATH: %s\n", command, filename, exepath);
 	//printf("COMMAND: %s \nFILENAME: %s\n", command, filename);
-	
+
 	getCommand(command, filename, exepath);
-	printf("Command: %s\n", command);
+	if (is_verbose) printf("COMMAND: %s\n", command);
 	system(command);
-	 
+
 	return 0;
 }
