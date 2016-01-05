@@ -38,12 +38,12 @@ Compilation commands:
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
+#include <errno.h>
 
 #define ARG_SIZE 40
 #define VAL_SIZE 100
 #define COM_SIZE 600
-
-#define VERBOSE 0
 
 #if defined(_WIN32) || defined(WIN32)
 	#define _WIN32_IE 0x0400
@@ -52,7 +52,8 @@ Compilation commands:
 #endif
 
 char * launcher_name;
-int is_verbose = VERBOSE;
+char is_verbose = 0;
+char no_msgbox = 0;
 
 char default_config_file[] = \
 "player: engine/blenderplayer\n"
@@ -80,7 +81,7 @@ short is_between(int value, int from, int to){
 
 int file_exist (char *filename) {
 	FILE * pFile;
-	pFile = fopen(filename , "r");
+	pFile = fopen(filename, "r");
 	if (pFile == NULL) return 0;
 	else {fclose(pFile); return 1;}
 }
@@ -99,16 +100,76 @@ void substr(char *text, int i, int j) {
 	(*text) = '\0';
 }
 
+//Returns True of no more text can be append, False and adds a EOL otherwise.
 int  append(char*s, size_t size, char c) {
-     if(strlen(s) + 1 >= size) {
-          return 1;
-     }
-     int len = strlen(s);
-     s[len] = c;
-     s[len+1] = '\0';
-     return 0;
+	if(strlen(s) + 1 >= size) {
+		return 1;
+	}
+	int len = strlen(s);
+	s[len] = c;
+	s[len+1] = '\0';
+	return 0;
 }
 
+void remove_ext(char * text, char * ext) {
+	char * tmp = strrchr(text, '.');
+	if (strstr(tmp, ext) != NULL) {
+		(*tmp) = '\0';
+		return;
+	}
+}
+
+int count(char *text, char ch) {
+	int c = 0;
+	while((*text) != '\0') {
+		if (ch == *text) c++;
+		text++;
+	}
+	return c;
+}
+
+int getParentDir(char *parent, char * text) {
+	strncpy(parent, text, COM_SIZE);
+	char * tmp = strrchr(parent, '/');
+	if (tmp == NULL) return 0;
+	(*(++tmp)) = '\0';
+	return 1;
+}
+
+void getDirLevel(char *parent, char *path, int lvl) {
+	strncpy(parent, path, COM_SIZE);
+	int c = 0;
+	char ch = '/';
+	while((*parent) != '\0') {
+		if (ch == *parent) c++;
+		if (c == lvl) (*(++parent)) = '\0';
+		parent++;
+	}
+}
+
+void mkdirp(char * path) {
+	char parent[COM_SIZE];
+	getParentDir(parent, path);
+	int c = count(parent, '/');
+	int i = 2;
+	for(; i<=c; i++) {
+		getDirLevel(parent, path, i);
+		if (mkdir(parent) != 0) {
+			if (errno != EEXIST && is_verbose) {
+				printf("Error with mkdir: %s\n", parent);
+			}
+		}
+	}
+	
+}
+
+char * basename(char *text) {
+	char * tmp = strrchr(text, '/');
+	int diff = tmp-text;
+	if (tmp == NULL) return text;
+	if (diff == 0 || diff == strlen(text)-1) { (*tmp) = '\0'; return text; }
+	return tmp+1;
+}
 
 void replace_char(char *text, char a, char b) {
 	while (*text != 0) {
@@ -128,10 +189,89 @@ void remove_char(char *text, char a) {
 }
 
 void printHelp() {
-	printf("This is the blenderplayer launcher, writted by Robert Planas. (Free for non-comercial use)\n\n");
-	printf("-help or -h\tShow this dialog.\n");
-	printf("-g\t\tGenerate a config file in the current directory. (Overwrite if exists)\n\n");
-	printf("Remember to use -h on the blenderplayer to see the aviable commands.\n\n");
+	printf("This is the BGECore launcher, writted by Robert Planas. (BSD 2-Clause)\n\n");
+	printf("--help or -h\tShow this dialog.\n");
+	printf("-g\t\tGenerate a config file in the current directory. (Overwrite if exists)\n");
+	printf("-v\t\tVerbose mode\n");
+	printf("-w\t\tDo not create windows to display error messages.\n\n");
+	printf("You can use -h on the blenderplayer to see the aviable commands.\n\n");
+}
+
+#if defined(_WIN32) || defined(WIN32)
+void msgbox(char *text) {
+	if (no_msgbox) {
+		printf("%s\n", text);
+		return;
+	}
+	MessageBox(NULL, text, launcher_name, MB_OK);
+}
+#else
+void msgbox(char *text) {
+	if (no_msgbox) {
+		printf("%s\n", text);
+		return;
+	}
+	char * command;
+	#if __APPLE__ && __MACH__
+	sprintf(command, "osascript -e 'tell app \"System Events\" to display dialog \"%s\"'", text);
+	#else
+	sprintf(command, "xmessage -center \"%s\"", text);
+	#endif
+	system(command);
+}
+#endif
+
+/*char * getLocalDirectory() {
+	
+}*/
+
+FILE * getConfigFile() {
+	FILE * pFile;
+	char * filename = "config.txt";
+	if (file_exist(filename) == 0) {
+		msgbox("No default config.txt file found!");
+		return NULL;
+	}
+	pFile = fopen(filename, "a");
+	if (pFile == NULL)
+	{
+		//Get PATH
+		TCHAR localdir[MAX_PATH];
+		SHGetSpecialFolderPath(NULL, localdir, CSIDL_MYDOCUMENTS, TRUE);
+		replace_char(localdir, '\\', '/');
+		sprintf(localdir, "%s/My Games/%s/%s", localdir, launcher_name, filename);
+		//sprintf(localdir, "%s/My Games/%s", localdir, filename);
+		
+		if (is_verbose) printf("Reading from local directory: %s\n", localdir);
+		pFile = fopen(localdir, "r");
+		if (pFile == NULL) {
+			if (is_verbose) printf("Creating new configuration file.\n");
+			char parent[COM_SIZE];
+			getParentDir(parent, localdir);
+			mkdirp(parent);
+			pFile = fopen(localdir, "w");
+			if (pFile == NULL) {
+				msgbox("Error while loading configuration file. Permission denied.");
+				return NULL;
+			}
+			FILE * oFile = fopen(filename, "r");
+			if (oFile == NULL) {
+				fclose(pFile); return NULL;
+			}
+			 
+			char ch;
+			while( ( ch = fgetc(oFile) ) != EOF ) fputc(ch, pFile);
+			fclose(oFile); fclose(pFile);
+			pFile = fopen(localdir, "r");
+		}
+		
+	}
+	else {
+		fclose(pFile);
+		pFile = fopen(filename, "r");
+	}
+	if (pFile == NULL) msgbox("Error while loading configuration file.");
+	return pFile;
 }
 
 void generateConfigFileText() {
@@ -150,95 +290,96 @@ void parseConfig(FILE *pFile, char * command, char * filename, char * exepath) {
 
 	fseek(pFile, 0, SEEK_END);
 	rewind(pFile);
-    do {
-        c = fgetc (pFile);
-        if(feof(pFile)) break;
-        if (c=='\r') continue;
-        if (c=='\n') {
-            int val_p = n;
-            mode=ARGUMENT; n=0;
-            if (is_verbose) printf("PARSING ARG: %s\n", arg);
+	do {
+		c = fgetc (pFile);
+		if (c == EOF) break;
+		if (feof(pFile)) break;
+		if (c=='\r') continue;
+		if (c=='\n') {
+			int val_p = n;
+			mode=ARGUMENT; n=0;
+			if (is_verbose && (strlen(arg) > 0)) printf("PARSING ARG: %s\n", arg);
 
-            //Commands
-            if (strcmp(arg, "player")==0) {
-                strncat(exepath, val, val_p);
-                if (is_verbose) printf("EXEPATH (player): %s\n", exepath);
-            }
-            if (strcmp(arg, "blend")==0) {
-                strncat(filename, val, val_p);
-                if (is_verbose) printf("FILENAME (blend): %s\n", filename);
-            }
+			//Commands
+			if (strcmp(arg, "player")==0) {
+				strncat(exepath, val, val_p);
+				if (is_verbose) printf("EXEPATH (player): %s\n", exepath);
+			}
+			if (strcmp(arg, "blend")==0) {
+				strncat(filename, val, val_p);
+				if (is_verbose) printf("FILENAME (blend): %s\n", filename);
+			}
 
-            if (strcmp(arg, "resolution")==0) {
-                strncat(command, " -w ", 4);
-                strncat(command, val, val_p);
-                if (is_verbose) printf("COMMAND (resolution): %s\n", command);
-            }
-            if (strcmp(arg, "stereomode")==0) {
-                strncat(command, " -s ", 4);
-                strncat(command, val, val_p);
-                if (is_verbose) printf("COMMAND (stereomode): %s\n", command);
-            }
-            if (strcmp(arg, "anti-aliasing")==0) {
-                strncat(command, " -m ", 4);
-                strncat(command, val, val_p);
-                if (is_verbose) printf("COMMAND (anti-aliasing): %s\n", command);
-            }
+			if (strcmp(arg, "resolution")==0) {
+				strncat(command, " -w ", 4);
+				strncat(command, val, val_p);
+				if (is_verbose) printf("COMMAND (resolution): %s\n", command);
+			}
+			if (strcmp(arg, "stereomode")==0) {
+				strncat(command, " -s ", 4);
+				strncat(command, val, val_p);
+				if (is_verbose) printf("COMMAND (stereomode): %s\n", command);
+			}
+			if (strcmp(arg, "anti-aliasing")==0) {
+				strncat(command, " -m ", 4);
+				strncat(command, val, val_p);
+				if (is_verbose) printf("COMMAND (anti-aliasing): %s\n", command);
+			}
 
-            //If you enable space offset then remember to enable this to.
-            //if (strcmp(arg, "resolution")==0)	{strcat(command, " -w "); char * r = strtok (val,"x"); strcat(command, r);
-            //					 r = strtok (NULL,"x"); strcat(command, " "); strcat(command, r); } //Warning!
+			//If you enable space offset then remember to enable this to.
+			//if (strcmp(arg, "resolution")==0)	{strcat(command, " -w "); char * r = strtok (val,"x"); strcat(command, r);
+			//					 r = strtok (NULL,"x"); strcat(command, " "); strcat(command, r); } //Warning!
 
-            if (strcmp(arg, "fullscreen")==0 && strncmp(val, "true", 4)==0) {
-                strncat(command, " -f", 3);
-                if (is_verbose) printf("COMMAND (fullscreen): %s\n", command);
-            }
-            if (strcmp(arg, "debug")==0 && strncmp(val, "true", 4)==0) {
-                strncat(command, " -d", 3);
-                if (is_verbose) printf("COMMAND (debug): %s\n", command);
-            }
+			if (strcmp(arg, "fullscreen")==0 && strncmp(val, "true", 4)==0) {
+				strncat(command, " -f", 3);
+				if (is_verbose) printf("COMMAND (fullscreen): %s\n", command);
+			}
+			if (strcmp(arg, "debug")==0 && strncmp(val, "true", 4)==0) {
+				strncat(command, " -d", 3);
+				if (is_verbose) printf("COMMAND (debug): %s\n", command);
+			}
 
 
-            if (strcmp(arg, "fixedtime")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g fixedtime = 1");
-            if (strcmp(arg, "nomipmap")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g nomipmap = 1");
-            if (strcmp(arg, "show_framerate")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_framerate = 1");
-            if (strcmp(arg, "show_properties")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_properties = 1");
-            if (strcmp(arg, "show_profile")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_profile = 1");
-            if (strcmp(arg, "blender_material")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g blender_material = 1");
-            if (strcmp(arg, "ignore_deprecation_warnings")==0 && strncmp(val, "false", 4)==0) strcat(command, " -g ignore_deprecation_warnings = 0");
+			if (strcmp(arg, "fixedtime")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g fixedtime = 1");
+			if (strcmp(arg, "nomipmap")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g nomipmap = 1");
+			if (strcmp(arg, "show_framerate")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_framerate = 1");
+			if (strcmp(arg, "show_properties")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_properties = 1");
+			if (strcmp(arg, "show_profile")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g show_profile = 1");
+			if (strcmp(arg, "blender_material")==0 && strncmp(val, "true", 4)==0) strcat(command, " -g blender_material = 1");
+			if (strcmp(arg, "ignore_deprecation_warnings")==0 && strncmp(val, "false", 4)==0) strcat(command, " -g ignore_deprecation_warnings = 0");
 
-            if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {
-                memset(command, 0, COM_SIZE);
-                strncpy(command, val, val_p);
-                strncpy(filename, "", 0);
-                break;
-            }
+			if (strcmp(arg, "exec")==0 && strcmp(val, "")!=0) {
+				memset(command, 0, COM_SIZE);
+				strncpy(command, val, val_p);
+				strncpy(filename, "", 0);
+				break;
+			}
 
-		    //Clean
-	    	memset(arg, '\0', sizeof(arg));
-		    memset(val, '\0', sizeof(val));
-		    continue;
-	    }
+			//Clean
+			memset(arg, '\0', sizeof(arg));
+			memset(val, '\0', sizeof(val));
+			continue;
+		}
 		if (mode == __IGNORE__) continue;
 
-	    //Select modes
-	    if (c=='#') {mode = __IGNORE__; continue;}
-	    if (mode==ARGUMENT && c==':') {mode = VALUE; n=0; fseek(pFile, 1, SEEK_CUR); continue;}
-	    if (mode==ARGUMENT){
-            if(append(arg, ARG_SIZE, c) == 1){
-                printf("WARNING! option name have to have a length < %d(%d) chars : %s\n", ARG_SIZE, n, arg);
-                mode = __IGNORE__;
-                continue;
-            }
-	    }
-	    if (mode==VALUE) {
-            if(append(val, VAL_SIZE, c) == 1){
-                printf("WARNING! option value have to have a length < %d(%d) chars : %s\n", VAL_SIZE, n, val);
-                mode = __IGNORE__;
-                continue;
-            }
-        }
-	    ++n;
+		//Select modes
+		if (c=='#') {mode = __IGNORE__; continue;}
+		if (mode==ARGUMENT && c==':') {mode = VALUE; n=0; fseek(pFile, 1, SEEK_CUR); continue;}
+		if (mode==ARGUMENT){
+			if(append(arg, ARG_SIZE, c) == 1){
+				printf("WARNING! option name have to have a length < %d(%d) chars : %s\n", ARG_SIZE, n, arg);
+				mode = __IGNORE__;
+				continue;
+			}
+		}
+		if (mode==VALUE) {
+			if(append(val, VAL_SIZE, c) == 1){
+				printf("WARNING! option value have to have a length < %d(%d) chars : %s\n", VAL_SIZE, n, val);
+				mode = __IGNORE__;
+				continue;
+			}
+		}
+		++n;
 	}while(1);
 	if (is_verbose) printf("COMMAND (ALL): %s\n", command);
 }
@@ -278,12 +419,12 @@ void getCommand(char * command, char * filename, char * exepath) {
 		replace_char(pf, '\\', '/'); replace_char(pf86, '\\', '/');
 		strcat(pf, "/Blender Foundation/Blender/blenderplayer.exe");
 		strcat(pf86, "/Blender Foundation/Blender/blenderplayer.exe");
-		char ** paths = (char *[]) {pf, pf86, "engine/Blender/blenderplayer.exe", NULL};
+		char ** paths = (char *[]) {"engine/Blender/blenderplayer.exe", "C:/Program Files/Blender Foundation/Blender/blenderplayer.exe", pf, pf86, NULL};
 		char * path = findPlayerPath(paths);
 
 		if (path == NULL) {
 
-			MessageBox(NULL, "The blender player is missing. You can download a blender player form http://www.blender.org", launcher_name, MB_OK);
+			msgbox("The blender player is missing. You can download Blender from http://www.blender.org for free.");
 			return;
 		}
 		sprintf(quoted, "%s", path);
@@ -301,17 +442,13 @@ void getCommand(char * command, char * filename, char * exepath) {
 		strncpy(noexe, exepath, COM_SIZE-3);
 		substr(noexe, 0, strlen(noexe) - 4);
 		char ** paths = (char *[]) {noexe, "engine/Blender/blenderplayer",
-        "engine/blenderplayer.app/Contents/MacOS/blenderplayer",
+		"engine/blenderplayer.app/Contents/MacOS/blenderplayer",
 		"/usr/bin/blenderplayer", "/opt/blender/blenderplayer", NULL};
 		char * path = findPlayerPath(paths);
 		if (path == NULL) {
 			printf("No blenderplayer has been found!\n");
-#if __APPLE__ && __MACH__
-			system("osascript -e 'tell app \"System Events\" to display dialog \"No blenderplayer found! \nPlease install Blender on your system or put a copy in the 'engine' directory.\n\nwww.blender.org \"'");
-#else
-            system("xmessage -center \"Error: No Blenderplayer has been found in this computer. Please install Blender from the repositories\nor put a copy of Blender in the engine folder of the game directory.\n\nhttp://www.blender.org\"");
-#endif
-            return;
+			msgbox("No blenderplayer found! \nPlease install Blender on your system or put a copy in the 'engine' directory.\n\nwww.blender.org");
+			return;
 		}
 		else strcpy(exepath, path);
 		//strncpy(exepath, path, COM_SIZE-strlen(path));
@@ -331,34 +468,32 @@ int main(int argc, char * argv[])
 {
 	// --- handle arguments -------------------------------
 	launcher_name = argv[0];
+	remove_ext(launcher_name, ".exe");
+	replace_char(launcher_name, '\\', '/');
+	launcher_name = basename(launcher_name);
+	
 	if (argc>1) {
-		if(strcmp(argv[1],"-v")==0){
-			is_verbose = 1;
-		}else{
-			if(strcmp(argv[1],"--help") || strcmp(argv[1],"-h")==0) printHelp();
-			if(strcmp(argv[1],"-g")==0) generateConfigFileText();
-			return 0;
-		}
+		if(strcmp(argv[1],"-v")==0) is_verbose = 1;
+		if(strcmp(argv[1],"-w")==0) no_msgbox = 1;
+		if(strcmp(argv[1],"--help")==0 || strcmp(argv[1],"-h")==0) {printHelp(); return 0;}
+		if(strcmp(argv[1],"-g")==0) {generateConfigFileText(); return 0;}
 	}
+	
 	// --- normal use -------------------------------------------
-    char command[COM_SIZE] = "";
+	char command[COM_SIZE] = "";
 	char filename[VAL_SIZE] = "";
 	char exepath[COM_SIZE] = "";
 
-	FILE * pFile;
-	pFile = fopen ("config.txt" , "r");
-	if (pFile == NULL) {perror ("Error opening config file. Try -help or -h\n"); return 0;}
+	FILE *pFile = getConfigFile();
+	if (pFile == NULL) return 0;
 	else {
 		parseConfig(pFile, command, filename, exepath);
 		fclose (pFile);
 	}
-
-	//printf("COMMAND: %s FILENAME: %s EXEPATH: %s\n", command, filename, exepath);
-	//printf("COMMAND: %s \nFILENAME: %s\n", command, filename);
-
+	
 	getCommand(command, filename, exepath);
 	if (is_verbose) printf("COMMAND: %s\n", command);
 	system(command);
-
 	return 0;
+	
 }

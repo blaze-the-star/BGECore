@@ -1,7 +1,5 @@
 #Since no blenderlayer is found in this path, it is searched in the system default paths.
 player: engine/blenderplayer.exe
-
-
 blend: ../../template/data/game.blend
 
 #game settings
