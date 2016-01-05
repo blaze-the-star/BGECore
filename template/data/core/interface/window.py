@@ -317,7 +317,7 @@ class ImageCursor:
 		# Enable alpha blending
 		bgl.glEnable(bgl.GL_BLEND)
 		bgl.glBlendFunc(bgl.GL_SRC_ALPHA, bgl.GL_ONE_MINUS_SRC_ALPHA)
-		glAlphaFunc(bgl.GL_SRC_ALPHA, 1)
+		bgl.glAlphaFunc(bgl.GL_SRC_ALPHA, 1)
 
 		# Bind the texture
 		bgl.glBindTexture(bgl.GL_TEXTURE_2D, self._tex_id)
@@ -329,8 +329,8 @@ class ImageCursor:
 		#MipLevel
 		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_BASE_LEVEL, 0);
 		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAX_LEVEL, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MIN_FILTER, bgl.GL_LINEAR);
+		bgl.glTexParameteri(bgl.GL_TEXTURE_2D, bgl.GL_TEXTURE_MAG_FILTER, bgl.GL_LINEAR);
 		
 		# Draw the textured quad
 		bgl.glColor4f(*self.color)
@@ -344,8 +344,8 @@ class ImageCursor:
 
 		bgl.glBindTexture(bgl.GL_TEXTURE_2D, 0)
 		
-		glDisable(GL_BLEND)
-		glDisable(GL_TEXTURE_2D)
+		bgl.glDisable(bgl.GL_BLEND)
+		bgl.glDisable(bgl.GL_TEXTURE_2D)
 
 		bgl.glMatrixMode(bgl.GL_PROJECTION)
 		bgl.glPopMatrix()
