@@ -105,7 +105,7 @@ class Window():
 			vec = vec + gcam.position
 			self.hitobj, self.hitpoint, self.hitnormal, self.hitpoly = gcam.rayCast(vec, gcam, gcam.far, self.hitproperty, 0, self.hitxray, 1)
 
-		else:
+		elif render.getWindowWidth() != 0:
 			#Needs revision, rotation doesn't work
 			scx = gcam.ortho_scale
 			scy = gcam.ortho_scale * render.getWindowHeight()/render.getWindowWidth()

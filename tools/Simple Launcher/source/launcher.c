@@ -28,7 +28,7 @@ of the authors and should not be interpreted as representing official policies,
 either expressed or implied, of the FreeBSD Project.
 --------------------------------------------------------------------------------
 
-This launcher is compiled using gcc, with MinGW on windows.
+This launcher is compiled using gcc, with Visual Studio 2015 on Windows.
 Compilation commands:
 	windres xyz.rc xyz.rc.o
 	gcc -c launcher.c
@@ -41,6 +41,9 @@ Compilation commands:
 #include <sys/stat.h>
 #include <errno.h>
 
+extern int mkdir(char* text);
+extern int getcwd(char * text, size_t size);
+
 #define ARG_SIZE 40
 #define VAL_SIZE 100
 #define COM_SIZE 600
@@ -48,10 +51,14 @@ Compilation commands:
 #if defined(_WIN32) || defined(WIN32)
 	#define _WIN32_IE 0x0400
 	#include <Windows.h>
+	#include <WinBase.h>
 	#include <shlobj.h>
+	#include <FileAPI.h>
 #endif
 
 char * launcher_name;
+char * launcher_path;
+char config_path[COM_SIZE];
 char is_verbose = 0;
 char no_msgbox = 0;
 
@@ -75,11 +82,16 @@ char default_config_file[] = \
 "#Custom command line\n"
 "#exec: ./blenderplayer mygame.blend\n";
 
+void sprintInfo(char * text);
+void makeTempFile(char * filename);
+void getTempDirectory(char * localdir);
+void getLocalDirectory(char * localdir);
+
 short is_between(int value, int from, int to){
 	return value >= from && value <= to;
 }
 
-int file_exist (char *filename) {
+int file_exist(char *filename) {
 	FILE * pFile;
 	pFile = fopen(filename, "r");
 	if (pFile == NULL) return 0;
@@ -101,7 +113,7 @@ void substr(char *text, int i, int j) {
 }
 
 //Returns True of no more text can be append, False and adds a EOL otherwise.
-int  append(char*s, size_t size, char c) {
+int append(char*s, size_t size, char c) {
 	if(strlen(s) + 1 >= size) {
 		return 1;
 	}
@@ -171,6 +183,11 @@ char * basename(char *text) {
 	return tmp+1;
 }
 
+int isAbsolutePath(char * exepath) {
+	if (strlen(exepath) < 2) return 0;
+	return (is_between(exepath[0], 'a', 'z') || is_between(exepath[0], 'A', 'Z')) && exepath[1] == ':' && (exepath[2] == '/' || exepath[2] == '\\');
+}
+
 void replace_char(char *text, char a, char b) {
 	while (*text != 0) {
 		if (*text == a) (*text) = b;
@@ -186,15 +203,6 @@ void remove_char(char *text, char a) {
 		pT++;
 	}
 	(*text) = (*pT);
-}
-
-void printHelp() {
-	printf("This is the BGECore launcher, writted by Robert Planas. (BSD 2-Clause)\n\n");
-	printf("--help or -h\tShow this dialog.\n");
-	printf("-g\t\tGenerate a config file in the current directory. (Overwrite if exists)\n");
-	printf("-v\t\tVerbose mode\n");
-	printf("-w\t\tDo not create windows to display error messages.\n\n");
-	printf("You can use -h on the blenderplayer to see the aviable commands.\n\n");
 }
 
 #if defined(_WIN32) || defined(WIN32)
@@ -221,26 +229,72 @@ void msgbox(char *text) {
 }
 #endif
 
-/*char * getLocalDirectory() {
-	
-}*/
+#if defined(_WIN32) || defined(WIN32)
+void getTempDirectory(char * localdir) {
+	GetTempPath(COM_SIZE, localdir);
+	replace_char(localdir, '\\', '/');
+}
+#endif
+
+void loadGameProperty(FILE * pFile, char * data, char * name) {
+	char temp[512];
+	char * pT = temp;
+	int found = 0;
+
+	while (fgets(temp, 512, pFile) != NULL) {
+		if ((pT = strstr(temp, name)) != NULL && pT == temp) {
+			found = 1;
+			break;
+		}
+	}
+	if (found) {
+		pT += strlen(name) + 2;
+		strcpy(data, pT);
+	}
+	else (*data) = '\0';
+
+}
+
+#if defined(_WIN32) || defined(WIN32)
+void getLocalDirectory(char * localdir) {
+	SHGetSpecialFolderPath(NULL, localdir, CSIDL_MYDOCUMENTS, TRUE);
+	replace_char(localdir, '\\', '/');
+
+	char _blend_name[COM_SIZE];
+	char * blend_name = _blend_name;
+
+	FILE * pFile = fopen(config_path, "r");
+	if (pFile != NULL) {
+		loadGameProperty(pFile, blend_name, "blend");
+		replace_char(blend_name, '\\', '/');
+		blend_name = basename(blend_name);
+		remove_ext(blend_name, ".blend");
+		fclose(pFile);
+	}
+
+	sprintf(localdir, "%s/My Games/%s/", localdir, blend_name);
+}
+#endif
 
 FILE * getConfigFile() {
 	FILE * pFile;
+	
 	char * filename = "config.txt";
-	if (file_exist(filename) == 0) {
+	getParentDir(config_path, launcher_path);
+	strcat(config_path, filename);
+
+	if (file_exist(config_path) == 0) {
 		msgbox("No default config.txt file found!");
 		return NULL;
 	}
-	pFile = fopen(filename, "a");
+	pFile = fopen(config_path, "a");
 	if (pFile == NULL)
 	{
 		//Get PATH
-		TCHAR localdir[MAX_PATH];
-		SHGetSpecialFolderPath(NULL, localdir, CSIDL_MYDOCUMENTS, TRUE);
-		replace_char(localdir, '\\', '/');
-		sprintf(localdir, "%s/My Games/%s/%s", localdir, launcher_name, filename);
-		//sprintf(localdir, "%s/My Games/%s", localdir, filename);
+		char localdir[COM_SIZE];
+		getLocalDirectory(localdir);
+
+		strcat(localdir, filename);
 		
 		if (is_verbose) printf("Reading from local directory: %s\n", localdir);
 		pFile = fopen(localdir, "r");
@@ -254,21 +308,35 @@ FILE * getConfigFile() {
 				msgbox("Error while loading configuration file. Permission denied.");
 				return NULL;
 			}
-			FILE * oFile = fopen(filename, "r");
+			FILE * oFile = fopen(config_path, "r");
 			if (oFile == NULL) {
 				fclose(pFile); return NULL;
 			}
 			 
 			char ch;
 			while( ( ch = fgetc(oFile) ) != EOF ) fputc(ch, pFile);
+
 			fclose(oFile); fclose(pFile);
 			pFile = fopen(localdir, "r");
 		}
+		strncpy(config_path, localdir, COM_SIZE);
 		
+		//Now we update our info.txt file.
+		char info[COM_SIZE];
+		sprintInfo(info);
+
+		getParentDir(localdir, config_path);
+		strcat(localdir, "info.txt");
+
+		FILE * iFile = fopen(localdir, "w");
+		if (iFile != NULL) {
+			fprintf(iFile, info);
+			fclose(iFile);
+		}
 	}
 	else {
 		fclose(pFile);
-		pFile = fopen(filename, "r");
+		pFile = fopen(config_path, "r");
 	}
 	if (pFile == NULL) msgbox("Error while loading configuration file.");
 	return pFile;
@@ -279,7 +347,10 @@ void generateConfigFileText() {
 
 	FILE *f = fopen("config.txt", "w");
 	if (f == NULL) {perror("Error trying to write the config file. \n"); printf("So, it will be print here: \n\n%s", code);}
-	else fprintf(f, "%s", code);
+	else {
+		fprintf(f, "%s", code);
+		fclose(f);
+	}
 }
 
 void parseConfig(FILE *pFile, char * command, char * filename, char * exepath) {
@@ -399,8 +470,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 	char abspath[VAL_SIZE];
 	char quoted[VAL_SIZE];
 	char buffer[COM_SIZE];
-	short is_absolute_exepath = (is_between(exepath[0], 'a', 'z') || is_between(exepath[0], 'A', 'Z')) && exepath[1] == ':' && exepath[2] == '/';
-	if(is_absolute_exepath){
+	if(isAbsolutePath(exepath)){
 		sprintf(quoted, "\"%s\"", exepath);
 	}else{
 		GetModuleFileName(NULL, abspath, VAL_SIZE);
@@ -430,8 +500,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 		sprintf(quoted, "%s", path);
 	}
 
-	sprintf(buffer, "\"%s\"%s ", quoted, command);
-	strncat(buffer, filename, COM_SIZE);
+	sprintf(buffer, "\"\"%s\"%s \"%s\"\"", quoted, command, filename);
 	strcpy(command, buffer);
 }
 #else
@@ -464,19 +533,76 @@ void getCommand(char * command, char * filename, char * exepath) {
 }
 #endif
 
+void printHelp() {
+	printf("This is the BGECore launcher, writted by Robert Planas. (BSD 2-Clause)\n\n");
+	printf("--help or -h\tShow this dialog.\n");
+	printf("-g\t\tGenerate a config file in the current directory. (Overwrite if exists)\n");
+	printf("-v\t\tVerbose mode\n");
+	printf("-w\t\tDo not create windows to display error messages.\n\n");
+	printf("You can use -h on the blenderplayer to see the aviable commands.\n\n");
+}
+
+void sprintInfo(char * text) {
+	char * filename = "config.txt";
+	char tempdir[COM_SIZE] = ".";
+
+	getTempDirectory(tempdir);
+
+	sprintf(text, "#BGECore Launcher :::: Info\n"
+		"ConfigFilepath: %s\n"
+		"LauncherFilepath: %s\n"
+		"TempDirectory: %s\n", config_path, launcher_path, tempdir);
+}
+
+void printInfo() {
+	char localdir[COM_SIZE] = ".";
+	sprintInfo(localdir);
+	printf(localdir);
+}
+
+void makeTempFile(char * filepath) {
+	strcat(filepath, "BGECoreLauncherTempFile.txt");
+	FILE *f = fopen(filepath, "w");
+	if (f == NULL) perror("Error trying to write the temp file. \n");
+	else {
+		char text[COM_SIZE * 4];
+		sprintInfo(text);
+		fprintf(f, "%s", text);
+		fclose(f);
+	}
+}
+
+char _lfilepath[COM_SIZE];
 int main(int argc, char * argv[])
 {
 	// --- handle arguments -------------------------------
+	strcpy(_lfilepath, argv[0]);
+	replace_char(_lfilepath, '\\', '/');
+	launcher_path = _lfilepath;
+	if (isAbsolutePath(launcher_path) == 0) {
+		getcwd(launcher_path, COM_SIZE);
+		replace_char(_lfilepath, '\\', '/');
+		strcat(launcher_path, "/");
+		strcat(launcher_path, argv[0]);
+	}
+
 	launcher_name = argv[0];
 	remove_ext(launcher_name, ".exe");
 	replace_char(launcher_name, '\\', '/');
 	launcher_name = basename(launcher_name);
 	
+	FILE *pFile = getConfigFile();
+
 	if (argc>1) {
-		if(strcmp(argv[1],"-v")==0) is_verbose = 1;
-		if(strcmp(argv[1],"-w")==0) no_msgbox = 1;
-		if(strcmp(argv[1],"--help")==0 || strcmp(argv[1],"-h")==0) {printHelp(); return 0;}
-		if(strcmp(argv[1],"-g")==0) {generateConfigFileText(); return 0;}
+		if     (strcmp(argv[1],"-v")==0) is_verbose = 1;
+		else if(strcmp(argv[1],"-w")==0) no_msgbox = 1;
+		else {
+			if (strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "-h") == 0) printHelp();
+			if (strcmp(argv[1], "-info") == 0) printInfo();
+			if (strcmp(argv[1], "-g") == 0) generateConfigFileText();
+			fclose(pFile);
+			return 0;
+		}
 	}
 	
 	// --- normal use -------------------------------------------
@@ -484,14 +610,22 @@ int main(int argc, char * argv[])
 	char filename[VAL_SIZE] = "";
 	char exepath[COM_SIZE] = "";
 
-	FILE *pFile = getConfigFile();
 	if (pFile == NULL) return 0;
 	else {
 		parseConfig(pFile, command, filename, exepath);
 		fclose (pFile);
 	}
 	
-	getCommand(command, filename, exepath);
+	char * filepath;
+	if (isAbsolutePath(filename) == 0) {
+		char filepath_buff[COM_SIZE];
+		getParentDir(filepath_buff, launcher_path);
+		strncat(filepath_buff, filename, COM_SIZE);
+		filepath = filepath_buff;
+	}
+	else filepath = filename;
+
+	getCommand(command, filepath, exepath);
 	if (is_verbose) printf("COMMAND: %s\n", command);
 	system(command);
 	return 0;

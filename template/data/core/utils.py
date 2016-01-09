@@ -13,10 +13,12 @@ def loadGameProperty(name):
 		The property is loaded as string, then you use the type name to get the apropiate type.
 		*e.j:* ``media.device.volume = float(utils.loadGameProperty("volume"))``
 		
+		Raises ``KeyError`` if the property is not found.
+		
 		:param string name: Name of the property to load.
 		:return: A string containing the value of the property. 
 	"""
-	path = logic.expandPath("//../config.txt")
+	path = getLocalDirectory() + "config.txt"
 	with open(path, "r") as input:
 		for l in input.read().splitlines():
 			if len(l) == 0: continue
@@ -28,15 +30,15 @@ def loadGameProperty(name):
 				prop = l[y+2:]
 				return prop
 				
+	raise KeyError("Property " + name + " not found in the configuration file. ")
+				
 def saveGameProperty(name, value):
 	""" Saves a property to your :file:`config.txt` file.
 		
 	:param string name: Name of the property to load.
 	:param value: Value to save, will be converted into a string.
-	
-	.. warning:: Moving your game in a directory without file permissions will throw an exception. E.j: :file:`C:/Program Files/`. This will be solved using a copy on the user directory in future versions of BGECore, but for now please abstein from using system directories.
 	"""
-	path = logic.expandPath("//../config.txt")
+	path = getLocalDirectory() + "config.txt"
 	with open(path, "r+") as input:
 		match = False
 		new = ""
@@ -58,7 +60,51 @@ def saveGameProperty(name, value):
 		input.seek(0)
 		input.write(new)
 		
+def getBlendFilepath():
+	""" Returns the game .blend absolute filepath (including the blend name) """
+	try:
+		from bpy import data
+		return data.filepath
+	except ImportError:
+		import sys
+		path = [x for x in sys.argv if x.endswith(".blend") or x.endswith(".blend~")][0]
+		if path[-1] == '~': path = path[:-1]
+		return logic.expandPath("//" + os.path.basename(path))
+	
+def getLocalDirectory():
+	""" Returns the directory where local data can be stored. By default the same directory than the game. If there is no write acces then a directory inside the user folder. """
+	if module._local_data_directory == None:
+		try:
+			path = logic.expandPath("//../")
+			f = open(path + "config.txt", 'a')
+			module._local_data_directory = path
+		except PermissionError:
+			from sys import platform as _platform
+			if _platform == "linux" or _platform == "linux2": raise NotImplementedError()
+			elif _platform == "darwin": raise NotImplementedError()
+			elif _platform == "win32" or _platform == "cygwin":
+				import ctypes.wintypes
+				CSIDL_PERSONAL = 5       # My Documents
+				SHGFP_TYPE_CURRENT = 0   # Get current, not default value
+
+				buf= ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
+				ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
+				path = buf.value + os.sep + "My Games" + os.sep
 				
+			module._local_data_directory = path + os.path.basename(getBlendFilepath())[:-6] + os.sep
+			
+		else: f.close()
+
+	if os.path.isdir(module._local_data_directory):
+		return module._local_data_directory
+	else:
+		path = module._local_data_directory
+		os.makedirs(path)
+		import shutil
+		shutil.copyfile(logic.expandPath("//../config.txt"), path + "config.txt")
+		return path
+	
+
 
 #Internal
 _sleeptime = 0.0000
@@ -374,7 +420,7 @@ def setCamera(scene, camera_name):
 	
 	if not type(scene) is types.KX_Scene: scene = scene.scene #I know
 	scene.active_camera = camera
-	if scene == module.scene_gui:
+	if scene == module.scene_gui and module.window.width != 0:
 		win = module.window
 		win.camera = camera
 		win.camera_height = camera.worldPosition.z - 0.5

@@ -85,9 +85,11 @@ class Screen(interface.widget.Widget):
 		module.video_playback_list.append(self)
 		
 		#Audio
-		self.true_start_file = video
-		self.speaker = AudioFile()
-				
+		try:
+			self.true_start_file = video
+			self.speaker = AudioFile()
+		except RuntimeError: pass
+			
 		#Callback
 		self.callback = callback
 		
@@ -218,7 +220,7 @@ class AudioFile():
 			if loop: self.handle.loop_count = -1
 		except:
 			if os.path.isfile(path) == False: utils.debug("Audio File, Not Found: " + path)
-			else: utils.debug("AudioFile Load Error: " + path)
+			else: raise RuntimeException("AudioFile Load Error: " + path)
 		
 		self.playing = True
 		module.low_frequency_callbacks.append(self.update)

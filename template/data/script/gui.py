@@ -9,12 +9,13 @@ class GUI(behavior.Scene):
 		interface.window.cursor.scale = (0.4, 0.4)
 
 		#Start the game with intro video
-		if not constant.GAME_DEBUG and False:
+		if not constant.GAME_DEBUG:
 			interface.window.hideCursor()
 			utils.setCamera(self, "GUICamera.001") #Makes the menu desapear.
 			media.showScreen() #Spawns screen
 			media.screen.play("video/intro.avi", callback=self.afterVideo)
 			media.screen.obj.color.w = 0 #Sets the screen alpha to 0 (invisible).
+			media.screen.obj.worldScale = [0.3, 0.4, 1]
 			media.screen.fadeIn(2) #Sets the screen alpha to 1 with a linear interpolation over 2 seconds.
 
 		#Start the game directly

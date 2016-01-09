@@ -44,6 +44,10 @@ cont = None
 _arecallbacks = True
 _started = False
 
+#Properties of the launcher (generated or from info.txt)
+_launcher_location = None
+_local_data_directory = None
+
 def enableInputFor(behavior):
 	global listen_input_list
 	behavior.use_keyboard = True

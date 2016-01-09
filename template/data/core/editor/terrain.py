@@ -12,7 +12,7 @@ class DynamicTerrain:
 	def __init__(self, focus, filepath):
 		Tile.dynt = self
 		self.focus = focus
-		self.filepath = logic.expandPath("//../data/" + filepath)
+		self.filepath = filepath
 		
 		if os.path.isfile(self.filepath) == False:
 			format.newTerrainFile(self.filepath, self.sizeX, self.sizeY, 5, [2696, 825, 180, 48, 36], [50, 25, 13, 10, 10], [50, 25, 13, 10, 10])

@@ -117,7 +117,7 @@ class SceneEditor(behavior.Scene):
 		self.addBehavior(Cursor, "Cursor")
 		focus = self.objects["Cylinder"]
 		self.addBehavior(BasicControl, focus)
-		self.terrain = DynamicTerrain(focus, "avalon.terrain")
+		self.terrain = DynamicTerrain(focus, utils.getLocalDirectory() + "avalon.terrain")
 
 
 #behavior.addScene(SceneEditor, "SceneEditor") #This is done on dynamic, so that we can still import dynamic here.
