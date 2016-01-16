@@ -1,3 +1,5 @@
+from bge import logic
+
 _argn = 0
 _lastb = None
 class Object():
@@ -104,6 +106,7 @@ class Scene():
 		self.scene = None
 		self.objects = {}
 		self.objectsInactive = {}
+		self.owner = logic.getCurrentController().owner
 		
 	def init(self):
 		""" Override this with your behavior initialization. """
