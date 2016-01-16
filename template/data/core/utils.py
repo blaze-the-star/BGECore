@@ -9,32 +9,32 @@ import os
 
 def loadGameProperty(name):
 	""" Loads a property from your :file:`config.txt` file.
-	
+
 		The property is loaded as string, then you use the type name to get the apropiate type.
 		*e.j:* ``media.device.volume = float(utils.loadGameProperty("volume"))``
-		
+
 		Raises ``KeyError`` if the property is not found.
-		
+
 		:param string name: Name of the property to load.
-		:return: A string containing the value of the property. 
+		:return: A string containing the value of the property.
 	"""
 	path = getLocalDirectory() + "config.txt"
 	with open(path, "r") as input:
 		for l in input.read().splitlines():
 			if len(l) == 0: continue
 			if l[0] == '#': continue
-			
+
 			x = l.find(name)
 			y = l.find(": ")
 			if x == 0 and y > 0:
 				prop = l[y+2:]
 				return prop
-				
+
 	raise KeyError("Property " + name + " not found in the configuration file. ")
-				
+
 def saveGameProperty(name, value):
 	""" Saves a property to your :file:`config.txt` file.
-		
+
 	:param string name: Name of the property to load.
 	:param value: Value to save, will be converted into a string.
 	"""
@@ -46,7 +46,7 @@ def saveGameProperty(name, value):
 			if len(l) == 0 or l[0] == '#':
 				new += l + '\n'
 				continue
-				
+
 			x = l.find(name)
 			y = l.find(": ")
 			if x == 0 and y > 0 and not match:
@@ -59,7 +59,7 @@ def saveGameProperty(name, value):
 			new += "\n" + name + ": " + str(value)
 		input.seek(0)
 		input.write(new)
-		
+
 def getBlendFilepath():
 	""" Returns the game .blend absolute filepath (including the blend name) """
 	try:
@@ -70,18 +70,32 @@ def getBlendFilepath():
 		path = [x for x in sys.argv if x.endswith(".blend") or x.endswith(".blend~")][0]
 		if path[-1] == '~': path = path[:-1]
 		return logic.expandPath("//" + os.path.basename(path))
-	
+
+def checkVersion():
+	""" Returns wather if BGE version is greater or equal to core.module.MIN_VERSION """
+	try: from bge import app
+	except ImportError: return False
+	x, y, z = app.version
+	i, j, k = module.MIN_VERSION
+	if x > i: return True
+	elif x == i:
+		if y > j: return True
+		elif y == j: return z >= k
+		else: return False
+	else: return False
+
 def getLocalDirectory():
 	""" Returns the directory where local data can be stored. By default the same directory than the game. If there is no write acces then a directory inside the user folder. """
 	if module._local_data_directory == None:
+		blendname = os.path.basename(getBlendFilepath())[:-6]
 		try:
 			path = logic.expandPath("//../")
 			f = open(path + "config.txt", 'a')
 			module._local_data_directory = path
 		except PermissionError:
 			from sys import platform as _platform
-			if _platform == "linux" or _platform == "linux2": raise NotImplementedError()
-			elif _platform == "darwin": raise NotImplementedError()
+			if _platform == "linux" or _platform == "linux2" or _platform == "darwin":
+				path = os.getenv("HOME") + "/.local/share/" + blendname + '/'
 			elif _platform == "win32" or _platform == "cygwin":
 				import ctypes.wintypes
 				CSIDL_PERSONAL = 5       # My Documents
@@ -90,9 +104,9 @@ def getLocalDirectory():
 				buf= ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
 				ctypes.windll.shell32.SHGetFolderPathW(None, CSIDL_PERSONAL, None, SHGFP_TYPE_CURRENT, buf)
 				path = buf.value + os.sep + "My Games" + os.sep
-				
-			module._local_data_directory = path + os.path.basename(getBlendFilepath())[:-6] + os.sep
-			
+
+			module._local_data_directory = path + blendname + os.sep
+
 		else: f.close()
 
 	if os.path.isdir(module._local_data_directory):
@@ -103,13 +117,11 @@ def getLocalDirectory():
 		import shutil
 		shutil.copyfile(logic.expandPath("//../config.txt"), path + "config.txt")
 		return path
-	
-
 
 #Internal
 _sleeptime = 0.0000
 _nosleep = False #Susped sleep
-_3sleep = 0      #Only do 1 of 3 sleep calls.			
+_3sleep = 0      #Only do 1 of 3 sleep calls.
 def frameSleep():
 	""" Forces a sleep time on BGE to make low-consiming games not melt the CPU. """
 	global _nosleep, _3sleep
@@ -118,15 +130,15 @@ def frameSleep():
 	else: _3sleep = 0
 	if avg < 30: _nosleep = True
 	else: _nosleep = False
-	
+
 	if _sleeptime <= 0 or _nosleep == True: return
 	if _3sleep > 1:
 		_3sleep -= 1
 		return
 	if _3sleep == 1: _3sleep = 3
-		
+
 	sleep(_sleeptime)
-	
+
 #Utils
 def debug(text):
 	""" Prints *text* if ``CORE_DEBUG_PRINT`` is enabled. """
@@ -135,7 +147,7 @@ def debug(text):
 def verbose(text):
 	""" Prints *text* if ``CORE_DEBUG_VERBOSE`` is enabled. """
 	if constant.CORE_DEBUG_VERBOSE == True: print(text)
-	
+
 def randRGB(r = None, g = None, b = None, a = 1):
 	""" Generates a random vector representing a color, paramaters not *None* will use that value instead of generating a new one. """
 	if not r: r = randint(0,100)/100
@@ -153,13 +165,13 @@ def getMultiples(num, d = [2]):
 	if len(d) > 1:
 		for i in d: l.extend(getMultiples(num, [i]))
 		return l
-	
+
 	d = d[0]
 	while(num >= d):
 		if num % d == 0: l.append(num)
 		num /= d
 	return l
-	
+
 def getPrimes(limit):
 	l = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101]
 	if limit <= 101:
@@ -173,22 +185,22 @@ def getPrimes(limit):
 				if i % x == 0: isp = False; break
 			if isp: l.append(i)
 			i += 1
-			
+
 		return l
-#END OF THE SHAME BLOCK	
-	
+#END OF THE SHAME BLOCK
+
 def getNearestVertexToPoly(object, poly, point):
 	""" Returns the nearest vertext to a poligon.
-	
+
 	:param poly: The poligon if wich vertex you want to check.
 	:type poly: |KX_PolyProxy|
 	:param point: The point to check, in world coordinates.
-	:type point: |Vector|	
+	:type point: |Vector|
 	"""
-	
+
 	if not type(point) is Vector: point = Vector(point)
 	mesh = poly.getMesh()
-	
+
 	min = None
 	f = None
 	for i in range(poly.getNumVertex()):
@@ -197,12 +209,12 @@ def getNearestVertexToPoly(object, poly, point):
 		if not min or r < min:
 			min = r
 			f = v
-	
+
 	return f
-	
+
 def getPolyNormal(poly):
 	""" Returns the normal of poligon based on the position of their vertex. It calculates the normal, it doesn't return manually modified normals.
-	
+
 	:param poly: The poligon.
 	:type poly: |KX_PolyProxy|
 	"""
@@ -214,14 +226,14 @@ def getPolyNormal(poly):
 	v3 = mesh.getVertex(0, poly.v3)
 	if s == 4: v4v = mesh.getVertex(0, poly.v4).XYZ
 	else: v4v = None
-	
+
 	if v4v: normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ, v4v)
 	else: normal = geometry.normal(v1.XYZ, v2.XYZ, v3.XYZ)
 	return normal
-		
+
 def recalculateNormals(obj):
 	""" Recalculates the normals of a |KX_GameObject|, |KX_MeshProxy| or |KX_PolyProxy|.
-	
+
 	It iterates through all the given vertex, it may be a slow operation, use with caution. """
 
 	if type(obj) is types.KX_GameObject:
@@ -230,13 +242,13 @@ def recalculateNormals(obj):
 	elif type(obj) is types.KX_PolyProxy: mesh = obj.getMesh()
 	else: raise ValueError("Argument must be KX_GameObject, KX_MeshPoxy or KX_PolyProxy, not " + str(type(obj)))
 	verdict = {} #Vertex Dictionary LOL
-	
+
 	#Iterate throught Faces and make a list with all the vertex and the normals of the faces the are part of.
 	if type(obj) is not types.KX_PolyProxy:
 		for i in range(mesh.numPolygons):
 			poly = mesh.getPolygon(i)
 			normal = getPolyNormal(poly)
-			
+
 			for j in range(poly.getNumVertex()):
 				try:
 					verdict[poly.getVertexIndex(j)].append(normal)
@@ -245,13 +257,13 @@ def recalculateNormals(obj):
 	else:
 		poly = obj
 		normal = getPolyNormal(poly)
-		
+
 		for j in range(poly.getNumVertex()):
 			try:
 				verdict[poly.getVertexIndex(j)].append(normal)
 			except KeyError:
 				verdict[poly.getVertexIndex(j)] = [normal]
-		
+
 	#Iterate throught the list recalculating the normal of each vertex.
 	for i, normals in verdict.items():
 		normal = Vector([0,0,0])
@@ -264,14 +276,14 @@ def recalculateNormals(obj):
 		normal.z /= s
 		normal.normalize()
 		mesh.getVertex(0, i).setNormal(normals[0].to_tuple())
-	
+
 def rand10():
 	""" Generates a rondom integer from 0 to 9 """
 	return randint(0,9)
 
 def vectorFrom2Points(origin, dest, module = None):
 	""" Returns a |Vector|  form 2 points in the space.
-	
+
 	:param origin: Point A
 	:type origin: |Vector|
 	:param dest: Point B
@@ -280,19 +292,19 @@ def vectorFrom2Points(origin, dest, module = None):
 	"""
 	vec = Vector((dest.x - origin.x, dest.y - origin.y, dest.z - origin.z))
 	if not module: return vec
-	
+
 	l = vec.length
-	 
+
 	if l < 0.0125: return vec.zero()
 	if l < module: return vec
-	
+
 	vec = vec / l
 	if module == 1: return vec
 	else: return vec * module
 
 def moveObjectToObject(origin, dest, speed = 1):
-	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. 
-	
+	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement.
+
 	:param origin: Object to move.
 	:type origin: |KX_GameObject|
 	:param dest: Destination object.
@@ -303,8 +315,8 @@ def moveObjectToObject(origin, dest, speed = 1):
 	return moveObjectToPosition(origin, dest.position, speed)
 
 def moveObjectToPosition(origin, dest, speed = 1):
-	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement. 
-	
+	""" Moves *origin* to *dest* at a speed of *speed*. Must by called every frame for a complete movement.
+
 	:param origin: Object to move.
 	:type origin: |KX_GameObject|
 	:param dest: Destination object.
@@ -315,12 +327,12 @@ def moveObjectToPosition(origin, dest, speed = 1):
 	fr = logic.getAverageFrameRate()
 	if fr < 20: fr = 20
 	vel = speed / fr
-	vec = vectorFrom2Points(origin.position, dest, vel) 
+	vec = vectorFrom2Points(origin.position, dest, vel)
 	if vec:
 		origin.position += vec
 		return True
 	else: return False
-	
+
 def removeAll(original_list, sublist):
 	""" Removes all ocurrences of any of the values of sublist from original_list"""
 	l = []
@@ -329,16 +341,16 @@ def removeAll(original_list, sublist):
 		for y in sublist:
 			if x == y: inl = True
 		if not inl and x not in l: l.append(x)
-			
+
 	return l
 
 #Scene Managment
 def getSceneByName(name):
 	""" Get a scene by its name. Only works with loaded scenes.
-	
+
 	.. deprecated:: 0.3
 		Use ``module.scene_game`` or ``module.scene_gui`` instead.
-	
+
 	"""
 	for scn in logic.getSceneList():
 		if scn.name == name: return scn
@@ -350,14 +362,14 @@ _change_scene_name = ""
 def setScene(name):
 	"""
 	Deletes the game scene (if any) and loads a new one.
-	
+
 	.. note::
 		The new scene will be initialized on the next logic frame.
-	
+
 	:param string name: Name of the scene to load. If none no scene will be loaded, but the current scene will be removed.
 	"""
 	global _change_scene_name
-	
+
 	if module.change_scene_frame == False:
 		module._started = False
 		if module.scene_game == None:
@@ -377,7 +389,7 @@ def setScene(name):
 	if name:
 		debug("Multiple calls to utils.setScene(), this call will be ignored.")
 		return
-	
+
 	name = _change_scene_name
 	scene = getSceneByName(name)
 	if not scene: return
@@ -393,7 +405,7 @@ def setScene(name):
 		b.init()
 		b.baseInit()
 		for bh in b.behaviors: bh.init()
-		
+
 def removeScene():
 	""" Removes the game scene. Same functionality that ``setScene(None)``. """
 	if not module.scene_behavior: return
@@ -402,22 +414,22 @@ def removeScene():
 	module.scene_behavior = None
 	module.scene_game.end()
 	module.scene_game = None
-		
+
 def setCamera(scene, camera_name):
 	""" Sets the active_camera of the a scene by another.
-	
+
 	.. note::
 		Use instead of ``KX_Scene.active_camera = KX_GameObject``.
-	
+
 	:param scene: Scene behavior where to change the active camera or KX_Scene
 	:type scene: |KX_Scene|
 	:param string camera_name: Name of the new active camera.
 	"""
 	camera = scene.objects[camera_name]
-	
+
 	#Spawn camera if in hidden layer?
 	#...
-	
+
 	if not type(scene) is types.KX_Scene: scene = scene.scene #I know
 	scene.active_camera = camera
 	if scene == module.scene_gui and module.window.width != 0:
@@ -426,19 +438,19 @@ def setCamera(scene, camera_name):
 		win.camera_height = camera.worldPosition.z - 0.5
 		win.scx = camera.ortho_scale
 		win.scy = camera.ortho_scale * (win.height / win.width)
-		
+
 #GLSL 2DFilters
 def setFilter2D(name, camera, slot):
 	""" Sets or enables a 2DFilter.
 
 	**Default aviable GLSL filters:** Bloom, Vignetting, ChromaticAberration, FXAA.
-	
+
 	Some filters may need special game properties, see: *TODO*
-	
+
 	:param string name: Name of the filter.
 	:param camera: The main camera of the scene (where logic bricks are used).
 	:type camera: |KX_GameObject|
-	:param integer slot: The slot (Logic Brick Actuator ID) where to apply the filter. Slots are 2DFiletre actuators connected with the Python 
+	:param integer slot: The slot (Logic Brick Actuator ID) where to apply the filter. Slots are 2DFiletre actuators connected with the Python
 		controller on the main camera. Slots name are prefixed with F, e.j. F0, F1, F2.
 	"""
 	try:
@@ -448,11 +460,11 @@ def setFilter2D(name, camera, slot):
 			module.filter_queue.append((name, camera, slot))
 			module._arecallbacks = True
 			return
-		
+
 		path = logic.expandPath("//core/glsl/" + name + ".filter2D")
 		with open(path, "r") as input:
 			text = input.read()
-		
+
 		filter = camera.actuators["F"+str(slot)]
 		filter.mode = logic.RAS_2DFILTER_CUSTOMFILTER
 		filter.passNumber = slot
@@ -465,7 +477,7 @@ def setFilter2D(name, camera, slot):
 
 def removeFilter2D(camera, slot):
 	""" Removes a 2DFilter.
-	
+
 	:param camera: The main camera of the scene (where logic bricks are used).
 	:type camera: |KX_GameObject|
 	:param integer slot: The slot.

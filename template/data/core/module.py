@@ -1,3 +1,5 @@
+MIN_VERSION = (2, 76, 0)
+
 #Scenes and behaviors
 scene_behavior_dict = {}
 scene_behavior = None
@@ -52,16 +54,16 @@ def enableInputFor(behavior):
 	global listen_input_list
 	behavior.use_keyboard = True
 	listen_input_list.append(behavior)
-	
+
 def enableInputOnGUI():
 	global listen_input_list
 	scene_gui_behavior.use_keyboard = True
 	listen_input_list.append(scene_gui_behavior)
-	
+
 def disableInputFor(behavior):
 	global listen_input_list
 	listen_input_list.remove(behavior)
-	
+
 def disableInputOnGUI():
 	global listen_input_list
 	listen_input_list.remove(scene_gui_behavior)

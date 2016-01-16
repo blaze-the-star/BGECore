@@ -1,20 +1,19 @@
 LAUNCHER
 - Test MacOS version.
-- Make Launcher use local config.txt file if possible (to avoid possible permision denied errors).
-	Automatically generate it of it doesn't exist
-	Use only when there are no permisions to edit the file.
+- Somewhat BUG: If launching the same game from multiple places with no-write-permission the .blend path used is the one of the first launch. We should probably use the read-only config file for the .blend path instead. Maybe in 0.7?
 
 GUI
 - Add a LoadingBar widget.
 - Make buttons with press layer (not only over)
-- Make a pause system.
+- Make a pause system. (That works)
 - Make SplitWindow system for Window.
 - Fix bug with Labels scale/position on Render->Display->Scale Mode.
+- Fix bug caused by BGE incompetence that doesn't update nor indicates the cursor position when it is out of the window/fullscreen on standalone mode and fucks our custom cursors.
 
 MEDIA
 - Add adjustable latterbox with transition effect.
 - window.Attach() and deatach() uses a list of KX_GameObeject(GUI) or Widgets that will be
-moved/scaled/rotated when you swich a GUI camera.
+moved/scaled/rotated/reparented when you swich a GUI camera.
 
 BEHAVIOR
 - Rewrite the camera and control behaviors and add beheavior properties to the documentation. Ex: behavior.scene (read-only), self.gui (GUI Behavior).
@@ -24,9 +23,6 @@ BEHAVIOR
 	GTA ````
 	AssasinsCreed ````
 - Make update() wait until all LibLoad on the initialization is complete.
-
-UTILS
-- updateNormals function. KX_MeshProxy
 
 DYNAMIC
 - Add core.dynamic.remove("file.blend") or core.dynamic.remove("libname")
