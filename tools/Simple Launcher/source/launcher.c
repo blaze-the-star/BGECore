@@ -39,9 +39,11 @@ Compilation commands:
 #include <stdio.h>
 #include <string.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <errno.h>
 
-extern int mkdir(char* text);
+__mode_t mkdirmode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
+extern int mkdir (const char *__path, __mode_t __mode);
 extern int getcwd(char * text, size_t size);
 
 #define ARG_SIZE 40
@@ -125,6 +127,7 @@ int append(char*s, size_t size, char c) {
 
 void remove_ext(char * text, char * ext) {
 	char * tmp = strrchr(text, '.');
+	if (tmp == NULL) return;
 	if (strstr(tmp, ext) != NULL) {
 		(*tmp) = '\0';
 		return;
@@ -166,13 +169,13 @@ void mkdirp(char * path) {
 	int i = 2;
 	for(; i<=c; i++) {
 		getDirLevel(parent, path, i);
-		if (mkdir(parent) != 0) {
+		if (mkdir(parent, mkdirmode) != 0) {
 			if (errno != EEXIST && is_verbose) {
 				printf("Error with mkdir: %s\n", parent);
 			}
 		}
 	}
-	
+
 }
 
 char * basename(char *text) {
@@ -184,8 +187,13 @@ char * basename(char *text) {
 }
 
 int isAbsolutePath(char * exepath) {
+	#if defined(_WIN32) || defined(WIN32)
 	if (strlen(exepath) < 2) return 0;
 	return (is_between(exepath[0], 'a', 'z') || is_between(exepath[0], 'A', 'Z')) && exepath[1] == ':' && (exepath[2] == '/' || exepath[2] == '\\');
+	#else
+	if (strlen(exepath) < 1) return 0;
+	return (exepath[0] == '/');
+	#endif
 }
 
 void replace_char(char *text, char a, char b) {
@@ -234,6 +242,12 @@ void getTempDirectory(char * localdir) {
 	GetTempPath(COM_SIZE, localdir);
 	replace_char(localdir, '\\', '/');
 }
+#else
+void getTempDirectory(char * localdir) {
+	char* env = getenv("TMPDIR");
+	if (env == NULL) env = "/var/tmp/";
+	strcpy(localdir, env);
+}
 #endif
 
 void loadGameProperty(FILE * pFile, char * data, char * name) {
@@ -255,10 +269,16 @@ void loadGameProperty(FILE * pFile, char * data, char * name) {
 
 }
 
-#if defined(_WIN32) || defined(WIN32)
 void getLocalDirectory(char * localdir) {
+	#if defined(_WIN32) || defined(WIN32)
 	SHGetSpecialFolderPath(NULL, localdir, CSIDL_MYDOCUMENTS, TRUE);
 	replace_char(localdir, '\\', '/');
+	strcat(localdir, "/My Games/");
+	#else
+	char* env = getenv("HOME");
+	strcpy(localdir, env);
+	strncat(localdir, "/.local/share/", 14);
+	#endif
 
 	char _blend_name[COM_SIZE];
 	char * blend_name = _blend_name;
@@ -272,13 +292,12 @@ void getLocalDirectory(char * localdir) {
 		fclose(pFile);
 	}
 
-	sprintf(localdir, "%s/My Games/%s/", localdir, blend_name);
+	sprintf(localdir, "%s%s/", localdir, blend_name);
 }
-#endif
 
 FILE * getConfigFile() {
 	FILE * pFile;
-	
+
 	char * filename = "config.txt";
 	getParentDir(config_path, launcher_path);
 	strcat(config_path, filename);
@@ -295,7 +314,7 @@ FILE * getConfigFile() {
 		getLocalDirectory(localdir);
 
 		strcat(localdir, filename);
-		
+
 		if (is_verbose) printf("Reading from local directory: %s\n", localdir);
 		pFile = fopen(localdir, "r");
 		if (pFile == NULL) {
@@ -312,7 +331,7 @@ FILE * getConfigFile() {
 			if (oFile == NULL) {
 				fclose(pFile); return NULL;
 			}
-			 
+
 			char ch;
 			while( ( ch = fgetc(oFile) ) != EOF ) fputc(ch, pFile);
 
@@ -320,7 +339,7 @@ FILE * getConfigFile() {
 			pFile = fopen(localdir, "r");
 		}
 		strncpy(config_path, localdir, COM_SIZE);
-		
+
 		//Now we update our info.txt file.
 		char info[COM_SIZE];
 		sprintInfo(info);
@@ -330,7 +349,7 @@ FILE * getConfigFile() {
 
 		FILE * iFile = fopen(localdir, "w");
 		if (iFile != NULL) {
-			fprintf(iFile, info);
+			fprintf(iFile, "%s", info);
 			fclose(iFile);
 		}
 	}
@@ -516,7 +535,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 		char * path = findPlayerPath(paths);
 		if (path == NULL) {
 			printf("No blenderplayer has been found!\n");
-			msgbox("No blenderplayer found! \nPlease install Blender on your system or put a copy in the 'engine' directory.\n\nwww.blender.org");
+			msgbox("No blenderplayer found! \nPlease install Blender on your system or put a copy in the 'engine' directory. Last version is strongly recomended. \n\nwww.blender.org");
 			return;
 		}
 		else strcpy(exepath, path);
@@ -526,9 +545,7 @@ void getCommand(char * command, char * filename, char * exepath) {
 		strcat(tmp, exepath);
 		strcpy(exepath, tmp);
 	}
-	strcat(exepath, command);
-	strncat(exepath, " ", 1);
-	strcat(exepath, filename);
+	sprintf(exepath, "%s%s \"%s\"", exepath, command, filename);
 	strcpy(command, exepath);
 }
 #endif
@@ -557,7 +574,7 @@ void sprintInfo(char * text) {
 void printInfo() {
 	char localdir[COM_SIZE] = ".";
 	sprintInfo(localdir);
-	printf(localdir);
+	printf("%s", localdir);
 }
 
 void makeTempFile(char * filepath) {
@@ -576,21 +593,23 @@ char _lfilepath[COM_SIZE];
 int main(int argc, char * argv[])
 {
 	// --- handle arguments -------------------------------
-	strcpy(_lfilepath, argv[0]);
+	char* _fcom = argv[0];
+	if (_fcom[0] == '.' && _fcom[1] == '/') _fcom+=2;
+	strcpy(_lfilepath, _fcom);
 	replace_char(_lfilepath, '\\', '/');
 	launcher_path = _lfilepath;
 	if (isAbsolutePath(launcher_path) == 0) {
 		getcwd(launcher_path, COM_SIZE);
 		replace_char(_lfilepath, '\\', '/');
 		strcat(launcher_path, "/");
-		strcat(launcher_path, argv[0]);
+		strcat(launcher_path, _fcom);
 	}
 
-	launcher_name = argv[0];
+	launcher_name = _fcom;
 	remove_ext(launcher_name, ".exe");
 	replace_char(launcher_name, '\\', '/');
 	launcher_name = basename(launcher_name);
-	
+
 	FILE *pFile = getConfigFile();
 
 	if (argc>1) {
@@ -604,7 +623,7 @@ int main(int argc, char * argv[])
 			return 0;
 		}
 	}
-	
+
 	// --- normal use -------------------------------------------
 	char command[COM_SIZE] = "";
 	char filename[VAL_SIZE] = "";
@@ -615,7 +634,7 @@ int main(int argc, char * argv[])
 		parseConfig(pFile, command, filename, exepath);
 		fclose (pFile);
 	}
-	
+
 	char * filepath;
 	if (isAbsolutePath(filename) == 0) {
 		char filepath_buff[COM_SIZE];
@@ -629,5 +648,5 @@ int main(int argc, char * argv[])
 	if (is_verbose) printf("COMMAND: %s\n", command);
 	system(command);
 	return 0;
-	
+
 }

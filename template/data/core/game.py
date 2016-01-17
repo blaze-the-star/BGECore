@@ -35,14 +35,15 @@ def loop():
 		media.device.volume = float(utils.loadGameProperty("volume"))
 		module.cont = logic.getCurrentController()
 		module._arecallbacks = False
+		if utils.checkVersion() == False: utils.debug("Atention! BGE version is outdated, please install last Blender release.")
 
 	if module._arecallbacks == True: return
-	
+
 	#GUI Behavior
 	if module.scene_gui_behavior.paused == False: module.scene_gui_behavior.update()
 	for b in module.scene_gui_behavior.behaviors:
 		if b.paused == False: b.update()
-		
+
 	#Key events
 	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_gui]
 	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
@@ -70,10 +71,10 @@ def loop():
 _fatal_error = False
 def secondary_loop():
 	global _last_traceback, _fatal_error
-	
+
 	#It takes 0.6ms when with the editor. (Without tile replacing)
 	try:
-		if _fatal_error: return 
+		if _fatal_error: return
 		if module.change_scene_frame == False:
 			if module.scene_behavior.paused == False:
 				module.scene_behavior.update()
@@ -91,7 +92,7 @@ def secondary_loop():
 			print(s)
 			_fatal_error = True
 		_last_traceback = s
-		
+
 	#It takes about 0.3ms (As much as the main loop)
 	listen_list = [x for x in module.listen_input_list if x._immuse_keyboard == True and x.scene == module.scene_game]
 	for x in module.listen_input_list: x._immuse_keyboard = x.use_keyboard
