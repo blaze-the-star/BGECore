@@ -27,16 +27,19 @@ def replaceBlenderText(obj):
 	
 	sx, sy, sz = [int(n*100) for n in obj.localScale]
 	
-	align = obj.get("Align", 0)
+	align = obj.get("Align", "Left")
 	align = ["Left", "Center", "Right"].index(align)
 	
 	wp = obj.worldPosition
 	xyz = obj.worldOrientation.to_euler()
-	label = Label(font, obj["Text"], sx, align, wp, xyz)
+	label = Label(font, "", sx, align, wp, xyz)
 	
 	label.visible = obj.visible
 	label.color = obj.color
+	label.shadow = obj.get("Shadow", False)
+	label.shadow_blur = obj.get("ShadowBlur", 0)
 	
+	label.text = obj["Text"]
 	module.labels[obj.name] = label
 	obj.endObject()
 		
@@ -139,6 +142,11 @@ class Label():
 
 	def __init__(self, font, text, size = 16, align = ALIGN_LEFT, position = [0,0,0], rotation = [0,0,0]):
 		position = Vector(position)
+		self.blur = 0
+		self.shadow = False
+		self.shadow_blur = 3
+		self.shadow_color = (0, 0, 0, 1)
+		self.shadow_offset = (1, -1)
 		
 		self.scene = module.scene_gui
 		self._font = font
@@ -163,12 +171,6 @@ class Label():
 		
 		self._lastscale = None
 		self._lastorth = self.scene.active_camera.ortho_scale
-		
-		self.blur = 0
-		self.shadow = True
-		self.shadow_blur = 3
-		self.shadow_color = (0, 0, 0, 1)
-		self.shadow_offset = (1, -1)
 		
 	def ProxyPosition(self, position):
 		P = widget.ProxyPosition(position)
@@ -269,7 +271,7 @@ class Label():
 			
 		bgl.glColor4f(*self._color)
 		blf.blur(font_id, self.blur)
-		blf.draw(font_id, self.text)
+		blf.draw(font_id, self._text)
 		
 		blf.disable(font_id, blf.ROTATION)
 		
@@ -359,11 +361,16 @@ class Label():
 		
 	@text.setter
 	def text(self, text):
-		lines = text.splitlines()
-		self._text = lines[0]
-		lines = lines[1:]
 		for l in self._lines: l.delete()
 		self._lines = []
+		
+		lines = text.splitlines()
+		if len(lines) < 2:
+			self._text = text
+			return
+			
+		self._text = lines[0]
+		lines = lines[1:]
 		for i, line in enumerate(lines):
 			new = self.copy(line, [0,-self.leading*self.scale.x*(i+1),0])
 			self._lines.append(new)
@@ -382,4 +389,9 @@ class Label():
 		
 		label = Label(self.font, text, size, self.align, self.position + offset, self.rotation)
 		label.color = self.color
+		label.blur = self.blur
+		label.shadow = self.shadow
+		label.shadow_blur = self.shadow_blur
+		label.shadow_color = self.shadow_color
+		label.shadow_offset = self.shadow_offset
 		return label
