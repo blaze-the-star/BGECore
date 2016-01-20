@@ -59,7 +59,7 @@ def saveGameProperty(name, value):
 			new += "\n" + name + ": " + str(value)
 		input.seek(0)
 		input.write(new)
-
+		
 def getBlendFilepath():
 	""" Returns the game .blend absolute filepath (including the blend name) """
 	try:

@@ -20,3 +20,4 @@ documentation/build/
 assets/
 template/engine/*
 *~
+template/data/avalon.terrain

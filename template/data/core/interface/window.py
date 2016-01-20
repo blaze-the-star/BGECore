@@ -74,7 +74,8 @@ class Window():
 	def update(self):
 		module.post_draw_step = 0
 
-		x, y = logic.mouse.position
+		if self.cursor == None: x, y = logic.mouse.position
+		else: x, y = self.cursor.position
 		to = [(x-0.5)*self.scx, (-y+0.5)*self.scy, 0]
 		cx, cy, cz = self.camera.worldPosition
 		tto = [to[0]+cx, to[1]+cy, 0]
@@ -83,9 +84,9 @@ class Window():
 		self.cursor_position = [tto[0], tto[1], self.camera_height]
 		if self.cursor:
 			if type(self.cursor) is ImageCursor:
-				self.cursor.position = x, y
+				self.cursor.position = logic.mouse.position
 			else:
-				self.cursor.worldPosition = self.cursor_position
+				self.cursor.worldPosition = logic.mouse.position
 
 		winx = render.getWindowWidth()
 		winy = render.getWindowHeight()
@@ -205,7 +206,7 @@ class ImageCursor:
 	
 	.. attribute:: position
 	
-		A pair containing the positon in screen coordinates. Equal to ``bge.logic.mouse.position``. Altering this value will not modify the mouse position and the cursor will be returned to the mouse position at the next frame.
+		A pair containing the positon in screen coordinates. 
 	
 	.. attribute:: scale
 	
@@ -213,7 +214,13 @@ class ImageCursor:
 
 	.. attribute:: texture
 	
-		A bitmap containing the texture data to use for the cursor. The date has been loaded using ``bge.texture.ImageFFmpeg``.
+		A bitmap containing the texture data to use for the cursor. The data has been loaded using ``bge.texture.ImageFFmpeg``.
+	
+	.. attribute::clipping
+	
+		An (x, y) set with -Inf < x,y <= 1 to specify the margin of the cursor from the window border, or None to disable clipping. Default: None
+		
+		.. Note:: With clipping disabled, a clipping of (0,0) will be aplied on fullcreen and embebed modes.	
 	"""
 
 	def __init__(self, path):
@@ -222,6 +229,7 @@ class ImageCursor:
 		self.path = path
 		self.fullpath = logic.expandPath("//../data/" + path)
 		self.texture = texture.ImageFFmpeg(self.fullpath)
+		self.clipping = None
 		
 		self._tex_id = glGenTextures(1)
 		self.size = [0, 0]
@@ -232,9 +240,9 @@ class ImageCursor:
 		self.texco = [(0, 0), (1, 0), (1, 1), (0, 1)]
 		self.color = [1, 1, 1, 1]
 		
-		x = 0
-		y = 0
-
+		x = render.getWindowWidth()/2
+		y = render.getWindowHeight()/2
+		
 		size = [50, 50]
 		
 		width = size[0]
@@ -243,21 +251,51 @@ class ImageCursor:
 		
 		# The "private" position returned by setter
 		self._position = [x, y]
+		self._last_position = self._position
 		self.calculate_glposition()
 		module.scene_gui.post_draw.append(self.draw)
 		self.scale = 0.5, 0.5
 
 	@property
 	def position(self):
-		return self._position
+		x, y = self._position
+		winx = render.getWindowWidth()
+		winy = render.getWindowHeight()
+		return x/winx, -y/winy + 1
 	
 	@position.setter
 	def position(self, val):
 		x, y = val
+		lx, ly = self._position
 		winx = render.getWindowWidth()
 		winy = render.getWindowHeight()
+			
+		if self.clipping  or render.getFullScreen():
+			#Emulate new position
+			_position = (lx-winx/2)+x*winx, (-y*winy + winy)+(ly-winy/2)
+			logic.mouse.position = 0.5, 0.5
+			x, y = _position
+			
+			#Apply filter
+			tx, ty = self._last_position
+			if abs(tx-x) < 1 and abs(ty-y) < 1: return
+
+			#Do the actual clipping
+			if self.clipping: mx, my = self.clipping
+			else: mx, my = 0, 0
+			winx = render.getWindowWidth()
+			winy = render.getWindowHeight()
+			if mx > 1 or my > 1: raise ValueError("clipping x and y values must be lower or equal than 1")
+			mx, my = mx*winx/2, my*winy/2
+			if x < mx: x = mx
+			if x > winx-mx: x = winx-mx
+			if y < my: y = my
+			if y > winy-my: y = winy-my
+			self._position = x, y
+			self._last_position = self._position
 		
-		self._position = x*winx, -y*winy + winy
+		else:
+			self._position = x*winx, -y*winy + winy
 		
 	@property
 	def scale(self):

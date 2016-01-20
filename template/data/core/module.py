@@ -1,4 +1,8 @@
 MIN_VERSION = (2, 76, 0)
+try:
+	import bpy
+	is_standalone = False
+except ImportError: is_standalone = True	
 
 #Scenes and behaviors
 scene_behavior_dict = {}
