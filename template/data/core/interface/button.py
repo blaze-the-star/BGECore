@@ -213,6 +213,10 @@ class Menu(Button):
 		self.button[index] = self
 		
 		module.enableInputFor(self)
+		
+		self.init()
+		
+	def init(self): pass
 	
 	def _mouseClick(self):
 		super()._mouseClick()
@@ -264,6 +268,10 @@ class TextMenu(TextButton):
 		self.color = self.ProxyColor()
 		
 		module.enableInputFor(self)
+		
+		self.init()
+		
+	def init(self): pass
 		
 	def _mouseClick(self):
 		super()._mouseClick()

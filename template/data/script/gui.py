@@ -57,13 +57,15 @@ class MainMenu(interface.TextMenu):
 	align = interface.label.ALIGN_CENTER
 	visible = True
 	fadeinref = None
-
+	
 	def init(self):
 		media.sui["select"] = media.AudioEffect("sound/ui/select.wav")
 		media.sui["click"] = media.AudioEffect("sound/ui/click_back.wav")
 		self.color = [1, 1, 1, 0]
 		self.obj.visible = True
+		self.label.color = [0.8, 0.8, 0.95, 1]
 		self.music = media.RandomMusic()
+		
 
 	def mouseIn(self):
 		if self.active: media.sui["select"].play()

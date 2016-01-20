@@ -113,6 +113,26 @@ class Label():
 	.. attribute:: leading
 	
 		The space between two lines of text on a multiline label. *Default: 1*
+		
+	.. attribute:: blur
+	
+		The blur of the label {0, 3, 5}
+	
+	.. attribute:: shadow
+		
+		True if the label should have shadow.
+		
+	.. attribute:: shadow_blur
+	
+		The blur level of the shadow, {0, 3, 5}
+		
+	.. attribute:: shadow_color
+	
+		The color of the shadow (rgba)
+		
+	.. attribute:: shadow_offset
+	
+		The (x, y) displacment of the shadow in pixels.
 	
 	"""
 	_fontname_id = {}
@@ -130,7 +150,7 @@ class Label():
 		self._glunit = None
 		self._glzunit = None
 		self._scale = self.ProxyScale([size/100, size/100, size/100])
-		self._color = self.ProxyColor([1,1,1,1])
+		self._color = self.ProxyColor([0,0,0,1])
 		self._lines = [] #The labels containing child lines on a multiline label.
 		
 		self.align = align
@@ -143,6 +163,12 @@ class Label():
 		
 		self._lastscale = None
 		self._lastorth = self.scene.active_camera.ortho_scale
+		
+		self.blur = 0
+		self.shadow = True
+		self.shadow_blur = 3
+		self.shadow_color = (0, 0, 0, 1)
+		self.shadow_offset = (1, -1)
 		
 	def ProxyPosition(self, position):
 		P = widget.ProxyPosition(position)
@@ -234,8 +260,17 @@ class Label():
 		else:
 			blf.rotation(font_id, 0)
 		
-		bgl.glColor4f(self._color.x, self._color.y, self._color.z, self._color.w)
-		blf.draw(font_id, self._text)
+		if self.shadow == True:
+			blf.position(font_id, pos[0]+self.shadow_offset[0], pos[1]+self.shadow_offset[1], pos[2])
+			bgl.glColor4f(*self.shadow_color)
+			blf.blur(font_id, self.shadow_blur)
+			blf.draw(font_id, self._text)
+			blf.position(font_id, pos[0], pos[1], pos[2])
+			
+		bgl.glColor4f(*self._color)
+		blf.blur(font_id, self.blur)
+		blf.draw(font_id, self.text)
+		
 		blf.disable(font_id, blf.ROTATION)
 		
 		self._lastscale = self.scale

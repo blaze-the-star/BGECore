@@ -73,10 +73,6 @@ class Widget():
 		global dict
 		dict[self.obj] = self
 		
-		self.init()
-		
-	def init(self): pass
-		
 	def ProxyPosition(self):
 		P = ProxyPosition(self.obj.worldPosition)
 		P.obj = self; return P
@@ -212,7 +208,15 @@ class Widget():
 		
 	@color.setter
 	def color(self, color):
-		for obj in self.transformable: obj.color = color
+		x, y, z, w = color
+		if self.color.x != x:
+			for obj in self.transformable: obj.color.x = x
+		if self.color.y != y:
+			for obj in self.transformable: obj.color.y = y
+		if self.color.z != z:
+			for obj in self.transformable: obj.color.z = z
+		if self.color.w != w:
+			for obj in self.transformable: obj.color.w = w
 		self._color = self.ProxyColor()
 		
 	@property
