@@ -4,16 +4,22 @@ This module provides you with various util functions of BGECore.
 
 .. currentmodule:: core.utils
 
+Files
+-------------------
+.. autofunction:: getBlendFilepath
+.. autofunction:: getLocalDirectory
+
 Configuration file
-------------------
+'''''''''''''''''''''''''''''''''''
 .. autofunction:: loadGameProperty
 .. autofunction:: saveGameProperty
 
-Debug and performance
+Debug
 ---------------------
-.. autofunction:: frameSleep
 .. autofunction:: debug
 .. autofunction:: verbose
+.. autofunction:: checkVersion
+.. autofunction:: frameSleep
 
 Math and movement
 -----------------

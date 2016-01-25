@@ -6,7 +6,7 @@ class GUI(behavior.Scene):
 	def init(self):
 		#Set the cursor, hide for the intro video.
 		interface.window.setCursor("gui/cursor.png")
-		interface.window.cursor.scale = (0.4, 0.4)
+		interface.window.cursor.scale = (0.5, 0.5)
 
 		#Start the game with intro video
 		if not constant.GAME_DEBUG:

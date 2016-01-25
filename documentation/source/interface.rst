@@ -19,7 +19,9 @@ Window
 
 .. autoclass:: core.interface.window.Window
 	:members:
-	
+
+Cursor
+~~~~~~~~
 .. autoclass:: core.interface.window.ImageCursor
 	:members:
 

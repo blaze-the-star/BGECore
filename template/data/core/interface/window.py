@@ -11,7 +11,7 @@ class Window():
 
 	.. attribute:: cursor
 
-		The |KX_GameObject| or :class:`.ImageCursor` of a custom cursor if used, otherwise *None*
+		The |KX_GameObject| or :class:`.ImageCursor` of a custom cursor if used, otherwise ``None``
 
 	.. attribute:: cursor_position
 
@@ -202,7 +202,7 @@ class ImageCursor:
 	
 	.. attribute:: color
 	
-		A 4-val list RGBA indicating the scale of each color channel to use with the cursor. *Default: [1,1,1,1]*
+		A RGBA list indicating the scale of each color channel to use with the cursor. Default: ``[1,1,1,1]``
 	
 	.. attribute:: position
 	
@@ -210,7 +210,7 @@ class ImageCursor:
 	
 	.. attribute:: scale
 	
-		A pair containing the scale of the cursor. *Default: (0.5, 0.5)*
+		A pair containing the scale of the cursor. Default: ``(0.5, 0.5)``
 
 	.. attribute:: texture
 	
@@ -218,7 +218,7 @@ class ImageCursor:
 	
 	.. attribute::clipping
 	
-		An (x, y) set with -Inf < x,y <= 1 to specify the margin of the cursor from the window border, or None to disable clipping. Default: None
+		An (x, y) set with **-Inf < x,y <= 1** to specify the margin of the cursor from the window border, or None to disable clipping. Default: ``None``
 		
 		.. Note:: With clipping disabled, a clipping of (0,0) will be aplied on fullcreen and embebed modes.	
 	"""
@@ -390,7 +390,7 @@ class ImageCursor:
 		bgl.glMatrixMode(bgl.GL_MODELVIEW)
 		
 	def delete(self):
-		""" Deletes the cursor. Usually you should use interface.window.setCursor(None) but this is for crazy bastards that have deleted the refernce on the window object. """
+		""" Deletes the cursor. Usually you should use ``interface.window.setCursor(None)`` but this is for crazy bastards that have deleted the refernce on the window object. """
 		
 		self.visible = False
 		try:

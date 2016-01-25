@@ -61,7 +61,7 @@ def saveGameProperty(name, value):
 		input.write(new)
 		
 def getBlendFilepath():
-	""" Returns the game .blend absolute filepath (including the blend name) """
+	""" Returns the blend file absolute filepath, including the name. """
 	try:
 		from bpy import data
 		return data.filepath
@@ -72,7 +72,7 @@ def getBlendFilepath():
 		return logic.expandPath("//" + os.path.basename(path))
 
 def checkVersion():
-	""" Returns wather if BGE version is greater or equal to core.module.MIN_VERSION """
+	""" Returns wather BGE version is greater or equal to ``core.module.MIN_VERSION`` """
 	try: from bge import app
 	except ImportError: return False
 	x, y, z = app.version
@@ -85,7 +85,10 @@ def checkVersion():
 	else: return False
 
 def getLocalDirectory():
-	""" Returns the directory where local data can be stored. By default the same directory than the game. If there is no write acces then a directory inside the user folder. """
+	""" Returns the directory where local data can be stored. By default the same directory than the game. If there is no write acces then a directory inside the user folder. 
+	
+	If a local directory is created it will use the main .blend name for it.
+	"""
 	if module._local_data_directory == None:
 		blendname = os.path.basename(getBlendFilepath())[:-6]
 		try:

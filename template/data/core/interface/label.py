@@ -14,7 +14,9 @@ def replaceBlenderText(obj):
 	* Font (*String*): Name of the font to use.
 	* Align (*String*): Either Left, Center or Right
 	* FLable (*Bool*, Optional): If true the text object will be replaced by a FLabel instead.
-	
+	* Wrap (*Float*, Optional): The width where to wrap the text, *None* if not used.
+	* Shadow (*Bool*, Optional): If true the text will have shadow.
+	* ShadowBlur (*Int*, Optional): The amount of blur to apply to the shadow *0, 3 or 5*
 	"""
 	if obj.get("FLabel") == True:
 		flabel.replaceBlenderText(obj)
@@ -38,6 +40,7 @@ def replaceBlenderText(obj):
 	label.color = obj.color
 	label.shadow = obj.get("Shadow", False)
 	label.shadow_blur = obj.get("ShadowBlur", 0)
+	label.wrap = obj.get("Wrap", None)
 	
 	label.text = obj["Text"]
 	module.labels[obj.name] = label
@@ -67,14 +70,6 @@ def reverse_text(text):
 			u = False
 	return newText
 	
-def _swap_UV_2(v0, v1):
-	uv0 = v0.getUV()
-	uv1 = v1.getUV()
-	uv0[0],uv1[0] = uv1[0],uv0[0]
-	uv0[1],uv1[1] = uv1[1],uv0[1]
-	v0.setUV(uv0)
-	v1.setUV(uv1)
-	
 class Label():
 	"""
 	The basic Text object of BGECore.
@@ -91,9 +86,9 @@ class Label():
 		
 		* Pixelation when rotating them.
 		* Incompativility with object materials using Alpha Sort / Alpha Blend.
-		* In order to look really good a text object with Object Properties -> Colro -> Alpha > 0 and < 1 must be present (but not nescesarily inside the camera frustum).
+		* In order to look really good a text object with Object Properties -> Color -> Alpha > 0 and < 1 must be present (but not nescesarily inside the camera frustum).
 		
-		Alternatively you can use **core.interface.flabel.FLabel** (Same API), wich uses a bitmap texture, however it has it's own problems:
+		Alternatively you can use **core.interface.flabel.FLabel** (Almost same API), wich uses a bitmap texture, however it has it's own problems:
 		
 		* No Kerning
 		* Most special characters don't work (inapropiate for anything other than english).
@@ -103,7 +98,7 @@ class Label():
 	
 	.. attribute:: visible
 	
-		Visibility, true or false. Use *color.w* for alpha channel. 
+		Visibility, *True* or *False*. Use ``color.w`` for the alpha channel. 
 	
 	.. attribute:: align
 	
@@ -111,11 +106,15 @@ class Label():
 	
 	.. attribute:: middle_height
 	
-		**Bool**, if True the text will be Y-Axis centered to the origin. Useful for widgets.
+		Boolean, if *True* the text will be Y-Axis centered to the origin. Useful for widgets.
 		
 	.. attribute:: leading
 	
-		The space between two lines of text on a multiline label. *Default: 1*
+		The space between two lines of text in a multiline label. **Default: 1**
+		
+	.. attribute:: wrap
+	
+		The width size where to wrap text, in blender units.
 		
 	.. attribute:: blur
 	
@@ -123,7 +122,7 @@ class Label():
 	
 	.. attribute:: shadow
 		
-		True if the label should have shadow.
+		*True* if the label should have shadow.
 		
 	.. attribute:: shadow_blur
 	
@@ -147,6 +146,7 @@ class Label():
 		self.shadow_blur = 3
 		self.shadow_color = (0, 0, 0, 1)
 		self.shadow_offset = (1, -1)
+		self.wrap = None
 		
 		self.scene = module.scene_gui
 		self._font = font
@@ -155,16 +155,15 @@ class Label():
 		
 		self._glposition = [0,0,0]
 		self._glscale = None
-		self._glunit = None
-		self._glzunit = None
+		self._glunit = render.getWindowWidth()/self.scene.active_camera.ortho_scale
 		self._scale = self.ProxyScale([size/100, size/100, size/100])
 		self._color = self.ProxyColor([0,0,0,1])
 		self._lines = [] #The labels containing child lines on a multiline label.
 		
 		self.align = align
 		self.leading = 1
-		self.text = text
 		self.font = self._font
+		self.text = text
 		self.visible = True
 		self.scene.post_draw.append(self.draw)
 		self.middle_height = False
@@ -211,6 +210,7 @@ class Label():
 		h = cam.worldPosition.z
 		font_id = Label._fontname_id[self._font]
 		unit = width/orth
+		self._glunit = unit
 		rpos = self._position - cam.worldPosition
 		
 		bgl.glMatrixMode(bgl.GL_PROJECTION)
@@ -340,7 +340,7 @@ class Label():
 	
 	@property
 	def font(self):
-		""" Font name to use from the `data/gui/font` directory. Expected ``.ttf`` file extension.
+		""" Font name to use from the `data/gui/font` directory. Expected a ``.ttf`` file extension.
 		
 		:type: String
 		"""
@@ -364,7 +364,28 @@ class Label():
 		for l in self._lines: l.delete()
 		self._lines = []
 		
-		lines = text.splitlines()
+		real_lines = text.splitlines()
+		if self.wrap != None:
+			font_id = Label._fontname_id[self._font]
+			wrap = self.wrap * self._glunit
+			if wrap <= 0: raise ValueError("Label wrap must be greater than 0")
+			
+			blf.size(font_id, int(self.scale.x*self._glunit), 72)
+			lines = []
+			for real_line in real_lines:
+				line = ""
+				for word in real_line.split():
+					line += word
+					x = blf.dimensions(font_id, line)[0]
+					print(font_id, line, blf.dimensions(font_id, line))
+					if x > wrap:
+						lines.append(line)
+						line = ""
+					else: line += " "
+				lines.append(line) 
+				
+		else: lines = real_lines			
+		
 		if len(lines) < 2:
 			self._text = text
 			return
