@@ -182,8 +182,6 @@ class Subtitles():
 		self._duration = 0.0
 		self._seek = 0
 		
-		print(self.data)
-		
 	@property
 	def filepath(self):
 		return self._filepath
@@ -239,8 +237,6 @@ class Subtitles():
 			return
 			
 		x = time.time()
-		
-		module.labels["Time"].text = str(int((x - self._start_time)*10)/10)
 		
 		if x - self._last_time > self._duration:
 			self.label.text = ""
