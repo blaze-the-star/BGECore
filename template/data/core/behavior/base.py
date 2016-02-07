@@ -1,4 +1,5 @@
 from bge import logic
+from core import module
 
 _argn = 0
 _lastb = None
@@ -7,7 +8,7 @@ class Object():
 		Use :meth:`Scene.addBehavior` to construct this behavior.
 	
 		:param object: Object to apply this behavior on.
-		:type object: |KX_GameObject| or String
+		:type object: |KX_GameObject|
 		
 		.. attribute:: obj
 			
@@ -166,14 +167,16 @@ class Scene():
 			
 			:param behavior.Object Behavior: The behavior to use.
 			:param obj: The obj that will have this behavior.
-			:type obj: |KX_GameObject| or string
+			:type obj: |KX_GameObject| or String
 		"""
 		
 		if type(obj) is str:
 			try:
 				obj = self.scene.objects[obj]
 				if obj == None: raise Exception()
-			except: obj = self.scene.objectsInactive[obj]
+			except KeyError:
+				try: obj = self.scene.objectsInactive[obj]
+				except KeyError: obj = module.labels[obj]
 		b = Behavior(obj)
 		self.behaviors.append(b)
 		return b

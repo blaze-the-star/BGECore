@@ -12,7 +12,10 @@ Video
 ------
 .. autoclass:: Screen
 	:members:
-
+	
+.. autoclass:: Subtitles
+	:members:
+	
 Audio
 ------
 .. data:: device

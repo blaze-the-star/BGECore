@@ -377,7 +377,6 @@ class Label():
 				for word in real_line.split():
 					line += word
 					x = blf.dimensions(font_id, line)[0]
-					print(font_id, line, blf.dimensions(font_id, line))
 					if x > wrap:
 						lines.append(line)
 						line = ""

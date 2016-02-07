@@ -9,7 +9,7 @@ class GUI(behavior.Scene):
 		interface.window.cursor.scale = (0.5, 0.5)
 
 		#Start the game with intro video
-		if not constant.GAME_DEBUG:
+		if not constant.GAME_DEBUG and False:
 			interface.window.hideCursor()
 			utils.setCamera(self, "GUICamera.001") #Makes the menu desapear.
 			media.showScreen() #Spawns screen

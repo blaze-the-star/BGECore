@@ -158,7 +158,17 @@ def randRGB(r = None, g = None, b = None, a = 1):
 	if not b: b = randint(0,100)/100
 	if not a: a = randint(0,100)/100
 	return Vector((r,g,b,a))
-
+	
+def getTimeFromString(text):
+	""" Returns a float reperesenting time in seconds from a string formatted like: hh:mm:ss,sss"""
+	text = text.replace(',', '.')
+	hours, minutes, seconds = (0, 0, 0)
+	l = text.split(':')
+	if len(l) == 1: seconds = float(l)
+	if len(l) == 2: minutes, seconds = int(l[0]), float(l[1])
+	if len(l) == 3: hours, minutes, seconds = int(l[0]), int(l[1]), float(l[2])
+	return hours*3600 + minutes*60 + seconds
+	
 #Math
 
 #THE SHAME BLOCK

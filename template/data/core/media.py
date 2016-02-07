@@ -124,6 +124,154 @@ class Screen(interface.widget.Widget):
 			module.video_playback_list.remove(self)
 			if self.callback: self.callback()
 		
+import bisect, time
+class Subtitles():
+	""" 
+	This object manages subtitles in the game. It uses a Label or Text object in order to render them.
+	
+	* Supported formats: **.srt**, **.sub**
+	
+	:param interface.Label label: The label to use to render the subtitles.
+	:param string filepath: The relative path to the file containing the subtitles.
+	:param float start_time: The time in sconds from where to start playing the subtitles.
+	:param float end_time: The time in seconds where to stop playing the subtitles.
+	
+	.. attribute:: filepath
+	
+		The relative path to the subtitles file. Modifing this at runtime efectively changes to subtitles data.
+		
+	.. attribute:: label
+	
+		The Label object used by the subtitles.
+		
+	.. attribute:: playing
+	
+		A boolean representing the state of the subtitles. Changin it to false pauses the subtitles.
+		
+	.. attribute:: data
+	
+		A list of 3-size set (start_time, end_time, dialog) for each subtitle.
+		
+	.. attribute:: raw_data
+	
+		The raw data from the subtitles file as a string. You can modify this and call *self.parse()* to generate new subtitles from data in memeory.
+	
+	"""
+	
+	def __init__(self, label, filepath, start_time = 6, end_time = None):
+		self.raw_data = None
+		self.data = []
+		self.keys = []
+		self.playing = False
+		
+		self.end_time = end_time
+		
+		self.label = label
+		self.filepath = filepath
+		
+		self._filepath = filepath
+		if filepath:
+			self.filepath = filepath
+			self.playing = True
+		
+		module.low_frequency_callbacks.append(self.update)
+		
+		self.next = (0, 0, "")
+		self._start_time = time.time() - start_time
+		self._last_time = self._start_time
+		self._duration = 0.0
+		self._seek = 0
+		
+		print(self.data)
+		
+	@property
+	def filepath(self):
+		return self._filepath
+		
+	@filepath.setter
+	def filepath(self, path):
+		self._filepath = path
+		
+		try:
+			with open(logic.expandPath('//' + path), 'r', encoding = "UTF-8") as f: self.raw_data = f.read()
+		except UnicodeDecodeError:
+			with open(logic.expandPath('//' + path), 'r', encoding = "Windows-1252") as f: self.raw_data = f.read()
+			
+		if self.filepath.endswith(".srt"): format = ".srt"
+		elif self.filepath.endswith(".sub"): format = ".sub"
+		else: raise ValueError("Subtitle file format not supported.")
+		self.parse(format)
+		
+	def parse(self, format = ".srt"):
+		""" Geneartes structured data from a SRT or SUB files. It uses the data stored in *raw_data* 
+		
+		:param string format: The format to use, one of: **.srt** or **.sub**
+		"""
+	
+		self.data = []
+		self.keys = []
+	
+		if format == ".srt": splitter = " --> "
+		if format == ".sub": splitter = ","
+	
+		text = self.raw_data
+		for block in text.split("\n\n"):
+			n = 0
+			for line in block.splitlines():
+				n += len(line)+1
+				try: st, end = line.split(splitter)
+				except ValueError: continue
+			
+				start_time = utils.getTimeFromString(st)
+				end_time = utils.getTimeFromString(end)
+				dialog = block[n:]
+			
+				self.data.append((start_time, end_time, dialog))
+				
+		self.keys = [x[1] for x in self.data]
+		if self.end_time == None:
+			self.end_time = self.data[-1][1]
+		
+	def update(self, time_diff):
+		if self.playing == False:
+			self._start_time += time_diff
+			self._last_time += time_diff
+			return
+			
+		x = time.time()
+		
+		module.labels["Time"].text = str(int((x - self._start_time)*10)/10)
+		
+		if x - self._last_time > self._duration:
+			self.label.text = ""
+		
+		if x - self._start_time > self.next[0]:
+			self._last_time = x
+			self._duration = self.next[1] - self.next[0]
+			t = x - self._start_time
+			dialog = self.next[2]
+			
+			#Filter
+			dialog = dialog.replace("<i>", "")
+			dialog = dialog.replace("</i>", "")
+			dialog = dialog.replace("<b>", "")
+			dialog = dialog.replace("</b>", "")
+			
+			self.label.text = dialog
+			try:
+				self.next = self.data[bisect.bisect_right(self.keys, t)]
+			except IndexError:
+				self.label.text = ""
+				module.low_frequency_callbacks.remove(self.update)
+				return
+			
+		if x - self._start_time > self.end_time:
+			self.label.text = ""
+			module.low_frequency_callbacks.remove(self.update)
+			
+#===============================================
+#						AUDIO
+#===============================================
 
 device = aud.device()
 

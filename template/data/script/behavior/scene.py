@@ -1,4 +1,4 @@
-from core import behavior, utils, module, key
+from core import behavior, utils, module, key, media
 from script import credits, constant
 
 class IntroScene(behavior.Scene):
@@ -13,6 +13,10 @@ class IntroScene(behavior.Scene):
 		#self.camtrack.playAction("IntroCameraAction", 0, 2000)
 		self.addBehavior(behavior.MouseLook, self.camtrack)
 		utils.setCamera(self, "IntroCamera")
+		
+		#Subtitles
+		self.subs = media.Subtitles(module.labels["Subtitles"], "gui/Star Trek.srt")
+		
 		
 	def update(self):
 		pass
