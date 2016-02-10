@@ -27,3 +27,9 @@ Callbacks are stored either in ``module.low_frequency_callbacks`` or ``module.he
 	
 .. autoclass:: core.sequencer.AlphaFade
 	:members:
+	
+Miscellanous
+----------------
+
+.. autoclass:: core.sequencer.Typewriter
+	:members:

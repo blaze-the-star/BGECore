@@ -163,6 +163,10 @@ class LinearInterpolation:
 		del self
 		
 class QuadraticInterpolation(LinearInterpolation):
+	""" Makes a quadratic interpolation over time, uses a callback to apply changes.
+	
+	.. warning:: The implementation sucks.
+	"""
 	def __init__(self, A, B, time, callback, final = None, transform = False, inverse = False):
 		super().__init__(A, B, time, callback, final, transform)
 		self.inverse = inverse
@@ -172,3 +176,83 @@ class QuadraticInterpolation(LinearInterpolation):
 		b = self.B
 		if self.inverse: return (x**2-2*x)*(a-b)+a
 		return (x**2+x)*((b-a)/2)+a
+		
+class Typewriter:
+	""" Writtes with a typewriter effect whatever you want to writte with a typeriter effect, then calls the callback function.
+	
+	.. note:: Today seems I'm not very good at documenting.
+	
+	:param interface.Label label: The Label.
+	:param function callback: The function to call once it ends.
+	
+	.. attribute:: x
+	
+		The time since the effect started, in seconds.
+	
+		:type: float
+		
+	.. attribute:: status
+	
+		True if playing. False if paused or stoped.
+		
+		:type: bool
+		
+	.. attribute:: callback
+	
+		To change the callback on runtime.
+	
+	.. attribute:: n
+	
+		The index of the last letter added to the Label. Remeber to set to integer when used.
+		
+		:type: float
+		
+	.. attribute:: speed
+	
+		The amount to add to *n* each iteration.
+		
+	.. attribute:: text
+	
+		The new text that will be written. Modifing this will start a new animation.
+		
+	"""
+
+	def __init__(self, label, callback=None):
+		self.label = label
+		self.status = True
+		self.x = 0
+		self.n = 0
+		self.speed = 1.3
+		self.callback = callback
+		self._text = None
+		self.text = self.label.text
+		
+		module.height_frequency_callbacks.append(self.update)
+		
+	def update(self, time):
+		if self.status == False: return
+		if self.x < 0 or self.n >= len(self.text):
+			self.status = False
+			if self.callback: self.callback()
+
+		self.x += time
+		self.n += self.speed
+		self.label.text = self.text[:int(self.n)]
+		
+	@property
+	def text(self):
+		return self._text
+		
+	@text.setter
+	def text(self, val):
+		self._text = val
+		self.n = 0
+		self.x = 0
+		self.label.text = ""
+		self.status = True
+	
+	def finish(self):
+		self.label.text = self.text
+		self.status = False
+		self.n = len(self.text)-1
+		

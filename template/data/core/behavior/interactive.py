@@ -100,8 +100,6 @@ class RenPyParser():
 				name = t[1]
 			self.blocks[type][name] = (y+1, None)
 			
-		print(self.store)
-			
 	def execInitLine(self, name, args, line):
 		if name == "define":
 			if args[1] != "=": raise NotImplementedError("At line " + str(self.line_index) + ". Wrong formated line. This line can't be interpreted with the current parser.")
@@ -175,6 +173,7 @@ class RenPyParser():
 			
 			if name == "" or name[0] == '"': is_command = False
 			elif name in self.characters.keys():
+				text = text.replace('\\"', '"')
 				return (self.characters[name], text[1:-1])
 			
 		except IndexError: return ("", "")
@@ -230,12 +229,8 @@ class InteractiveText(Object):
 				ch = name
 				name = name.name
 				color = ch.color
-				print(color)
 			
 			self.obj.text = text
 			if self.name:
 				self.name.text = name
 				if color: self.name.color = color
-				print(color)
-	
-		
