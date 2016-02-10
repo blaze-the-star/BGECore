@@ -1,6 +1,7 @@
 import core.behavior.base
 import core.behavior.camera
 import core.behavior.control
+import core.behavior.interactive
 from script import constant
 from core import module
 
@@ -12,6 +13,7 @@ CamPlayerControl = control.CamPlayerControl
 FixPlayerControl = control.FixPlayerControl
 OutPlayerControl = control.OutPlayerControl
 ThirdPerson = control.ThirdPerson
+InteractiveText = interactive.InteractiveText
 
 def addScene(class_name, name):
 	""" Adds a scene behavior class to a scene dictionary. This way when the |KX_Scene| is loaded the scene behavior will be inistanciated.
