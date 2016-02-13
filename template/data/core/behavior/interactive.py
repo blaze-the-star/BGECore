@@ -193,7 +193,7 @@ class RenPyParser():
 	
 from core.behavior.base import *
 from core.interface import event
-from core import module, key
+from core import module, key, sequencer
 from bge import logic
 class InteractiveText(Object):
 	""" 
@@ -206,6 +206,9 @@ class InteractiveText(Object):
 	
 	def init(self):
 		self.parser.parse("start")
+		self.obj.text = ""
+		if self.name: self.name.text = ""
+		self.twt = sequencer.Typewriter(self.obj)
 		module.enableInputFor(self)
 
 	@property
@@ -222,15 +225,18 @@ class InteractiveText(Object):
 			
 	def onKeyDown(self, keys):
 		if event.selected == None and key.LEFTMOUSE in keys:
-			name, text = self.parser.next()
-			color = None
-			
-			if type(name) == Character:
-				ch = name
-				name = name.name
-				color = ch.color
-			
-			self.obj.text = text
-			if self.name:
-				self.name.text = name
-				if color: self.name.color = color
+			if self.twt.status == True:
+				self.twt.finish()
+			else:
+				name, text = self.parser.next()
+				color = None
+				
+				if type(name) == Character:
+					ch = name
+					name = name.name
+					color = ch.color
+				
+				self.twt.text = text
+				if self.name:
+					self.name.text = name
+					if color: self.name.color = color

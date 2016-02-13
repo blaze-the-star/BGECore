@@ -18,4 +18,8 @@ You can find useful resources about Blender font generation and manipulation her
 (Another Alternative): http://www.ashsid.sk/wp/?p=21&lang=en-us
 (Colored Font With Gimp): http://www.blendenzo.com/tutColoredText.html
 
+------- Make sure to end your game with a good song, e.j ------------
+http://www.newgrounds.com/audio/listen/134684
+http://www.newgrounds.com/audio/listen/309134
+
 

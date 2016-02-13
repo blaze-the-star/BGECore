@@ -222,7 +222,7 @@ class Typewriter:
 		self.status = True
 		self.x = 0
 		self.n = 0
-		self.speed = 1.3
+		self.speed = 0.8
 		self.callback = callback
 		self._text = None
 		self.text = self.label.text

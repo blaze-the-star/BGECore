@@ -378,8 +378,8 @@ class Label():
 					line += word
 					x = blf.dimensions(font_id, line)[0]
 					if x > wrap:
-						lines.append(line)
-						line = ""
+						lines.append(line[:-len(word)])
+						line = word + " "
 					else: line += " "
 				lines.append(line) 
 				
