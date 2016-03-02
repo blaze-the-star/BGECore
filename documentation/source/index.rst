@@ -16,7 +16,7 @@ Contents:
    media
    sequencer
    dynamic   
-
+   
 Module
 ==================
 The ``core.module`` module provides acces to important references that can be used anywere.
@@ -52,6 +52,10 @@ The ``core.module`` module provides acces to important references that can be us
 .. data:: core.module.height_frequency_callbacks
 
 	A list of functions that will be called after each ``HEIGHT_FREQUECY_TICK``. Functions are called with the argument ``time``, a float representing the amount of time since the last call.
+	
+.. data:: core.module.is_standalone
+
+	True if BGE is running in standalone mode, False if it's running in embedded mode.
 	
 .. function:: enableInputFor (behavior)
 

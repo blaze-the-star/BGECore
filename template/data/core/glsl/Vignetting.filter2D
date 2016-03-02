@@ -1,14 +1,19 @@
 uniform sampler2D bgl_RenderedTexture;
 
-uniform float vignette_size;
+uniform float Vignetting_size;
+uniform float Vignetting_colorR;
+uniform float Vignetting_colorG;
+uniform float Vignetting_colorB;
+uniform float Vignetting_colorA;
 const float tolerance = 0.6;
 
 void main(void)
 {
+	float r = Vignetting_colorR;
 	vec2 powers = pow(abs(gl_TexCoord[3].st - 0.5), vec2(2.0));
-	float radiusSqrd = pow(vignette_size, 2.0);
+	float radiusSqrd = pow(Vignetting_size, 2.0);
 	float gradient = smoothstep(radiusSqrd-tolerance, radiusSqrd+tolerance, powers.x+powers.y);
    	    
-	gl_FragColor = mix(texture2D(bgl_RenderedTexture, gl_TexCoord[0].st), vec4(1.0, 0.0, 0.0, 0.0), gradient);
+	gl_FragColor = mix(texture2D(bgl_RenderedTexture, gl_TexCoord[0].st), vec4(Vignetting_colorR, Vignetting_colorG, Vignetting_colorB, Vignetting_colorA), gradient);
 	gl_FragColor.a = 1.0;
 }

@@ -453,10 +453,48 @@ def setCamera(scene, camera_name):
 		win.scy = camera.ortho_scale * (win.height / win.width)
 
 #GLSL 2DFilters
+import core.glsl as filter2D
+
+#DEPRECATED!
+
+#This can be clarely optimized and improved into a class.
+#This can also be optimized A LOT if we find another way to find the program id.
+def getShaderSource(program):
+	import bgl
+	
+	maxCount = 1
+	count = bgl.Buffer(bgl.GL_INT, 1)
+	shaders = bgl.Buffer(bgl.GL_BYTE, [maxCount])
+	bgl.glGetAttachedShaders(program, maxCount, count, shaders)
+	 
+	maxLength = 64000
+	length = bgl.Buffer(bgl.GL_INT, 1)
+	source = bgl.Buffer(bgl.GL_BYTE, [maxLength])
+	bgl.glGetShaderSource(shaders[0], maxLength, length, source)
+	return "".join(chr(source[i]) for i in range(length[0]))
+
+def bindUniformf(name, slot, camera):
+	import bgl
+	
+	filter = camera.actuators["F"+str(slot)]
+	text = filter.shaderText
+	
+	program = -1
+	for prog in range(32767):
+		if bgl.glIsProgram(prog) == True:
+			if text == getShaderSource(prog):
+				program = prog
+			
+	
+	
+			
+	bgl.glUseProgram(program)
+	bgl.glUniform1f(bgl.glGetUniformLocation(program, name), camera[name])
+
 def setFilter2D(name, camera, slot):
 	""" Sets or enables a 2DFilter.
 
-	**Default aviable GLSL filters:** Bloom, Vignetting, ChromaticAberration, FXAA.
+	**Default aviable GLSL filters:** Bloom, Vignetting, ChromaticAberration, FXAA, SBlur.
 
 	Some filters may need special game properties, see: *TODO*
 
@@ -483,7 +521,9 @@ def setFilter2D(name, camera, slot):
 		filter.passNumber = slot
 		filter.shaderText = text
 		cont.activate(filter)
+		
 		verbose("Setted 2D Filter " + name + " to slot " + str(slot))
+		
 	except:
 		import traceback
 		traceback.print_exc()

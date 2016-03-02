@@ -18,12 +18,6 @@ _last_traceback = ""
 def loop():
 	global _state, _last_time, _last_time2
 
-	#Set scene
-	if module.change_scene_frame == True:
-		if module.change_scene_dynamic == True: dynamic.loadScene(None, None)
-		else: utils.setScene(None)
-		return
-
 	#Game initialization
 	if _state == 0:
 		_state = 1
@@ -33,7 +27,6 @@ def loop():
 		module.scene_gui_behavior.init()
 		for b in module.scene_gui_behavior.behaviors: b.init()
 		media.device.volume = float(utils.loadGameProperty("volume"))
-		module.cont = logic.getCurrentController()
 		module._arecallbacks = False
 		if utils.checkVersion() == False: utils.debug("Atention! BGE version is outdated, please install last Blender release.")
 
@@ -75,7 +68,14 @@ def secondary_loop():
 	#It takes 0.6ms when with the editor. (Without tile replacing)
 	try:
 		if _fatal_error: return
-		if module.change_scene_frame == False:
+		
+		#Set scene
+		if module.change_scene_frame == True:
+			if module.change_scene_dynamic == True: dynamic.loadScene(None, None)
+			else: utils.setScene(None)
+			return
+		
+		else:
 			if module.scene_behavior.paused == False:
 				module.scene_behavior.update()
 				module.scene_behavior.baseUpdate()

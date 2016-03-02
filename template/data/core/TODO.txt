@@ -1,3 +1,7 @@
+GENERAL
+- Filters scripts and documentation.
+- Sinosuidal continus sequence. (Mixer?)
+
 LAUNCHER
 - Test MacOS version.
 - Somewhat BUG: If launching the same game from multiple places with no-write-permission the .blend path used is the one of the first launch. We should probably use the read-only config file for the .blend path instead. Maybe in 0.7?
@@ -26,5 +30,7 @@ BEHAVIOR
 
 DYNAMIC
 - Add core.dynamic.remove("file.blend") or core.dynamic.remove("libname")
+
+
 
 

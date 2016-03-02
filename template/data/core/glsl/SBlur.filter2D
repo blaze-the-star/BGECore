@@ -1,0 +1,29 @@
+uniform sampler2D bgl_RenderedTexture;
+
+uniform float SBlur_percent;
+uniform float SBlur_radious;
+uniform int SBlur_samples; // 4, 8, 16, 32
+
+float value = 0.0015*SBlur_radious; // Here, value = distance away to check for pixel color
+
+void main(void)
+{
+	if (value < 0.0001) value = 0.0015;
+	int _samples = SBlur_samples;
+	if (_samples == 0) _samples = 4;
+	int i;
+	vec4 color;
+	for (i=0; i < _samples/4; ++i) {
+		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x + value, gl_TexCoord[0].st.y + value)); // Sample area around current pixel
+		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x - value, gl_TexCoord[0].st.y - value));
+		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x + value, gl_TexCoord[0].st.y - value));
+		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x - value, gl_TexCoord[0].st.y + value));
+		value /= 2;
+	}
+   
+	color /= _samples;         // And average out the final color by number of samples; this could be in a for-loop
+   
+        vec4 origcolor = texture2D(bgl_RenderedTexture, gl_TexCoord[0].st); // This is a slight difference from the blur filter;
+   
+	gl_FragColor = origcolor + SBlur_percent * (color - origcolor); // Here, we use a simple formula where if percent = 0, then we simply use the original color. Otherwise, we use the blurred color;
+}
