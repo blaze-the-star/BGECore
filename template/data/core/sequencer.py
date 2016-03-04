@@ -222,7 +222,7 @@ class Typewriter:
 		self.status = True
 		self.x = 0
 		self.n = 0
-		self.speed = 0.8
+		self.speed = 0.6
 		self.callback = callback
 		self._text = None
 		self.text = self.label.text
@@ -237,7 +237,13 @@ class Typewriter:
 
 		self.x += time
 		self.n += self.speed
-		self.label.text = self.text[:int(self.n)]
+		n = int(self.n)
+		text = self.text[:self.text.find(' ', n)]
+		if len(self.label.returnWrapped(text, self.label.wrap)) > len(self.label.returnWrapped(self.text[:n], self.label.wrap)):
+			i = self.text.rfind(' ', 0, n)
+			self.label.text = self.text[:i] + "\n" + self.text[i:n] 
+		else:
+			self.label.text = self.text[:n]
 		
 	@property
 	def text(self):
@@ -246,7 +252,7 @@ class Typewriter:
 	@text.setter
 	def text(self, val):
 		self._text = val
-		self.n = 0
+		self.n = 1
 		self.x = 0
 		self.label.text = ""
 		self.status = True

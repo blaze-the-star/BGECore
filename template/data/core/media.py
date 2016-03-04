@@ -14,7 +14,8 @@ def showScreen():
 	global screen
 	ac = module.scene_gui.active_camera
 	if screen == None:
-		screen = Screen(module.scene_gui.addObject("GUIScreen", ac))
+		obj = module.scene_gui.objectsInactive["GUIScreen"]
+		screen = Screen(module.scene_gui.addObject(obj, ac))
 		screen.obj.worldPosition.z = 0
 		screen.obj.visible = True
 	else:
@@ -26,6 +27,7 @@ def hideScreen():
 	global screen
 	if not screen: return
 	screen.obj.visible = False
+	screen.replaceTexture(None)
 
 #===================================
 #			SREEN CLASS
@@ -65,6 +67,15 @@ class Screen(interface.widget.Widget):
 		
 		:param string filepath: The relative path (from the data folder) of the texture/image to replace.		
 		"""
+		if filepath == None:
+			try: del self.texture
+			except: pass
+			try: del self.video.source
+			except: pass
+			try: del self.video
+			except: pass
+			return
+		
 		path = logic.expandPath("//../data/" + filepath)
 		self.texture = texture.Texture(self.obj, 0)
 		self.texture.source = texture.ImageFFmpeg(path)
@@ -289,6 +300,10 @@ class AudioFile():
 	.. attribute:: volume_min
 	
 		Minium volume of the audio.
+		
+	.. attribute:: volume_max
+	
+		Maxium volume of the audio.
 	
 	.. attribute:: time
 	
@@ -301,6 +316,7 @@ class AudioFile():
 		self.time = 0
 		self.handle = None
 		self.volume_min = 0
+		self.volume_max = 1
 		self.callback = None
 		self._volume = 1
 
@@ -398,7 +414,7 @@ class AudioFile():
 		if self.fadeout and self.fadeout.status != False:
 			self.fadeout.delete()
 			
-		self.fadein = sequencer.LinearInterpolation(self.volume, 1, time, self._interpol)
+		self.fadein = sequencer.LinearInterpolation(self.volume, self.volume_max, time, self._interpol)
 	
 	def _interpol(self, x):
 		self.volume = x
@@ -447,7 +463,8 @@ class AudioFile():
 	def volume(self, x):
 		try:
 			if x < self.volume_min: self.handle.volume = self.volume_min
-			self.handle.volume = x
+			elif x > self.volume_max: self.handle.volume = self.volume_max
+			else: self.handle.volume = x
 		except: self._volume = x
 	
 	def update(self, time):

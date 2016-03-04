@@ -66,7 +66,7 @@ class RenPyParser():
 	def __init__(self, filepath):
 		self.dialog_position = 0
 	
-		with open(filepath, 'r') as f:
+		with open(filepath, 'r', encoding = "UTF-8") as f:
 			self.raw_data = "\n"
 			self.raw_data += f.read().replace("    ", "\t")
 			
@@ -118,7 +118,10 @@ class RenPyParser():
 			if type(obj) is Character: self.characters[args[0]] = obj
 					
 	def execLine(self, name, args):
-		print(name, args)
+		if name == '$':
+			command = ",".join(args)
+			print(command)
+			eval(command)
 		
 	def parseLine(self, line):
 		lvl= 0
@@ -189,7 +192,6 @@ class RenPyParser():
 #===========================================================
 #				This are the behaviours, not part of the Parser
 #===========================================================
-		
 	
 from core.behavior.base import *
 from core.interface import event
@@ -202,13 +204,27 @@ class InteractiveText(Object):
 	
 	parser = None
 	name = None
+	bubble = None
+	dialogBox = None
 	_filepath = None
 	
 	def init(self):
+		self._visible = True
 		self.parser.parse("start")
 		self.obj.text = ""
-		if self.name: self.name.text = ""
-		self.twt = sequencer.Typewriter(self.obj)
+		self.obj.visible = True
+		if self.name:
+			self.name.text = ""
+			self.name.visible = True
+		if self.dialogBox:
+			self.dialogBox.visible = True
+		
+		def setBubble(self):
+			if self.bubble != None: self.bubble.visible = True
+		
+		self.twt = sequencer.Typewriter(self.obj, lambda: setBubble(self))
+		self.dbs = None
+		
 		module.enableInputFor(self)
 
 	@property
@@ -223,11 +239,44 @@ class InteractiveText(Object):
 		else:
 			raise RuntimeError("The InteractiveText behavior only supports .rpy files. ")
 			
+	@property
+	def visible(self):
+		return self._visible
+		
+	@visible.setter
+	def visible(self, val):
+		self._visible = False
+		self.set_alpha(0)
+	
+	def set_alpha(self, val):
+		self.obj.color.w = val
+		self.name.color.w = val
+		if self.bubble: self.bubble.color.w = val
+		if self.dialogBox: self.dialogBox.color.w = val
+		if val == 0: self._visible = False
+		else: self._visible = True
+	
 	def onKeyDown(self, keys):
+		def setDBS(self, val): self.dbs = val
+	
+		if event.selected == None and key.RIGHTMOUSE in keys:
+			if self.twt.status == True:
+				self.twt.finish()
+				if self.bubble != None: self.bubble.visible = True
+			else:
+				if not self.dbs and self.visible:
+					self.dbs = sequencer.LinearInterpolation(1, 0, 2, self.set_alpha, lambda: setDBS(self, None))
+	
 		if event.selected == None and key.LEFTMOUSE in keys:
 			if self.twt.status == True:
 				self.twt.finish()
-			else:
+				if self.bubble != None: self.bubble.visible = True
+			elif self.visible == False:
+				if self.dbs: self.dbs.delete()
+				self.dbs = sequencer.LinearInterpolation(0, 1, 2, self.set_alpha, lambda: setDBS(self, None))
+			elif self.dbs == None:
+				if self.bubble != None: self.bubble.visible = False
+				
 				name, text = self.parser.next()
 				color = None
 				

@@ -324,6 +324,8 @@ class Label():
 	@color.setter
 	def color(self, color):
 		self._color = self.ProxyColor(color)
+		r, g, b, a = self.shadow_color
+		self.shadow_color = r, g, b, self.color.w
 		for line in self._lines:
 			line.color = color
 			
@@ -359,6 +361,27 @@ class Label():
 			text += "\n" + line.text
 		return text
 		
+	def returnWrapped(self, text, wrap):
+		""" Return a list of lines of wrapped text """
+		real_lines = text.splitlines()
+		font_id = Label._fontname_id[self._font]
+		wrap = self.wrap * self._glunit
+		if wrap <= 0: raise ValueError("Label wrap must be greater than 0")
+		
+		blf.size(font_id, int(self.scale.x*self._glunit), 72)
+		lines = []
+		for real_line in real_lines:
+			line = ""
+			for word in real_line.split():
+				line += word
+				x = blf.dimensions(font_id, line)[0]
+				if x > wrap:
+					lines.append(line[:-len(word)])
+					line = word + " "
+				else: line += " "
+			lines.append(line) 
+		return lines
+		
 	@text.setter
 	def text(self, text):
 		for l in self._lines: l.delete()
@@ -366,22 +389,7 @@ class Label():
 		
 		real_lines = text.splitlines()
 		if self.wrap != None:
-			font_id = Label._fontname_id[self._font]
-			wrap = self.wrap * self._glunit
-			if wrap <= 0: raise ValueError("Label wrap must be greater than 0")
-			
-			blf.size(font_id, int(self.scale.x*self._glunit), 72)
-			lines = []
-			for real_line in real_lines:
-				line = ""
-				for word in real_line.split():
-					line += word
-					x = blf.dimensions(font_id, line)[0]
-					if x > wrap:
-						lines.append(line[:-len(word)])
-						line = word + " "
-					else: line += " "
-				lines.append(line) 
+			lines = self.returnWrapped(text, self.wrap)
 				
 		else: lines = real_lines			
 		
@@ -409,6 +417,7 @@ class Label():
 		
 		label = Label(self.font, text, size, self.align, self.position + offset, self.rotation)
 		label.color = self.color
+		label.visible = self.visible
 		label.blur = self.blur
 		label.shadow = self.shadow
 		label.shadow_blur = self.shadow_blur
