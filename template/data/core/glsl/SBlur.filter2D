@@ -18,10 +18,10 @@ void main(void)
 		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x - value, gl_TexCoord[0].st.y - value));
 		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x + value, gl_TexCoord[0].st.y - value));
 		color += texture2D(bgl_RenderedTexture, vec2(gl_TexCoord[0].st.x - value, gl_TexCoord[0].st.y + value));
-		value /= 2;
+		value = value / 2.0;
 	}
    
-	color /= _samples;         // And average out the final color by number of samples; this could be in a for-loop
+	color = color / float(_samples);         // And average out the final color by number of samples; this could be in a for-loop
    
         vec4 origcolor = texture2D(bgl_RenderedTexture, gl_TexCoord[0].st); // This is a slight difference from the blur filter;
    

@@ -14,6 +14,21 @@ def debug(text):
 
 def verbose(text):
 	if constant.CORE_DEBUG_VERBOSE == True: print(text)
+	
+_loop = False
+_nextframe_callbacks = []
+_nextframe_callbacks2 = []
+def _nextframe_predraw():
+	global _nextframe_callbacks, _nextframe_callbacks2
+	
+	cpy = _nextframe_callbacks2
+	
+	_nextframe_callbacks2 = _nextframe_callbacks
+	_nextframe_callbacks = []
+	
+	for call in cpy: call()
+
+	
 #######################################
 
 def getShaderSource(program):
@@ -42,6 +57,7 @@ class Filter2D():
 		self.uniforms = []
 		self.program = None
 		self.afdraw_list = []
+		self.error = -2 #if >= 1 fail.
 	
 		#Make child class attributtes become instance attributtes.
 		for key, value in self.__class__.__dict__.items() :
@@ -96,9 +112,12 @@ class Filter2D():
 			filter.shaderText = text
 			cont.activate(filter)
 			
-			#Finally we bind the uniforms
-			for uniform in self.uniforms:
-				self.bindUniformf(uniform)
+			#Finally we bind the uniforms, but a frame later.
+			global _nextframe_callbacks, _loop
+			if not _loop:
+				self.owner.scene.pre_draw.append(_nextframe_predraw)
+				_loop = True
+			_nextframe_callbacks.append(self.bindAllUnioforms)				
 			
 			verbose("Setted 2D Filter " + name + " to slot " + str(slot))
 		
@@ -110,16 +129,13 @@ class Filter2D():
 		super().__setattr__(name, value)
 		if name in self.uniforms:
 			self.bindUniformf(name)
-	
-	def afterend(self): 
-		#called on scene.post_draw to find the shader program the same frame the shader is initialized.
-		for name in self.afdraw_list:
-			self.bindUniformf(name)
-		self.owner.scene.post_draw.remove(self.afterend)
-		self.afdraw_list = []
 		
 			
-	def bindUniformf(self, name):
+	def bindAllUnioforms(self):
+		for uniform in self.uniforms:
+			self.bindUniformf(uniform)
+		
+	def findProgram(self):
 		if self.program == None:
 			filter = self.owner.actuators["F"+str(self.slot)]
 			text = filter.shaderText
@@ -130,13 +146,11 @@ class Filter2D():
 						self.program = prog
 						
 			if self.program == -1: #If shader code not found, wait until post_draw.
-				self.program = None				
-				self.afdraw_list.append(name)
-				
-				if len(self.afdraw_list) == 1:
-					self.owner.scene.post_draw.append(self.afterend)
-				return
-				
+				raise RuntimeError("Shader " + self.__class__.__name__ + " not found!")
+		return self.program
+			
+	def bindUniformf(self, name):
+		self.findProgram()
 		bgl.glUseProgram(self.program)
 		pname = self.__class__.__name__ + '_' + name
 		bgl.glUniform1f(bgl.glGetUniformLocation(self.program, pname), getattr(self, name))
