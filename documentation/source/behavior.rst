@@ -12,7 +12,6 @@ Behaviors
 	class MySceneBehavior(core.behavior.Scene):
 		def init(self):
 			self.b_camera = self.addBehavior(ThirdPerson, "Player")
-			core.utils.setFilter2D("ChromaticAberration", self.scene.active_camera, 1)
 			core.module.enableInputFor(self)
 			
 		def update(self):
@@ -44,5 +43,8 @@ Preseted Behaviors
 ------------------
 
 .. autoclass:: core.behavior.camera.MouseLook
+	:members:
+	
+.. autoclass:: core.behavior.interactive.InteractiveText
 	:members:
 	

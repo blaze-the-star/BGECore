@@ -45,5 +45,3 @@ Scene Managment
 .. autofunction:: setScene
 .. autofunction:: removeScene
 .. autofunction:: setCamera
-.. autofunction:: setFilter2D
-.. autofunction:: removeFilter2D

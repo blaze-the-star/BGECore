@@ -199,7 +199,44 @@ from core import module, key, sequencer
 from bge import logic
 class InteractiveText(Object):
 	""" 
-		Creates an interective text for Visual Novels and games alike. This class can be subclassed to expand functionality.
+	Creates interactive text of a visual novel. It uses a tiny RenPy parser to parse the text.  Works with the mouse buttons.
+		
+	.. attribute:: parser
+	
+		The RenPyParser instance.
+		
+	.. attribute:: obj
+	
+		Like in any other behavior, however here it is a Label instead of a KX_GameObject. It is the Label of the main/dialog text.
+		
+	.. attribute:: name
+	
+		A label that will work as the name of the Character specified in RenPy. (Optional)
+		
+		:type: interface.Label
+		
+	.. attribute:: bubble
+	
+		An icon to indicate the that the line has reached the end. (Optional)
+
+		:type: |KX_GameObject|
+		
+	.. attribute:: dialogBox
+	
+		The background dialogBox behind the text. (Optional)
+		
+		:type: |KX_GameObject|
+		
+	.. attribute:: filepath
+	
+		The absolute path where to find the the RenPy script.
+		
+		:type: string
+		
+	.. attribute:: visible
+	
+		Indicates or setts the alpha color of all the objects that depend on this behavior. When the alpha color is 0 returns False. If the object is invisible the text won't advance until it's visible again.
+	
 	"""
 	
 	parser = None
