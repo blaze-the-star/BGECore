@@ -42,10 +42,6 @@ Compilation commands:
 #include <sys/types.h>
 #include <errno.h>
 
-__mode_t mkdirmode = S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH;
-extern int mkdir (const char *__path, __mode_t __mode);
-extern int getcwd(char * text, size_t size);
-
 #define ARG_SIZE 40
 #define VAL_SIZE 100
 #define COM_SIZE 600
@@ -56,6 +52,11 @@ extern int getcwd(char * text, size_t size);
 	#include <WinBase.h>
 	#include <shlobj.h>
 	#include <FileAPI.h>
+	#include <direct.h>
+#else
+	__mode_t mkdirmode = (S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+	extern int mkdir(const char *__path, __mode_t __mode);
+	extern int getcwd(char * text, size_t size);
 #endif
 
 char * launcher_name;
@@ -145,6 +146,7 @@ int count(char *text, char ch) {
 
 int getParentDir(char *parent, char * text) {
 	strncpy(parent, text, COM_SIZE);
+	parent[COM_SIZE - 1] = 0;
 	char * tmp = strrchr(parent, '/');
 	if (tmp == NULL) return 0;
 	(*(++tmp)) = '\0';
@@ -169,7 +171,11 @@ void mkdirp(char * path) {
 	int i = 2;
 	for(; i<=c; i++) {
 		getDirLevel(parent, path, i);
+#if defined(_WIN32) || defined(WIN32)
+		if (mkdir(parent) != 0) {
+#else
 		if (mkdir(parent, mkdirmode) != 0) {
+#endif
 			if (errno != EEXIST && is_verbose) {
 				printf("Error with mkdir: %s\n", parent);
 			}
@@ -599,7 +605,11 @@ int main(int argc, char * argv[])
 	replace_char(_lfilepath, '\\', '/');
 	launcher_path = _lfilepath;
 	if (isAbsolutePath(launcher_path) == 0) {
+#if defined(_WIN32) || defined(WIN32)
+		_getcwd(launcher_path, COM_SIZE);
+#else
 		getcwd(launcher_path, COM_SIZE);
+#endif
 		replace_char(_lfilepath, '\\', '/');
 		strcat(launcher_path, "/");
 		strcat(launcher_path, _fcom);
@@ -639,7 +649,7 @@ int main(int argc, char * argv[])
 	if (isAbsolutePath(filename) == 0) {
 		char filepath_buff[COM_SIZE];
 		getParentDir(filepath_buff, launcher_path);
-		strncat(filepath_buff, filename, COM_SIZE);
+		strncat(filepath_buff, filename, COM_SIZE-VAL_SIZE);
 		filepath = filepath_buff;
 	}
 	else filepath = filename;
